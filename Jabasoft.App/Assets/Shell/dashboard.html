@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="utf-8" />
+    <title>Token verbruik</title>
+    <link rel="stylesheet" href="https://shared.jabasoft.local/jabasoft-theme.css" />
+    <style>
+        body {
+            background: var(--lcars-content);
+            margin: 0;
+            padding: 24px;
+        }
+
+        h2 {
+            font-family: var(--app-font-family);
+            color: var(--lcars-actionrail-start);
+        }
+    </style>
+</head>
+<body>
+    <div class="token-usage-dashboard">
+        <h2>Token verbruik — alle apps</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>App</th>
+                    <th>Tijdstip</th>
+                    <th>Model</th>
+                    <th>Prompt</th>
+                    <th>Completion</th>
+                    <th>Totaal</th>
+                </tr>
+            </thead>
+            <tbody id="rows"></tbody>
+        </table>
+        <p id="empty" style="display:none;"></p>
+    </div>
+    <script src="config.js"></script>
+    <script src="dashboard.js"></script>
+</body>
+</html>

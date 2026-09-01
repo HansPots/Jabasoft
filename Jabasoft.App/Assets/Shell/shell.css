@@ -1,0 +1,16 @@
+/* Shell-specific details not covered by the shared jabasoft-theme.css
+   (that file has the tokens and the .shell grid/menu base styles - this
+   is just the header title, kept local because it's specific to the
+   Jabasoft shell page itself, not something another app would reuse). */
+
+.jbs-header-title {
+    font-family: var(--lcars-font);
+    font-weight: bold;
+    font-size: 28px;
+    letter-spacing: 4px;
+    color: var(--lcars-text-dark);
+    height: 100%;
+    display: flex;
+    align-items: center;
+    padding-left: 24px;
+}

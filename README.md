@@ -1,0 +1,53 @@
+# Jabasoft
+
+WPF-shell voor de hele JabaSoft-familie. Vanuit hier open je de andere apps
+(`JabaSoft.TabStudio`, `JabaSoftLocalAiStudio`) en zie je het gezamenlijke
+token-verbruik.
+
+## Architectuur
+
+Het hele venster is één `WebView2`-control (`Jabasoft.App/MainWindow.xaml`).
+De shell-chrome (header, menu, content-area) is gewone HTML/CSS/JS onder
+`Jabasoft.App/Assets/Shell/`, niet native XAML — zo kan de shell dezelfde
+`jabasoft-theme.css` gebruiken als de andere apps. De ingesloten apps
+(TabStudio, LocalAiStudio) worden getoond via een `<iframe>` in die pagina;
+er zijn geen aparte native WebView2-instances per app nodig.
+
+Twee virtual-host-mappings (`CoreWebView2.SetVirtualHostNameToFolderMapping`,
+ingesteld in `MainWindow.xaml.cs`) laten de shell lokale bestanden laden
+zonder een eigen webserver:
+
+- `https://app.jabasoft.local/...` → `Assets/Shell/` (deze app zelf, vanuit
+  de build-output-map — `config.js` wordt hier bij elke start opnieuw
+  gegenereerd, dus dat bestand hoort niet in source control).
+- `https://shared.jabasoft.local/...` → `Jabasoft.Shared/Shared.UI/wwwroot/`
+  (rechtstreeks vanaf schijf, hetzelfde fysieke bestand als TabStudio en
+  LocalAiStudio via `_content/Shared.UI/...` laden — zie
+  `Jabasoft.Shared/README.md`).
+
+Voor het token-verbruik-dashboard host de app zelf een kleine, in-process
+ASP.NET Core minimal API (`http://localhost:5300` standaard, instelbaar via
+`Api:BaseUrl` in `appsettings.json`) die rechtstreeks op de gedeelde
+`JabaSoftTelemetry`-database leest (via `Shared.Telemetry`, projectverwijzing
+naar `Jabasoft.Shared`). `Assets/Shell/dashboard.html` haalt die API op.
+
+## Configuratie (`Jabasoft.App/appsettings.json`)
+
+- `ConnectionStrings:JabaSoftTelemetry` — zelfde connection string als
+  TabStudio/LocalAiStudio.
+- `SharedUi:ThemeFolder` — absoluut pad naar `Jabasoft.Shared/Shared.UI/wwwroot`.
+  Standaard uitgegaan van `C:\Repos\Jabasoft.Shared\Shared.UI\wwwroot`.
+- `Apps:<Naam>:DevelopmentUrl` / `Apps:<Naam>:MainUrl` — waar de betreffende
+  app te bereiken is. `MainUrl` is nu leeg (nog geen IIS-hosting van de
+  main-branch ingericht); zodra dat er is, hier invullen — geen codewijziging
+  nodig. Zolang `MainUrl` leeg is, wordt `DevelopmentUrl` gebruikt.
+
+## Starten
+
+```bash
+dotnet run --project Jabasoft.App
+```
+
+Vereist dat SQL Server lokaal bereikbaar is voor de `JabaSoftTelemetry`-
+database, en dat de te openen apps (TabStudio/LocalAiStudio) los draaien op
+de geconfigureerde URL's (`dotnet run` in hun eigen repo).
