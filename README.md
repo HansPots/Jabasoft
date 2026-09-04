@@ -41,6 +41,20 @@ naar `Jabasoft.Shared`). `Assets/Shell/dashboard.html` haalt die API op.
   app te bereiken is. `MainUrl` is nu leeg (nog geen IIS-hosting van de
   main-branch ingericht); zodra dat er is, hier invullen — geen codewijziging
   nodig. Zolang `MainUrl` leeg is, wordt `DevelopmentUrl` gebruikt.
+- `Apps:<Naam>:ProjectPath` — map van de app's web-project (bv.
+  `TabStudio.Web`), gebruikt om die app automatisch te starten (zie hieronder).
+
+## Apps automatisch starten
+
+Bij het opstarten controleert `MainWindow.xaml.cs` (`EnsureAppsRunningAsync`)
+per geconfigureerde app of `DevelopmentUrl` al bereikbaar is. Zo niet, start
+het zelf `dotnet run` in `ProjectPath` (met `ASPNETCORE_ENVIRONMENT=Development`)
+en wacht tot de app reageert (max. 45s) voordat de shell navigeert. Draait een
+app al (handmatig gestart, of van een vorige Jabasoft-sessie), dan blijft die
+met rust. Bij het sluiten van Jabasoft worden alleen de apps die het zelf
+startte weer afgesloten (`OnClosed`, met de hele procesboom). Een
+"JABASOFT WORDT GESTART..."-scherm (`Assets/Shell/loading.html`) overbrugt de
+wachttijd van een koude `dotnet run`-build.
 
 ## Starten
 
@@ -48,6 +62,11 @@ naar `Jabasoft.Shared`). `Assets/Shell/dashboard.html` haalt die API op.
 dotnet run --project Jabasoft.App
 ```
 
+Of vanuit Visual Studio: `Jabasoft.slnx` openen en op F5/Start drukken —
+`Jabasoft.App` is het enige project in de solution, dus dat wordt automatisch
+het opstartproject. Het gedrag is identiek aan `dotnet run`: dezelfde
+`OnLoaded`-logica start TabStudio/LocalAiStudio zo nodig zelf op.
+
 Vereist dat SQL Server lokaal bereikbaar is voor de `JabaSoftTelemetry`-
-database, en dat de te openen apps (TabStudio/LocalAiStudio) los draaien op
-de geconfigureerde URL's (`dotnet run` in hun eigen repo).
+database. TabStudio/LocalAiStudio hoeven niet meer los gestart te worden —
+zie hierboven — maar dat kan nog steeds (dan gebruikt Jabasoft die instance).

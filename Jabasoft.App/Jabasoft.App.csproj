@@ -21,7 +21,7 @@
     <None Update="appsettings.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Assets\Shell\shell.html;Assets\Shell\shell.css;Assets\Shell\shell.js;Assets\Shell\dashboard.html;Assets\Shell\dashboard.js">
+    <None Update="Assets\Shell\shell.html;Assets\Shell\shell.css;Assets\Shell\shell.js;Assets\Shell\dashboard.html;Assets\Shell\dashboard.js;Assets\Shell\loading.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
