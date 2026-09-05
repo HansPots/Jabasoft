@@ -67,7 +67,12 @@ html, body {
     font-weight: bold;
     font-size: 11px;
     text-transform: uppercase;
-    color: var(--lcars-menu);
+    /* var(--lcars-menu) is a *background* token (bright coral in LCARS,
+       near-black #252526 in VS) - using it as text color on the black
+       .styleguide-nav background made this unreadable once the VS theme
+       existed. --lcars-actionrail-start is meant for accent text/labels
+       (see .token-usage-dashboard th) and stays legible in both themes. */
+    color: var(--lcars-actionrail-start);
 }
 
 .app-group button.page-link {
