@@ -1,20 +1,21 @@
 @* ============================================================
    TokenDashboardRoot — the BlazorWebView root component behind
-   Jabasoft's "Token verbruik" menu item. Renders TokenUsageOverview, a
-   Jabasoft-only presentation of the same shared token-usage data
-   TabStudio/LocalAiStudio show via Jabasoft.Base.TokenUsageDashboard
-   (that shared component is untouched - TabStudio/LocalAiStudio still
-   render it as a plain table, unchanged).
+   Jabasoft's "Token verbruik" menu item. Renders Jabasoft.Base's
+   TokenUsageOverview - the same shared component TabStudio and
+   LocalAiStudio embed on their own /token-usage pages (filtered to
+   their own app there; unfiltered here for the cross-app overview).
 
    Reuses the shared .shell/.shell-header/.shell-menu grid classes from
    jabasoft-theme.css (loaded by wwwroot/index.html) so this reads as
-   the same shell, not a different screen - "Terug" hands control back
-   to the HTML shell via JabasoftHostBridge (see MainWindow.xaml.cs).
+   the same shell, not a different screen (no footer, matching
+   shell.html) - "Terug" hands control back to the HTML shell via
+   JabasoftHostBridge (see MainWindow.xaml.cs).
 
    Known gap: this page's own WebView2 instance doesn't share
    localStorage with the main shell's, so the LCARS/VS theme toggle set
    there doesn't carry over here yet - always starts on LCARS.
    ============================================================ *@
+@using Jabasoft.Base
 @inject JabasoftHostBridge HostBridge
 
 <div class="shell">
@@ -31,5 +32,4 @@
         <TokenUsageOverview />
     </main>
     <div class="shell-actionrail"></div>
-    <footer class="shell-footer"></footer>
 </div>

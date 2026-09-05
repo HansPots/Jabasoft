@@ -1,7 +1,16 @@
 /* Minimal chrome styling for this page specifically - shell.css (the
-   Jabasoft HTML shell's own styling for .jbs-header-title etc.) isn't
-   loaded here, only the shared jabasoft-theme.css/vs-theme.css tokens
-   (see wwwroot/index.html). */
+   Jabasoft HTML shell's own styling) isn't loaded here, only the
+   shared jabasoft-theme.css/vs-theme.css tokens (see wwwroot/
+   index.html) - so this mirrors shell.css's own polish (pill nav
+   buttons, gold sidebar-foot, no footer row) to read as the same
+   shell, not a different screen. */
+
+.shell {
+    grid-template-rows: var(--lcars-header-height) minmax(0, 1fr);
+    grid-template-areas:
+        "header  header  header"
+        "menu    content actionrail";
+}
 
 .shell-header {
     display: flex;
@@ -17,8 +26,38 @@
     color: var(--lcars-text-dark);
 }
 
+.shell-menu {
+    padding: 24px 12px 0;
+    border-radius: 30px 0 0 30px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.shell-menu .nav {
+    display: grid;
+    gap: 8px;
+}
+
 .shell-menu .nav button {
-    background: rgba(0, 0, 0, 0.2);
-    border-radius: 4px;
-    margin: 8px;
+    height: 48px;
+    padding: 0 16px;
+    border: 2px solid transparent;
+    border-radius: 18px 18px 18px 0;
+    background: #08080d;
+    color: var(--lcars-text-light);
+    font-weight: 700;
+}
+
+.shell-menu .nav button:hover {
+    background: var(--lcars-footer-start);
+    color: var(--lcars-text-dark);
+}
+
+.shell-menu .sidebar-foot {
+    margin: auto -12px 0;
+    padding: 7px 14px;
+    border-top: 5px solid var(--lcars-black);
+    background: var(--lcars-footer-start);
+    color: var(--lcars-text-dark);
 }

@@ -71,7 +71,7 @@ html, body {
        near-black #252526 in VS) - using it as text color on the black
        .styleguide-nav background made this unreadable once the VS theme
        existed. --lcars-actionrail-start is meant for accent text/labels
-       (see .token-usage-dashboard th) and stays legible in both themes. */
+       and stays legible in both themes. */
     color: var(--lcars-actionrail-start);
 }
 
