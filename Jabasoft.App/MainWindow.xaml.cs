@@ -50,6 +50,19 @@ public partial class MainWindow : Window
         var themeCssPath = Path.Combine(Path.GetFullPath(themeFolder), "jabasoft-theme.css");
         var shellFolderForApi = Path.Combine(AppContext.BaseDirectory, "Assets", "Shell");
 
+        // Dummy-page copies are disposable snapshots, regenerated on demand
+        // by "Pagina's verversen" - but a copy captured before a code
+        // change (e.g. vs-theme.css/theme.js moving to Jabasoft.Shared) can
+        // silently keep pointing at a path that no longer resolves, and
+        // then just looks like theming "doesn't work" with no visible
+        // error. Clearing them on every startup means what you see always
+        // reflects the current code, at the cost of one re-capture click.
+        var dummyPagesFolderAtStartup = Path.Combine(shellFolderForApi, "dummy-pages");
+        if (Directory.Exists(dummyPagesFolderAtStartup))
+        {
+            Directory.Delete(dummyPagesFolderAtStartup, recursive: true);
+        }
+
         // Shared telemetry database: same connection string every JabaSoft
         // app points at, so this API reads whatever TabStudio/LocalAiStudio
         // (and Jabasoft itself, later) have recorded.

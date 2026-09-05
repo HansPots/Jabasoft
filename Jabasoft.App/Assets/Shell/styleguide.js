@@ -17,7 +17,12 @@
         // same page's own origin (app.jabasoft.local), so it applies
         // theme.js/vs-theme.css itself, just like every other Jabasoft
         // page - no live cross-origin embed, no proxying at view time.
-        previewFrame.src = page.file;
+        //
+        // Cache-busted on purpose: assigning the exact same src an iframe
+        // already has is a no-op in the browser, so re-selecting a page
+        // (or reloading after a fresh capture replaced the file on disk)
+        // would otherwise keep showing whatever was there before.
+        previewFrame.src = page.file + "?t=" + Date.now();
         previewTitle.textContent = (app.displayName || "") + " — " + (page.label || page.path) + " (kopie)";
         previewOpen.href = (app.mainUrl || app.developmentUrl) + page.path;
 
