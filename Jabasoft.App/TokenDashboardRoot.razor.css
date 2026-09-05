@@ -1,0 +1,24 @@
+/* Minimal chrome styling for this page specifically - shell.css (the
+   Jabasoft HTML shell's own styling for .jbs-header-title etc.) isn't
+   loaded here, only the shared jabasoft-theme.css/vs-theme.css tokens
+   (see wwwroot/index.html). */
+
+.shell-header {
+    display: flex;
+    align-items: center;
+    padding-left: 24px;
+}
+
+.jbs-header-title {
+    font-family: var(--lcars-font);
+    font-weight: bold;
+    font-size: 20px;
+    letter-spacing: 2px;
+    color: var(--lcars-text-dark);
+}
+
+.shell-menu .nav button {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+    margin: 8px;
+}

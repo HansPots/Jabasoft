@@ -1,8 +1,8 @@
-<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk.Razor">
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net10.0-windows</TargetFramework>
+    <TargetFramework>net10.0-windows10.0.19041.0</TargetFramework>
     <UseWPF>true</UseWPF>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
@@ -15,6 +15,13 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Jabasoft.Shared\Shared.Telemetry\Shared.Telemetry.csproj" />
+    <ProjectReference Include="..\..\Jabasoft.Shared\Jabasoft.Base\Jabasoft.Base.csproj" />
+    <!-- Only needed so the BlazorWebView host page (wwwroot/index.html)
+         can load _content/Shared.UI/jabasoft-theme.css etc. via the
+         normal RCL static-web-assets convention - the main WebView2
+         shell doesn't need this reference, it maps that folder directly
+         from disk (see SetupVirtualHosts in MainWindow.xaml.cs). -->
+    <ProjectReference Include="..\..\Jabasoft.Shared\Shared.UI\Shared.UI.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -27,6 +34,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebView.Wpf" Version="10.0.100" />
     <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.4191.47" />
   </ItemGroup>
 

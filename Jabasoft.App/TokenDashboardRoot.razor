@@ -1,0 +1,37 @@
+@* ============================================================
+   TokenDashboardRoot — the BlazorWebView root component behind
+   Jabasoft's "Token verbruik" menu item. This is the ONE canonical
+   token-usage view for the whole family: TabStudio/LocalAiStudio embed
+   the exact same Jabasoft.Base.TokenUsageDashboard component (Blazor
+   Server), and this renders it again unchanged (Blazor Hybrid) -
+   Jabasoft used to have its own third, HTML/JS-only implementation
+   (dashboard.html/dashboard.js), removed in favor of this.
+
+   Reuses the shared .shell/.shell-header/.shell-menu grid classes from
+   jabasoft-theme.css (loaded by wwwroot/index.html) so this reads as
+   the same shell, not a different screen - "Terug" hands control back
+   to the HTML shell via JabasoftHostBridge (see MainWindow.xaml.cs).
+
+   Known gap: this page's own WebView2 instance doesn't share
+   localStorage with the main shell's, so the LCARS/VS theme toggle set
+   there doesn't carry over here yet - always starts on LCARS.
+   ============================================================ *@
+@using Jabasoft.Base
+@inject JabasoftHostBridge HostBridge
+
+<div class="shell">
+    <header class="shell-header">
+        <div class="jbs-header-title">JABASOFT — TOKEN VERBRUIK</div>
+    </header>
+    <aside class="shell-menu" aria-label="Main navigation">
+        <nav class="nav">
+            <button type="button" @onclick="() => HostBridge.BackToShell()">&larr; Terug</button>
+        </nav>
+        <div class="sidebar-foot"><span>alle apps</span></div>
+    </aside>
+    <main class="shell-content">
+        <TokenUsageDashboard />
+    </main>
+    <div class="shell-actionrail"></div>
+    <footer class="shell-footer"></footer>
+</div>

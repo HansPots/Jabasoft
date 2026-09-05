@@ -14,15 +14,33 @@
         }
     });
 
-    items.push({ label: "Token verbruik", url: "dashboard.html" });
+    // Token verbruik isn't HTML inside this WebView2 content iframe
+    // anymore - it's BlazorWebView-hosted (a native sibling control, see
+    // MainWindow.xaml/.cs), so selecting it posts a message to the WPF
+    // host instead of setting content.src.
+    items.push({ label: "Token verbruik", special: "token-dashboard" });
     items.push({ label: "Stijlgids", url: "styleguide.html" });
+
+    function postToHost(message) {
+        if (window.chrome && window.chrome.webview) {
+            window.chrome.webview.postMessage(message);
+        }
+    }
 
     function activate(index) {
         var buttons = nav.querySelectorAll("button");
         for (var i = 0; i < buttons.length; i++) {
             buttons[i].classList.toggle("active", i === index);
         }
-        content.src = items[index].url;
+
+        var item = items[index];
+        if (item.special === "token-dashboard") {
+            postToHost("show-token-dashboard");
+            return;
+        }
+
+        postToHost("hide-token-dashboard");
+        content.src = item.url;
     }
 
     items.forEach(function (item, index) {
@@ -45,9 +63,11 @@
             var current = document.documentElement.getAttribute("data-theme");
             window.jabasoftTheme.set(current === "vs" ? "lcars" : "vs");
 
-            // Reload whatever's currently shown (dashboard.html,
-            // styleguide.html, or a directly-embedded app) so it re-reads
-            // the new theme immediately instead of only on next navigation.
+            // Reload whatever's currently shown (styleguide.html or a
+            // directly-embedded app) so it re-reads the new theme
+            // immediately instead of only on next navigation. No-op if
+            // the token dashboard (a different control) is what's
+            // actually visible right now.
             content.src = content.src;
         });
     }

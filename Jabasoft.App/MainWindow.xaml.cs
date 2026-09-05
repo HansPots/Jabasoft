@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Components.WebView.Wpf;
 using Microsoft.Web.WebView2.Core;
 using Shared.Telemetry;
 
@@ -74,6 +75,13 @@ public partial class MainWindow : Window
         builder.Services.AddScoped<ITokenUsageRepository, TokenUsageRepository>();
         builder.Services.AddHttpClient();
 
+        // Token verbruik: the BlazorWebView control shares this same DI
+        // container (see TokenDashboardView.Services below), so the exact
+        // same Jabasoft.Base.TokenUsageDashboard component TabStudio/
+        // LocalAiStudio embed works here unchanged.
+        builder.Services.AddWpfBlazorWebView();
+        builder.Services.AddSingleton<JabasoftHostBridge>();
+
         // The dashboard page is fetched from a WebView2 virtual host
         // (https://app.jabasoft.local), a different origin than this API
         // (http://localhost:5300), so a permissive local CORS policy is
@@ -83,12 +91,6 @@ public partial class MainWindow : Window
 
         _api = builder.Build();
         _api.UseCors();
-        _api.MapGet("/api/token-usage", async (ITokenUsageRepository repository, CancellationToken cancellationToken) =>
-        {
-            var since = DateTimeOffset.UtcNow.AddDays(-30);
-            var entries = await repository.GetAllEntriesAsync(since, cancellationToken);
-            return Results.Ok(entries);
-        });
 
         // Backs the Stijlgids page: reads live from IConfiguration (which
         // reloads appsettings.json on change) so editing Apps:*:Pages there
@@ -212,10 +214,61 @@ public partial class MainWindow : Window
         // and the window would otherwise sit blank until it's done.
         WebView.CoreWebView2.Navigate("https://app.jabasoft.local/loading.html");
 
+        // Token verbruik: shell.js posts "show-token-dashboard" instead of
+        // navigating its content iframe there (see shell.js), since that
+        // page is now BlazorWebView-hosted, a native sibling control, not
+        // HTML inside this WebView2. JabasoftHostBridge carries the
+        // opposite direction (BlazorWebView -> "go back to the shell").
+        WebView.CoreWebView2.WebMessageReceived += (_, args) =>
+        {
+            switch (args.TryGetWebMessageAsString())
+            {
+                case "show-token-dashboard":
+                    ShowTokenDashboard();
+                    break;
+                case "hide-token-dashboard":
+                    TokenDashboardView.Visibility = Visibility.Collapsed;
+                    WebView.Visibility = Visibility.Visible;
+                    break;
+            }
+        };
+
+        TokenDashboardView.Services = _api.Services;
+        TokenDashboardView.RootComponents.Add(new RootComponent
+        {
+            Selector = "#app",
+            ComponentType = typeof(TokenDashboardRoot),
+        });
+
+        _api.Services.GetRequiredService<JabasoftHostBridge>().BackToShellRequested += ShowShell;
+
         await EnsureAppsRunningAsync(configuration);
 
         WriteShellConfig(configuration, apiBaseUrl, shellFolder);
         WebView.CoreWebView2.Navigate("https://app.jabasoft.local/shell.html");
+    }
+
+    private void ShowTokenDashboard()
+    {
+        // WebMessageReceived already fires on the WPF UI thread, but this
+        // keeps the method safe to call from anywhere.
+        Dispatcher.Invoke(() =>
+        {
+            WebView.Visibility = Visibility.Collapsed;
+            TokenDashboardView.Visibility = Visibility.Visible;
+        });
+    }
+
+    private void ShowShell()
+    {
+        // JabasoftHostBridge.BackToShellRequested fires from the Blazor
+        // Hybrid component's own dispatcher, not necessarily the WPF UI
+        // thread, so this one actually needs the marshal.
+        Dispatcher.Invoke(() =>
+        {
+            TokenDashboardView.Visibility = Visibility.Collapsed;
+            WebView.Visibility = Visibility.Visible;
+        });
     }
 
     private void SetupVirtualHosts(string themeFolder, string shellFolder)

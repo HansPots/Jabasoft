@@ -2,8 +2,16 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
+        xmlns:blazor="clr-namespace:Microsoft.AspNetCore.Components.WebView.Wpf;assembly=Microsoft.AspNetCore.Components.WebView.Wpf"
         Title="Jabasoft" Height="900" Width="1400" Background="Black">
     <Grid>
         <wv2:WebView2 x:Name="WebView" />
+        <!-- Same-size sibling, shown instead of WebView when "Token
+             verbruik" is selected (see JabasoftHostBridge / MainWindow.xaml.cs).
+             Two full-window controls swapped by Visibility rather than one
+             control repositioned to match an HTML region, since syncing a
+             native control's bounds to an element inside the other control
+             would need constant JS<->WPF position round-trips. -->
+        <blazor:BlazorWebView x:Name="TokenDashboardView" HostPage="wwwroot/index.html" Visibility="Collapsed" />
     </Grid>
 </Window>
