@@ -1,0 +1,126 @@
+/* ============================================================
+   READ ME FIRST — TokenUsageOverview styling
+
+   Deliberately mirrors JabaSoftLocalAiStudio's Settings.razor.css look
+   (same border/panel/orange/muted palette, same rounded-corner-with-
+   one-square-corner button/bar shape) rather than the plain table the
+   shared Jabasoft.Base.TokenUsageDashboard uses - this is Jabasoft-only
+   styling, nothing here touches the shared component or the other apps.
+   ============================================================ */
+
+.token-overview {
+    --border: #535562;
+    --panel: #08080d;
+    --orange: #ff9700;
+    --muted: #cac9dc;
+
+    color: #fff;
+    font-family: var(--lcars-font, inherit);
+}
+
+.token-overview-hint {
+    color: var(--muted);
+}
+
+.token-totals {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.token-total-tile {
+    flex: 1;
+    box-sizing: border-box;
+    padding: 16px 20px;
+    border: 2px solid var(--border);
+    border-radius: 15px;
+    background: var(--panel);
+}
+
+.token-total-tile-grand {
+    border-color: var(--orange);
+}
+
+.token-total-label {
+    display: block;
+    margin-bottom: 6px;
+    color: var(--muted);
+    font-size: 0.85em;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.token-total-value {
+    display: block;
+    font-size: 1.6em;
+    font-weight: 700;
+}
+
+.token-total-tile-grand .token-total-value {
+    color: var(--orange);
+}
+
+.token-weeks {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.token-week {
+    border: 2px solid var(--border);
+    border-radius: 15px;
+    background: var(--panel);
+    overflow: hidden;
+}
+
+.token-week[open] {
+    border-color: var(--orange);
+}
+
+.token-week-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 20px;
+    cursor: pointer;
+    list-style: none;
+    user-select: none;
+}
+
+.token-week-bar::-webkit-details-marker {
+    display: none;
+}
+
+.token-week-label {
+    font-weight: 700;
+}
+
+.token-week-total {
+    color: var(--muted);
+    font-size: 0.9em;
+}
+
+.token-week[open] .token-week-total {
+    color: var(--orange);
+}
+
+.token-week-details {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9em;
+}
+
+.token-week-details th,
+.token-week-details td {
+    padding: 8px 20px;
+    border-top: 1px solid var(--border);
+    text-align: left;
+}
+
+.token-week-details th {
+    color: var(--muted);
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-size: 0.85em;
+}

@@ -1,0 +1,124 @@
+@* ============================================================
+   TokenUsageOverview — Jabasoft-only view of the shared token-usage
+   data. Deliberately NOT the shared Jabasoft.Base.TokenUsageDashboard
+   component (that stays a plain table, unchanged, since TabStudio and
+   LocalAiStudio still embed it as-is) - this is a separate, richer
+   presentation built and styled only for Jabasoft: totals up top, then
+   entries grouped per ISO week as a collapsible bar (native <details>,
+   no JS needed), styled to match LocalAiStudio's Settings page (dark
+   panel cards, orange accent) rather than a plain table.
+   ============================================================ *@
+@using System.Globalization
+@using Shared.Telemetry
+@inject ITokenUsageRepository TokenUsageRepository
+
+<div class="token-overview">
+    @if (_weekGroups is null)
+    {
+        <p class="token-overview-hint">Laden...</p>
+    }
+    else if (_weekGroups.Count == 0)
+    {
+        <p class="token-overview-hint">Nog geen geregistreerd tokenverbruik.</p>
+    }
+    else
+    {
+        <section class="token-totals">
+            <div class="token-total-tile">
+                <span class="token-total-label">Prompt</span>
+                <span class="token-total-value">@_totalPromptTokens.ToString("N0")</span>
+            </div>
+            <div class="token-total-tile">
+                <span class="token-total-label">Completion</span>
+                <span class="token-total-value">@_totalCompletionTokens.ToString("N0")</span>
+            </div>
+            <div class="token-total-tile token-total-tile-grand">
+                <span class="token-total-label">Totaal</span>
+                <span class="token-total-value">@_totalTokens.ToString("N0")</span>
+            </div>
+        </section>
+
+        <section class="token-weeks">
+            @foreach (var week in _weekGroups)
+            {
+                <details class="token-week">
+                    <summary class="token-week-bar">
+                        <span class="token-week-label">@week.Label</span>
+                        <span class="token-week-total">@week.TotalTokens.ToString("N0") tokens</span>
+                    </summary>
+                    <table class="token-week-details">
+                        <thead>
+                            <tr>
+                                <th>App</th>
+                                <th>Tijdstip</th>
+                                <th>Model</th>
+                                <th>Prompt</th>
+                                <th>Completion</th>
+                                <th>Totaal</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var entry in week.Entries)
+                            {
+                                <tr>
+                                    <td>@entry.Application</td>
+                                    <td>@entry.Timestamp.LocalDateTime.ToString("g")</td>
+                                    <td>@(entry.Model ?? "-")</td>
+                                    <td>@entry.PromptTokens.ToString("N0")</td>
+                                    <td>@entry.CompletionTokens.ToString("N0")</td>
+                                    <td>@entry.TotalTokens.ToString("N0")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </details>
+            }
+        </section>
+    }
+</div>
+
+@code {
+    /// <summary>App name to filter on (e.g. "TabStudio"). Null shows every app.</summary>
+    [Parameter] public string? Application { get; set; }
+
+    /// <summary>How far back to show usage for. Defaults to the last 30 days.</summary>
+    [Parameter] public TimeSpan Lookback { get; set; } = TimeSpan.FromDays(30);
+
+    private List<WeekGroup>? _weekGroups;
+    private long _totalPromptTokens;
+    private long _totalCompletionTokens;
+    private long _totalTokens;
+
+    private sealed record WeekGroup(string Label, IReadOnlyList<TokenUsageEntry> Entries)
+    {
+        public long TotalTokens { get; } = Entries.Sum(e => e.TotalTokens);
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var since = DateTimeOffset.UtcNow - Lookback;
+        var entries = Application is null
+            ? await TokenUsageRepository.GetAllEntriesAsync(since, CancellationToken.None)
+            : await TokenUsageRepository.GetEntriesAsync(Application, since, CancellationToken.None);
+
+        _totalPromptTokens = entries.Sum(e => e.PromptTokens);
+        _totalCompletionTokens = entries.Sum(e => e.CompletionTokens);
+        _totalTokens = entries.Sum(e => e.TotalTokens);
+
+        _weekGroups = entries
+            .GroupBy(e => ISOWeek.GetYear(e.Timestamp.LocalDateTime))
+            .SelectMany(yearGroup => yearGroup
+                .GroupBy(e => ISOWeek.GetWeekOfYear(e.Timestamp.LocalDateTime))
+                .Select(weekGroup =>
+                {
+                    var weekStart = ISOWeek.ToDateTime(yearGroup.Key, weekGroup.Key, DayOfWeek.Monday);
+                    var weekEnd = weekStart.AddDays(6);
+                    var label = $"Week {weekGroup.Key}, {yearGroup.Key} ({weekStart:d MMM} - {weekEnd:d MMM})";
+                    var orderedEntries = weekGroup.OrderByDescending(e => e.Timestamp).ToList();
+                    return (SortKey: weekStart, Group: new WeekGroup(label, orderedEntries));
+                }))
+            .OrderByDescending(x => x.SortKey)
+            .Select(x => x.Group)
+            .ToList();
+    }
+}

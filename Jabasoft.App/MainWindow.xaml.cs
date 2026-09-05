@@ -76,9 +76,11 @@ public partial class MainWindow : Window
         builder.Services.AddHttpClient();
 
         // Token verbruik: the BlazorWebView control shares this same DI
-        // container (see TokenDashboardView.Services below), so the exact
-        // same Jabasoft.Base.TokenUsageDashboard component TabStudio/
-        // LocalAiStudio embed works here unchanged.
+        // container (see TokenDashboardView.Services below), so
+        // TokenUsageOverview (Jabasoft.App/TokenUsageOverview.razor) reads
+        // from the exact same ITokenUsageRepository TabStudio/LocalAiStudio
+        // write to via Jabasoft.Base.TokenUsageDashboard - same data,
+        // Jabasoft-only presentation.
         builder.Services.AddWpfBlazorWebView();
         builder.Services.AddSingleton<JabasoftHostBridge>();
 
