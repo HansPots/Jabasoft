@@ -68,8 +68,8 @@ public partial class MainWindow : Window
         // app points at, so this API reads whatever TabStudio/LocalAiStudio
         // (and Jabasoft itself, later) have recorded.
         var telemetryConnectionString =
-            builder.Configuration.GetConnectionString("JabaSoftTelemetry")
-            ?? "Server=localhost;Database=JabaSoftTelemetry;Integrated Security=True;Encrypt=True;TrustServerCertificate=True;";
+            builder.Configuration.GetConnectionString("JabasoftBase")
+            ?? "Server=localhost;Database=JabasoftBase;Integrated Security=True;Encrypt=True;TrustServerCertificate=True;";
 
         builder.Services.AddDbContext<TelemetryDbContext>(options => options.UseSqlServer(telemetryConnectionString));
         builder.Services.AddScoped<ITokenUsageRepository, TokenUsageRepository>();
@@ -200,7 +200,7 @@ public partial class MainWindow : Window
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"Could not apply migrations for the shared JabaSoftTelemetry database: {ex.Message}");
+            Debug.WriteLine($"Could not apply migrations for the shared JabasoftBase database: {ex.Message}");
         }
 
         _ = _api.RunAsync();
