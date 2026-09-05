@@ -1,12 +1,28 @@
 /* Shell-specific details not covered by the shared jabasoft-theme.css
    (that file has the tokens and the .shell grid/menu base styles - this
-   is just the header title, kept local because it's specific to the
-   Jabasoft shell page itself, not something another app would reuse). */
+   file is Jabasoft-only polish, styled after JabaSoftLocalAiStudio's
+   own shell (ShellHeader/ShellMenu): rounded pill nav buttons, a gold
+   sidebar-foot strip, no footer row. Loads after jabasoft-theme.css and
+   vs-theme.css, so same-selector rules here win for the LCARS theme;
+   the VS theme's own `:root[data-theme="vs"] .shell-menu ...` overrides
+   (see Jabasoft.Shared/Shared.UI/wwwroot/vs-theme.css) stay in charge
+   under VS regardless of load order, since that selector is more
+   specific. */
+
+.shell {
+    /* Jabasoft has no footer content (unlike LocalAiStudio's
+       ShellFooter, which shows live CPU/RAM/model stats this app has
+       nothing equivalent for) - drop the footer row entirely instead
+       of keeping an empty one. */
+    grid-template-rows: var(--lcars-header-height) minmax(0, 1fr);
+    grid-template-areas:
+        "header  header  header"
+        "menu    content actionrail";
+}
 
 .shell-header {
     display: flex;
     align-items: center;
-    justify-content: space-between;
 }
 
 .jbs-header-title {
@@ -44,18 +60,77 @@
     flex-shrink: 0;
 }
 
-.jbs-theme-toggle {
-    margin-right: 24px;
-    background: rgba(0, 0, 0, 0.15);
-    border: 1px solid rgba(0, 0, 0, 0.3);
+/* ---------- rounded sidebar shape, matching LocalAiStudio's ShellMenu ---------- */
+
+.shell-menu {
+    padding: 24px 12px 0;
+    border-radius: 30px 0 0 30px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* ---------- nav pill buttons, matching LocalAiStudio's ShellMenu ---------- */
+
+.shell-menu .nav {
+    display: grid;
+    gap: 8px;
+}
+
+.shell-menu .nav a,
+.shell-menu .nav button {
+    height: 48px;
+    padding: 0 16px;
+    border: 2px solid transparent;
+    border-radius: 18px 18px 18px 0;
+    background: #08080d;
+    color: var(--lcars-text-light);
+    font-weight: 700;
+}
+
+.shell-menu .nav a:hover,
+.shell-menu .nav button:hover {
+    background: var(--lcars-footer-start);
     color: var(--lcars-text-dark);
-    border-radius: 4px;
-    padding: 6px 14px;
-    font-family: var(--app-font-family);
+}
+
+.shell-menu .nav a.active,
+.shell-menu .nav button.active {
+    border-color: var(--lcars-footer-start);
+}
+
+/* ---------- theme picker, under the page list rather than in the header ---------- */
+
+.jbs-theme-select {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-top: 12px;
+    padding: 10px 14px;
+    color: var(--lcars-text-light);
     font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.jbs-theme-select select {
+    padding: 4px 8px;
+    border: 1px solid rgba(0, 0, 0, 0.3);
+    border-radius: 4px;
+    background: rgba(0, 0, 0, 0.15);
+    color: inherit;
+    font: inherit;
+    text-transform: none;
     cursor: pointer;
 }
 
-.jbs-theme-toggle:hover {
-    background: rgba(0, 0, 0, 0.3);
+/* ---------- gold sidebar-foot strip, matching LocalAiStudio ---------- */
+
+.shell-menu .sidebar-foot {
+    margin: auto -12px 0;
+    padding: 7px 14px;
+    border-top: 5px solid var(--lcars-black);
+    background: var(--lcars-footer-start);
+    color: var(--lcars-text-dark);
 }

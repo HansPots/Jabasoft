@@ -57,11 +57,14 @@
         activate(0);
     }
 
-    var themeToggle = document.getElementById("theme-toggle");
-    if (themeToggle && window.jabasoftTheme) {
-        themeToggle.addEventListener("click", function () {
-            var current = document.documentElement.getAttribute("data-theme");
-            window.jabasoftTheme.set(current === "vs" ? "lcars" : "vs");
+    // A <select> rather than a toggle button: LCARS/VS today, but this is
+    // meant to grow - each new theme (see Jabasoft.Shared/Shared.UI/
+    // wwwroot) is just another <option> in shell.html, no JS changes.
+    var themeSelect = document.getElementById("theme-select");
+    if (themeSelect && window.jabasoftTheme) {
+        themeSelect.value = document.documentElement.getAttribute("data-theme") || "lcars";
+        themeSelect.addEventListener("change", function () {
+            window.jabasoftTheme.set(themeSelect.value);
 
             // Reload whatever's currently shown (styleguide.html or a
             // directly-embedded app) so it re-reads the new theme

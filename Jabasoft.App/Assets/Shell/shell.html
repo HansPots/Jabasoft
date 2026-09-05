@@ -12,17 +12,22 @@
     <div class="shell">
         <header class="shell-header">
             <div class="jbs-header-title">JABASOFT</div>
-            <button id="theme-toggle" type="button" class="jbs-theme-toggle" title="Thema wisselen">Thema</button>
         </header>
         <aside class="shell-menu" aria-label="Main navigation">
             <nav class="nav" id="nav"></nav>
+            <label class="jbs-theme-select">
+                <span>Thema</span>
+                <select id="theme-select">
+                    <option value="lcars">LCARS</option>
+                    <option value="vs">Visual Studio</option>
+                </select>
+            </label>
             <div class="sidebar-foot"><span>v: 0.1.0-dev</span></div>
         </aside>
         <main class="shell-content">
             <iframe id="content" title="App content"></iframe>
         </main>
         <div class="shell-actionrail"></div>
-        <footer class="shell-footer"></footer>
     </div>
     <script src="config.js"></script>
     <script src="shell.js"></script>
