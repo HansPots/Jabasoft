@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="utf-8" />
+    <title>Stijlgids</title>
+    <link rel="stylesheet" href="https://shared.jabasoft.local/jabasoft-theme.css" />
+    <link rel="stylesheet" href="vs-theme.css" />
+    <link rel="stylesheet" href="styleguide.css" />
+    <script src="theme.js"></script>
+</head>
+<body>
+    <div class="styleguide">
+        <aside class="styleguide-nav">
+            <div class="styleguide-nav-header">
+                <span>Pagina's</span>
+                <button id="refresh-btn" type="button" title="Pagina's verversen">&#8635;</button>
+            </div>
+            <div id="app-groups"></div>
+        </aside>
+        <main class="styleguide-preview">
+            <div class="styleguide-preview-header">
+                <span id="preview-title">Kies een pagina</span>
+                <a id="preview-open" href="#" target="_blank" title="Openen in nieuw tabblad">&#8599;</a>
+            </div>
+            <iframe id="preview-frame" title="Paginavoorbeeld"></iframe>
+        </main>
+        <aside class="styleguide-css">
+            <div class="styleguide-css-header">
+                <span>jabasoft-theme.css</span>
+                <button id="save-css-btn" type="button">Opslaan</button>
+            </div>
+            <textarea id="css-editor" spellcheck="false"></textarea>
+            <div id="css-status" class="styleguide-css-status"></div>
+        </aside>
+    </div>
+    <script src="config.js"></script>
+    <script src="styleguide.js"></script>
+</body>
+</html>

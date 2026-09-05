@@ -1,0 +1,61 @@
+/* Second theme, local to Jabasoft only - proves the shell can re-theme
+   itself without touching Jabasoft.Shared/Shared.UI/jabasoft-theme.css
+   (the one file every app, including TabStudio/LocalAiStudio, actually
+   shares). This file only redefines the same custom properties that
+   jabasoft-theme.css already defines on :root, scoped under
+   :root[data-theme="vs"] - so every rule in jabasoft-theme.css and this
+   app's own shell.css/dashboard.html/styleguide.css that already reads
+   var(--lcars-*) re-themes automatically, with zero layout duplication.
+   Toggled via theme.js (the header's "Thema" button). Loosely modelled
+   on Visual Studio's dark theme (editor/sidebar dark grays, #007acc
+   accent blue). */
+
+:root[data-theme="vs"] {
+    --lcars-black: #1e1e1e;
+    /* header-start/-end kept identical on purpose: jabasoft-theme.css's
+       .shell-header still runs them through linear-gradient(), and this
+       theme is meant to have zero visible gradients - see the explicit
+       flat-background overrides below for the same reason. */
+    --lcars-header-start: #3c3c3c;
+    --lcars-header-end: #3c3c3c;
+    --lcars-menu: #252526;
+    --lcars-content: #1e1e1e;
+    --lcars-actionrail-start: #007acc;
+    --lcars-actionrail-end: #007acc;
+    --lcars-footer-start: #007acc;
+    --lcars-footer-end: #007acc;
+    --lcars-text-dark: #d4d4d4;
+    --lcars-text-light: #ffffff;
+    --app-font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+}
+
+/* Belt and braces: override the gradient rules themselves too, in case a
+   flat two-stop gradient ever isn't good enough (e.g. a browser rendering
+   quirk at the exact stop boundary). No gradients anywhere in this theme. */
+:root[data-theme="vs"] .shell-header {
+    background: var(--lcars-header-start);
+}
+
+:root[data-theme="vs"] .styleguide-preview-header {
+    background: var(--lcars-actionrail-start);
+}
+
+:root[data-theme="vs"] .shell-menu .nav a.active,
+:root[data-theme="vs"] .shell-menu .nav button.active {
+    background: #094771;
+}
+
+:root[data-theme="vs"] .shell-menu .nav a:hover,
+:root[data-theme="vs"] .shell-menu .nav button:hover {
+    background: #2a2d2e;
+    color: #ffffff;
+}
+
+:root[data-theme="vs"] .token-usage-dashboard th,
+:root[data-theme="vs"] .token-usage-dashboard td {
+    border-bottom-color: #3c3c3c;
+}
+
+:root[data-theme="vs"] .token-usage-dashboard th {
+    color: #9cdcfe;
+}

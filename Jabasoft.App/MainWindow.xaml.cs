@@ -45,6 +45,11 @@ public partial class MainWindow : Window
         var apiBaseUrl = builder.Configuration["Api:BaseUrl"] ?? "http://localhost:5300";
         builder.WebHost.UseUrls(apiBaseUrl);
 
+        var themeFolder = builder.Configuration["SharedUi:ThemeFolder"]
+            ?? Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "Jabasoft.Shared", "Shared.UI", "wwwroot");
+        var themeCssPath = Path.Combine(Path.GetFullPath(themeFolder), "jabasoft-theme.css");
+        var shellFolderForApi = Path.Combine(AppContext.BaseDirectory, "Assets", "Shell");
+
         // Shared telemetry database: same connection string every JabaSoft
         // app points at, so this API reads whatever TabStudio/LocalAiStudio
         // (and Jabasoft itself, later) have recorded.
@@ -54,6 +59,7 @@ public partial class MainWindow : Window
 
         builder.Services.AddDbContext<TelemetryDbContext>(options => options.UseSqlServer(telemetryConnectionString));
         builder.Services.AddScoped<ITokenUsageRepository, TokenUsageRepository>();
+        builder.Services.AddHttpClient();
 
         // The dashboard page is fetched from a WebView2 virtual host
         // (https://app.jabasoft.local), a different origin than this API
@@ -71,6 +77,103 @@ public partial class MainWindow : Window
             return Results.Ok(entries);
         });
 
+        // Backs the Stijlgids page: reads live from IConfiguration (which
+        // reloads appsettings.json on change) so editing Apps:*:Pages there
+        // and clicking "Pagina's verversen" picks up new pages without
+        // restarting Jabasoft.
+        _api.MapGet("/api/apps-config", (IConfiguration configuration) => Results.Ok(BuildAppsConfig(configuration)));
+
+        // Also backs the Stijlgids page: the CSS editing strip reads/writes
+        // the one canonical jabasoft-theme.css directly (Jabasoft.Shared/
+        // Shared.UI/wwwroot), the same physical file every app loads - so a
+        // save here is immediately live everywhere, no copy involved.
+        _api.MapGet("/api/theme-css", async () =>
+        {
+            if (!File.Exists(themeCssPath))
+            {
+                return Results.NotFound();
+            }
+
+            return Results.Text(await File.ReadAllTextAsync(themeCssPath), "text/css");
+        });
+
+        _api.MapPut("/api/theme-css", async (HttpRequest request) =>
+        {
+            using var reader = new StreamReader(request.Body);
+            var content = await reader.ReadToEndAsync();
+            await File.WriteAllTextAsync(themeCssPath, content);
+            return Results.Ok();
+        });
+
+        // Stijlgids "kopiëren": a live cross-origin embed can't be
+        // re-themed from here (TabStudio/LocalAiStudio's own document is
+        // out of reach, and touching their source is out of scope - the
+        // second theme is Jabasoft-local only, see vs-theme.css). So
+        // instead of embedding the live app, this fetches each configured
+        // page's current HTML *once* and saves it as a genuine local copy
+        // under Assets/Shell/dummy-pages/ - same origin as the shell
+        // itself, styled with the normal <link>/theme.js setup every other
+        // Jabasoft page uses, no proxying at request time. These are
+        // frozen snapshots, not live views: rerun this (the Stijlgids
+        // "Pagina's verversen" button) after a real page's markup changes.
+        _api.MapPost("/api/capture-pages", async (IConfiguration configuration, IHttpClientFactory httpClientFactory) =>
+        {
+            var dummyPagesFolder = Path.Combine(shellFolderForApi, "dummy-pages");
+            using var client = httpClientFactory.CreateClient();
+            client.Timeout = TimeSpan.FromSeconds(10);
+
+            var captured = new List<object>();
+            foreach (var appSection in configuration.GetSection("Apps").GetChildren())
+            {
+                var baseUrl = appSection["MainUrl"];
+                if (string.IsNullOrWhiteSpace(baseUrl))
+                {
+                    baseUrl = appSection["DevelopmentUrl"];
+                }
+
+                if (string.IsNullOrWhiteSpace(baseUrl))
+                {
+                    continue;
+                }
+
+                var appFolder = Path.Combine(dummyPagesFolder, appSection.Key);
+                Directory.CreateDirectory(appFolder);
+
+                foreach (var pageSection in appSection.GetSection("Pages").GetChildren())
+                {
+                    var path = pageSection["Path"];
+                    if (string.IsNullOrWhiteSpace(path))
+                    {
+                        continue;
+                    }
+
+                    var fileName = ToSafeFileName(path) + ".html";
+                    try
+                    {
+                        var html = await client.GetStringAsync(baseUrl.TrimEnd('/') + path);
+                        var injection =
+                            $"<base href=\"{baseUrl.TrimEnd('/')}/\" />" +
+                            "<link rel=\"stylesheet\" href=\"vs-theme.css\" />" +
+                            "<script src=\"theme.js\"></script>";
+
+                        var headIndex = html.IndexOf("<head>", StringComparison.OrdinalIgnoreCase);
+                        html = headIndex >= 0
+                            ? html.Insert(headIndex + "<head>".Length, injection)
+                            : injection + html;
+
+                        await WriteFileWithRetryAsync(Path.Combine(appFolder, fileName), html);
+                        captured.Add(new { app = appSection.Key, path, file = $"dummy-pages/{appSection.Key}/{fileName}", ok = true });
+                    }
+                    catch (Exception ex)
+                    {
+                        captured.Add(new { app = appSection.Key, path, error = ex.Message, ok = false });
+                    }
+                }
+            }
+
+            return Results.Ok(captured);
+        });
+
         try
         {
             using var scope = _api.Services.CreateScope();
@@ -84,10 +187,10 @@ public partial class MainWindow : Window
         _ = _api.RunAsync();
 
         var configuration = builder.Configuration;
-        var shellFolder = Path.Combine(AppContext.BaseDirectory, "Assets", "Shell");
+        var shellFolder = shellFolderForApi;
 
         await WebView.EnsureCoreWebView2Async();
-        SetupVirtualHosts(configuration, shellFolder);
+        SetupVirtualHosts(themeFolder, shellFolder);
 
         // Show a "starting up" page immediately - EnsureAppsRunningAsync
         // below can take a while the first time (cold "dotnet run" build),
@@ -100,10 +203,8 @@ public partial class MainWindow : Window
         WebView.CoreWebView2.Navigate("https://app.jabasoft.local/shell.html");
     }
 
-    private void SetupVirtualHosts(IConfiguration configuration, string shellFolder)
+    private void SetupVirtualHosts(string themeFolder, string shellFolder)
     {
-        var themeFolder = configuration["SharedUi:ThemeFolder"]
-            ?? Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "Jabasoft.Shared", "Shared.UI", "wwwroot");
         WebView.CoreWebView2.SetVirtualHostNameToFolderMapping(
             "shared.jabasoft.local", Path.GetFullPath(themeFolder), CoreWebView2HostResourceAccessKind.Allow);
 
@@ -223,19 +324,91 @@ public partial class MainWindow : Window
     /// </summary>
     private static void WriteShellConfig(IConfiguration configuration, string apiBaseUrl, string shellFolder)
     {
+        var json = JsonSerializer.Serialize(new { apps = BuildAppsConfig(configuration), apiBaseUrl });
+        File.WriteAllText(Path.Combine(shellFolder, "config.js"), $"window.jabasoftConfig = {json};");
+    }
+
+    /// <summary>
+    /// Reads the Apps section fresh from IConfiguration every call (the
+    /// default appsettings.json provider reloads on file change), so both
+    /// the one-time config.js write above and the live /api/apps-config
+    /// endpoint (used by the Stijlgids page's "Pagina's verversen" button)
+    /// share the same shape and both reflect edits without a restart.
+    /// </summary>
+    private static Dictionary<string, object> BuildAppsConfig(IConfiguration configuration)
+    {
         var apps = new Dictionary<string, object>();
         foreach (var appSection in configuration.GetSection("Apps").GetChildren())
         {
+            var pages = new List<object>();
+            foreach (var pageSection in appSection.GetSection("Pages").GetChildren())
+            {
+                var path = pageSection["Path"];
+                if (string.IsNullOrWhiteSpace(path))
+                {
+                    continue;
+                }
+
+                pages.Add(new
+                {
+                    path,
+                    label = pageSection["Label"] ?? path,
+                    file = $"dummy-pages/{appSection.Key}/{ToSafeFileName(path)}.html",
+                });
+            }
+
             apps[appSection.Key] = new
             {
                 displayName = appSection["DisplayName"] ?? appSection.Key,
                 developmentUrl = appSection["DevelopmentUrl"],
                 mainUrl = appSection["MainUrl"],
+                pages,
             };
         }
 
-        var json = JsonSerializer.Serialize(new { apps, apiBaseUrl });
-        File.WriteAllText(Path.Combine(shellFolder, "config.js"), $"window.jabasoftConfig = {json};");
+        return apps;
+    }
+
+    /// <summary>
+    /// A freshly-written file in this folder is occasionally still briefly
+    /// locked (observed with Windows file-system scanners) right after
+    /// creation, so a plain WriteAllTextAsync can spuriously fail here.
+    /// Retried a few times with a short backoff before giving up for real.
+    /// </summary>
+    private static async Task WriteFileWithRetryAsync(string path, string content)
+    {
+        for (var attempt = 1; attempt <= 3; attempt++)
+        {
+            try
+            {
+                await File.WriteAllTextAsync(path, content);
+                return;
+            }
+            catch (IOException) when (attempt < 3)
+            {
+                await Task.Delay(200 * attempt);
+            }
+        }
+    }
+
+    /// <summary>Turns a route like "/" or "/songs/{Id}" into a plain file-name-safe token ("root", "songs-id").</summary>
+    private static string ToSafeFileName(string path)
+    {
+        if (path == "/")
+        {
+            return "root";
+        }
+
+        var chars = path.Trim('/').ToCharArray();
+        for (var i = 0; i < chars.Length; i++)
+        {
+            if (!char.IsLetterOrDigit(chars[i]))
+            {
+                chars[i] = '-';
+            }
+        }
+
+        return new string(chars).ToLowerInvariant();
     }
 
     private void OnClosed(object? sender, EventArgs e)

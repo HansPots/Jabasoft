@@ -3,6 +3,12 @@
    is just the header title, kept local because it's specific to the
    Jabasoft shell page itself, not something another app would reuse). */
 
+.shell-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
 .jbs-header-title {
     font-family: var(--lcars-font);
     font-weight: bold;
@@ -13,4 +19,20 @@
     display: flex;
     align-items: center;
     padding-left: 24px;
+}
+
+.jbs-theme-toggle {
+    margin-right: 24px;
+    background: rgba(0, 0, 0, 0.15);
+    border: 1px solid rgba(0, 0, 0, 0.3);
+    color: var(--lcars-text-dark);
+    border-radius: 4px;
+    padding: 6px 14px;
+    font-family: var(--app-font-family);
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.jbs-theme-toggle:hover {
+    background: rgba(0, 0, 0, 0.3);
 }
