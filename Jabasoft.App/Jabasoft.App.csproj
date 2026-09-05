@@ -15,7 +15,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Jabasoft.Shared\Shared.Telemetry\Shared.Telemetry.csproj" />
-    <ProjectReference Include="..\..\Jabasoft.Shared\Jabasoft.Base\Jabasoft.Base.csproj" />
+    <ProjectReference Include="..\..\Jabasoft.Base\Jabasoft.Base.csproj" />
     <!-- Only needed so the BlazorWebView host page (wwwroot/index.html)
          can load _content/Shared.UI/jabasoft-theme.css etc. via the
          normal RCL static-web-assets convention - the main WebView2
