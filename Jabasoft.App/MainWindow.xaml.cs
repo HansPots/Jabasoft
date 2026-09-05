@@ -107,15 +107,17 @@ public partial class MainWindow : Window
 
         // Stijlgids "kopiëren": a live cross-origin embed can't be
         // re-themed from here (TabStudio/LocalAiStudio's own document is
-        // out of reach, and touching their source is out of scope - the
-        // second theme is Jabasoft-local only, see vs-theme.css). So
-        // instead of embedding the live app, this fetches each configured
-        // page's current HTML *once* and saves it as a genuine local copy
-        // under Assets/Shell/dummy-pages/ - same origin as the shell
-        // itself, styled with the normal <link>/theme.js setup every other
-        // Jabasoft page uses, no proxying at request time. These are
-        // frozen snapshots, not live views: rerun this (the Stijlgids
-        // "Pagina's verversen" button) after a real page's markup changes.
+        // out of reach, and touching their source is out of scope while
+        // the second theme is still being tuned - see Jabasoft.Shared/
+        // Shared.UI/wwwroot/vs-theme.css). So instead of embedding the
+        // live app, this fetches each configured page's current HTML
+        // *once* and saves it as a genuine local copy under Assets/Shell/
+        // dummy-pages/ - same origin as the shell itself, styled with the
+        // normal <link>/theme.js setup every other Jabasoft page uses
+        // (from the shared.jabasoft.local virtual host, not a local copy),
+        // no proxying at request time. These are frozen snapshots, not
+        // live views: rerun this (the Stijlgids "Pagina's verversen"
+        // button) after a real page's markup changes.
         _api.MapPost("/api/capture-pages", async (IConfiguration configuration, IHttpClientFactory httpClientFactory) =>
         {
             var dummyPagesFolder = Path.Combine(shellFolderForApi, "dummy-pages");
@@ -153,8 +155,8 @@ public partial class MainWindow : Window
                         var html = await client.GetStringAsync(baseUrl.TrimEnd('/') + path);
                         var injection =
                             $"<base href=\"{baseUrl.TrimEnd('/')}/\" />" +
-                            "<link rel=\"stylesheet\" href=\"vs-theme.css\" />" +
-                            "<script src=\"theme.js\"></script>";
+                            "<link rel=\"stylesheet\" href=\"https://shared.jabasoft.local/vs-theme.css\" />" +
+                            "<script src=\"https://shared.jabasoft.local/theme.js\"></script>";
 
                         var headIndex = html.IndexOf("<head>", StringComparison.OrdinalIgnoreCase);
                         html = headIndex >= 0
