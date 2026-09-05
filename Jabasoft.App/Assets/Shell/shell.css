@@ -21,6 +21,29 @@
     padding-left: 24px;
 }
 
+/* VS theme's title bar is a compact ~40px strip (see
+   Jabasoft.Shared/Shared.UI/vs-theme.css's --lcars-header-height) - the
+   28px monospace LCARS wordmark doesn't fit that silhouette, so this
+   swaps it for a small dot + regular-weight UI text, the way an actual
+   VS/VS Code title bar reads: quiet, not a logo. */
+:root[data-theme="vs"] .jbs-header-title {
+    font-family: var(--app-font-family);
+    font-weight: 600;
+    font-size: 13px;
+    letter-spacing: normal;
+    padding-left: 12px;
+    gap: 8px;
+}
+
+:root[data-theme="vs"] .jbs-header-title::before {
+    content: "";
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--lcars-actionrail-start);
+    flex-shrink: 0;
+}
+
 .jbs-theme-toggle {
     margin-right: 24px;
     background: rgba(0, 0, 0, 0.15);
