@@ -206,7 +206,23 @@ public partial class MainWindow : Window
         var configuration = builder.Configuration;
         var shellFolder = shellFolderForApi;
 
-        await WebView.EnsureCoreWebView2Async();
+        // WebView (the shell) and TokenDashboardView (BlazorWebView) are two
+        // separate WebView2 instances in one process. Left to their own
+        // defaults they'd both resolve the same default user-data folder
+        // (derived from the exe path), and two CoreWebView2 environments
+        // can't cleanly share one folder - that's exactly the kind of
+        // collision that leaves one control rendering fine (the .NET-to-JS
+        // direction still works, so content still appears) while its
+        // JS-to-.NET event channel - the thing @onclick depends on -
+        // silently never delivers anything back. Giving each control its
+        // own explicit, distinct folder removes the collision entirely.
+        var shellEnvironment = await CoreWebView2Environment.CreateAsync(
+            userDataFolder: Path.Combine(AppContext.BaseDirectory, "WebView2Data", "Shell"));
+
+        TokenDashboardView.BlazorWebViewInitializing += (_, args) =>
+            args.UserDataFolder = Path.Combine(AppContext.BaseDirectory, "WebView2Data", "Dashboard");
+
+        await WebView.EnsureCoreWebView2Async(shellEnvironment);
         SetupVirtualHosts(themeFolder, shellFolder);
 
         // Show a "starting up" page immediately - EnsureAppsRunningAsync
@@ -254,8 +270,21 @@ public partial class MainWindow : Window
         // keeps the method safe to call from anywhere.
         Dispatcher.Invoke(() =>
         {
-            WebView.Visibility = Visibility.Collapsed;
+            // WebView2 and BlazorWebView are both native (HWND/DirectComposition
+            // -hosted) controls stacked in the same Grid cell. Visibility alone
+            // controls WPF hit-testing for ordinary elements, but these "airspace"
+            // controls can keep intercepting pointer input even while Collapsed -
+            // IsHitTestVisible=false plus an explicit focus hand-off makes sure
+            // input actually reaches the one that's supposed to be on top.
+            // Hidden (not Collapsed) so both controls always occupy real layout
+            // space - a composition-hosted control that starts at a 0x0
+            // Collapsed size may never establish a working input/hit-test
+            // surface, and Visibility alone won't fix that after the fact.
+            WebView.IsHitTestVisible = false;
+            WebView.Visibility = Visibility.Hidden;
             TokenDashboardView.Visibility = Visibility.Visible;
+            TokenDashboardView.IsHitTestVisible = true;
+            TokenDashboardView.Focus();
         });
     }
 
@@ -266,8 +295,11 @@ public partial class MainWindow : Window
         // thread, so this one actually needs the marshal.
         Dispatcher.Invoke(() =>
         {
-            TokenDashboardView.Visibility = Visibility.Collapsed;
+            TokenDashboardView.IsHitTestVisible = false;
+            TokenDashboardView.Visibility = Visibility.Hidden;
             WebView.Visibility = Visibility.Visible;
+            WebView.IsHitTestVisible = true;
+            WebView.Focus();
         });
     }
 

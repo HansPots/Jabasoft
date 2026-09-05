@@ -12,6 +12,6 @@
              control repositioned to match an HTML region, since syncing a
              native control's bounds to an element inside the other control
              would need constant JS<->WPF position round-trips. -->
-        <blazor:BlazorWebView x:Name="TokenDashboardView" HostPage="wwwroot/index.html" Visibility="Collapsed" />
+        <blazor:BlazorWebView x:Name="TokenDashboardView" HostPage="wwwroot/index.html" Visibility="Hidden" IsHitTestVisible="False" />
     </Grid>
 </Window>
