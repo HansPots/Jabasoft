@@ -133,11 +133,18 @@ html, body {
 }
 
 .styleguide-css {
-    display: flex;
     flex-direction: column;
     background: #1b1b1b;
     color: #d8d8d8;
     border-left: 2px solid var(--lcars-actionrail-start);
+}
+
+/* Same reasoning as .floating-panel:not([hidden]) above - #theme-panel and
+   #component-panel both toggle the "hidden" attribute (see showPagesTab/
+   showComponentsTab in styleguide.js), and this class' own "display: flex"
+   would otherwise always win over that. */
+.styleguide-css:not([hidden]) {
+    display: flex;
 }
 
 .styleguide-css-header {
@@ -185,4 +192,189 @@ html, body {
     font-size: 12px;
     min-height: 18px;
     color: var(--lcars-footer-start);
+}
+
+/* ---------- nav tabs (Pagina's / Componenten) ---------- */
+
+.styleguide-nav-tabs {
+    display: flex;
+    gap: 4px;
+}
+
+.nav-tab {
+    background: transparent;
+    border: none;
+    color: #999;
+    font-size: 12px;
+    font-weight: bold;
+    text-transform: uppercase;
+    padding: 4px 8px;
+    cursor: pointer;
+}
+
+.nav-tab.active {
+    color: var(--lcars-footer-start);
+    border-bottom: 2px solid var(--lcars-footer-start);
+}
+
+.styleguide-nav-actions {
+    display: flex;
+    gap: 6px;
+}
+
+/* ---------- preview toolbar (Selecteer element / Toon regio's) ---------- */
+
+.styleguide-preview-tools {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.tool-toggle {
+    background: rgba(0, 0, 0, 0.15);
+    border: 1px solid rgba(0, 0, 0, 0.3);
+    color: var(--lcars-text-dark);
+    border-radius: 4px;
+    padding: 5px 10px;
+    font-size: 12px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.tool-toggle:disabled {
+    opacity: 0.4;
+    cursor: default;
+}
+
+.tool-toggle.active {
+    background: var(--lcars-actionrail-start);
+    color: var(--lcars-text-light);
+}
+
+/* ---------- component detail panel ---------- */
+
+.component-panel {
+    overflow-y: auto;
+}
+
+#component-preview {
+    height: 160px;
+    border: 0;
+    border-bottom: 1px solid var(--lcars-actionrail-start);
+    background: white;
+}
+
+.component-ai {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 10px 12px;
+    border-top: 1px solid #333;
+}
+
+#ai-instructions {
+    height: 50px;
+    resize: none;
+    background: #1b1b1b;
+    color: #d8d8d8;
+    border: 1px solid #444;
+    border-radius: 4px;
+    padding: 6px;
+    font-family: var(--app-font-family);
+    font-size: 12px;
+}
+
+.component-ai button,
+.materialize-btn {
+    background: var(--lcars-footer-start);
+    color: var(--lcars-text-dark);
+    border: none;
+    border-radius: 4px;
+    padding: 8px 10px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.materialize-btn {
+    margin: 0 12px 6px;
+}
+
+/* ---------- floating panels (element-picker confirmation, AI settings) ---------- */
+
+.floating-panel {
+    position: fixed;
+    top: 60px;
+    right: 400px;
+    width: 320px;
+    background: var(--lcars-black);
+    color: var(--lcars-text-light);
+    border: 2px solid var(--lcars-actionrail-start);
+    border-radius: 8px;
+    padding: 12px;
+    z-index: 1000;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+    flex-direction: column;
+    gap: 8px;
+    font-family: var(--app-font-family);
+}
+
+/* A plain class selector and the browser's own [hidden] rule have equal
+   specificity, so without this, "display: flex" above (an author rule)
+   would win the cascade over the UA stylesheet's "[hidden] { display:
+   none }" simply for coming later - the panel would ignore its hidden
+   attribute and always show. */
+.floating-panel:not([hidden]) {
+    display: flex;
+}
+
+.floating-panel-header {
+    font-weight: bold;
+    text-transform: uppercase;
+    font-size: 12px;
+    color: var(--lcars-footer-start);
+}
+
+.floating-panel-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.floating-panel-actions button,
+.floating-panel #picker-name-input,
+.floating-panel select,
+.floating-panel input[type="text"] {
+    flex: 1;
+    background: #1b1b1b;
+    color: var(--lcars-text-light);
+    border: 1px solid #444;
+    border-radius: 4px;
+    padding: 6px 8px;
+    font-family: var(--app-font-family);
+    font-size: 12px;
+}
+
+.floating-panel-actions button {
+    cursor: pointer;
+    font-weight: bold;
+    background: var(--lcars-actionrail-start);
+    border-color: var(--lcars-actionrail-start);
+}
+
+.floating-panel-field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 12px;
+}
+
+.picker-html-preview {
+    max-height: 120px;
+    overflow: auto;
+    background: #1b1b1b;
+    padding: 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    white-space: pre-wrap;
+    word-break: break-all;
+    margin: 0;
 }

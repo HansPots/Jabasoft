@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -14,6 +15,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Components.WebView.Wpf;
 using Microsoft.Web.WebView2.Core;
+using Jabasoft.Base.AiBroker;
 using Shared.Telemetry;
 
 namespace Jabasoft.App;
@@ -51,6 +53,13 @@ public partial class MainWindow : Window
         var themeCssPath = Path.Combine(Path.GetFullPath(themeFolder), "jabasoft-theme.css");
         var shellFolderForApi = Path.Combine(AppContext.BaseDirectory, "Assets", "Shell");
 
+        // Components are persistent design data (like jabasoft-theme.css),
+        // not disposable snapshots like dummy-pages/config.js below - they
+        // need to live in source control, so they're read/written directly
+        // in the *source* Assets/Shell folder, never the build output copy.
+        var sourceShellFolder = builder.Configuration["Stijlgids:SourceShellFolder"]
+            ?? Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "Assets", "Shell");
+
         // Dummy-page copies are disposable snapshots, regenerated on demand
         // by "Pagina's verversen" - but a copy captured before a code
         // change (e.g. vs-theme.css/theme.js moving to Jabasoft.Shared) can
@@ -75,6 +84,13 @@ public partial class MainWindow : Window
         builder.Services.AddScoped<ITokenUsageRepository, TokenUsageRepository>();
         builder.Services.AddHttpClient();
 
+        // Stijlgids "Genereer CSS met AI": same shared broker TabStudio/
+        // LocalAiStudio use, not a separate AI integration. Jabasoft has no
+        // AiConnectorSettings database of its own (see ai-connector.json
+        // below), so this is only wired up here, not exposed as a general
+        // chat feature.
+        builder.Services.AddHttpClient<IAiBrokerClient, AiBrokerClient>(c => c.BaseAddress = new Uri(AiBrokerClient.DefaultBaseUrl));
+
         // Token verbruik: the BlazorWebView control shares this same DI
         // container (see TokenDashboardView.Services below), so
         // TokenUsageOverview (Jabasoft.App/TokenUsageOverview.razor) reads
@@ -93,6 +109,12 @@ public partial class MainWindow : Window
 
         _api = builder.Build();
         _api.UseCors();
+
+        // Starts Jabasoft.Broker if no instance is reachable yet (any
+        // JabaSoft app can be the one that starts it) - fire-and-forget so
+        // a cold broker build doesn't delay Jabasoft's own startup. See
+        // Jabasoft.Base/AiBroker/AiBrokerProcessLauncher.cs.
+        _ = AiBrokerProcessLauncher.EnsureRunningAsync();
 
         // Backs the Stijlgids page: reads live from IConfiguration (which
         // reloads appsettings.json on change) so editing Apps:*:Pages there
@@ -121,6 +143,147 @@ public partial class MainWindow : Window
             await File.WriteAllTextAsync(themeCssPath, content);
             return Results.Ok();
         });
+
+        // ---------- Stijlgids: components (select-in-preview -> named,
+        // separately-stylable component -> optionally materialized as a
+        // real Blazor component in Jabasoft.Base) ----------
+        var componentsFolder = Path.Combine(Path.GetFullPath(sourceShellFolder), "components");
+        Directory.CreateDirectory(componentsFolder);
+        var componentsIndexPath = Path.Combine(componentsFolder, "index.json");
+        var aiConnectorPath = Path.Combine(AppContext.BaseDirectory, "ai-connector.json");
+        var jabasoftBaseProjectPath = builder.Configuration["JabasoftBaseProject:ProjectPath"]
+            ?? Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "..", "Jabasoft.Base");
+
+        _api.MapGet("/api/components", async () => Results.Ok(await ReadComponentIndexAsync(componentsIndexPath)));
+
+        _api.MapPost("/api/components", async (ComponentCreateRequest request) =>
+        {
+            if (string.IsNullOrWhiteSpace(request.Name))
+            {
+                return Results.BadRequest("Geef het component een naam.");
+            }
+
+            var safeName = ToSafeComponentName(request.Name);
+            await WriteFileWithRetryAsync(Path.Combine(componentsFolder, $"{safeName}.html"), request.Html ?? string.Empty);
+
+            var cssPath = Path.Combine(componentsFolder, $"{safeName}.css");
+            if (!File.Exists(cssPath))
+            {
+                await WriteFileWithRetryAsync(cssPath, string.Empty);
+            }
+
+            var index = await ReadComponentIndexAsync(componentsIndexPath);
+            index.RemoveAll(c => c.Name.Equals(safeName, StringComparison.OrdinalIgnoreCase));
+            index.Add(new ComponentInfo(safeName, request.SourceApp ?? "", request.SourcePath ?? "", DateTimeOffset.UtcNow));
+            await WriteFileWithRetryAsync(componentsIndexPath, JsonSerializer.Serialize(index));
+
+            return Results.Ok(new { name = safeName });
+        });
+
+        _api.MapGet("/api/components/{name}/html", async (string name) =>
+        {
+            var path = Path.Combine(componentsFolder, $"{ToSafeComponentName(name)}.html");
+            return File.Exists(path) ? Results.Text(await File.ReadAllTextAsync(path), "text/html") : Results.NotFound();
+        });
+
+        _api.MapGet("/api/components/{name}/css", async (string name) =>
+        {
+            var path = Path.Combine(componentsFolder, $"{ToSafeComponentName(name)}.css");
+            return File.Exists(path) ? Results.Text(await File.ReadAllTextAsync(path), "text/css") : Results.NotFound();
+        });
+
+        _api.MapPut("/api/components/{name}/css", async (string name, HttpRequest request) =>
+        {
+            using var reader = new StreamReader(request.Body);
+            var content = await reader.ReadToEndAsync();
+            await WriteFileWithRetryAsync(Path.Combine(componentsFolder, $"{ToSafeComponentName(name)}.css"), content);
+            return Results.Ok();
+        });
+
+        _api.MapPost("/api/components/{name}/generate-css", async (string name, ComponentGenerateCssRequest request, IAiBrokerClient broker) =>
+        {
+            var safeName = ToSafeComponentName(name);
+            var htmlPath = Path.Combine(componentsFolder, $"{safeName}.html");
+            if (!File.Exists(htmlPath))
+            {
+                return Results.NotFound();
+            }
+
+            var html = await File.ReadAllTextAsync(htmlPath);
+            var settings = await ReadAiConnectorSettingsAsync(aiConnectorPath);
+            var themeExcerpt = File.Exists(themeCssPath) ? await File.ReadAllTextAsync(themeCssPath) : "";
+            // The tokens (colors/spacing) are declared once near the top of
+            // the shared stylesheet - a short excerpt is enough context for
+            // a model to pick matching colors without pasting the whole file.
+            var rootBlockEnd = themeExcerpt.IndexOf('}');
+            var themeTokens = rootBlockEnd > 0 ? themeExcerpt[..(rootBlockEnd + 1)] : themeExcerpt;
+
+            var systemPrompt =
+                "Je schrijft CSS voor één UI-component van de JabaSoft-huisstijl. " +
+                "Gebruik de opgegeven kleur-/spacing-tokens (CSS custom properties) waar passend. " +
+                "Antwoord ALLEEN met de CSS, geen uitleg, geen markdown-codeblok.";
+            var userPrompt =
+                $"HTML van het component:\n{html}\n\n" +
+                $"Beschikbare tokens uit jabasoft-theme.css:\n{themeTokens}\n\n" +
+                $"Instructies: {(string.IsNullOrWhiteSpace(request.Instructions) ? "maak een nette, opgeruimde stijl passend bij de huisstijl." : request.Instructions)}";
+
+            var result = await broker.ChatAsync(
+                new ChatRequest(
+                    ParseProvider(settings.Provider),
+                    settings.ServerUrl,
+                    settings.Model,
+                    [new Jabasoft.Base.AiBroker.ChatMessage("system", systemPrompt), new Jabasoft.Base.AiBroker.ChatMessage("user", userPrompt)],
+                    "Jabasoft"),
+                CancellationToken.None);
+
+            if (!result.Success)
+            {
+                return Results.Ok(new { success = false, errorMessage = result.ErrorMessage });
+            }
+
+            return Results.Ok(new { success = true, css = StripMarkdownCodeFence(result.Reply) });
+        });
+
+        _api.MapPost("/api/components/{name}/materialize", async (string name) =>
+        {
+            var safeName = ToSafeComponentName(name);
+            var htmlPath = Path.Combine(componentsFolder, $"{safeName}.html");
+            var cssPath = Path.Combine(componentsFolder, $"{safeName}.css");
+            if (!File.Exists(htmlPath))
+            {
+                return Results.NotFound();
+            }
+
+            var pascalName = ToPascalCase(safeName);
+            var html = await File.ReadAllTextAsync(htmlPath);
+            var css = File.Exists(cssPath) ? await File.ReadAllTextAsync(cssPath) : "";
+
+            var razorPath = Path.Combine(Path.GetFullPath(jabasoftBaseProjectPath), $"{pascalName}.razor");
+            var razorCssPath = Path.Combine(Path.GetFullPath(jabasoftBaseProjectPath), $"{pascalName}.razor.css");
+            await WriteFileWithRetryAsync(razorPath, html);
+            await WriteFileWithRetryAsync(razorCssPath, css);
+
+            return Results.Ok(new { razorPath, razorCssPath, usageSnippet = $"<{pascalName} />" });
+        });
+
+        // ---------- Jabasoft's own AI Connector settings (LM Studio by
+        // default) - same shape as TabStudio's/LocalAiStudio's
+        // AiConnectorSettings, but Jabasoft has no SQL database of its own
+        // to store it in, so it's a small runtime-writable JSON file next
+        // to the exe instead (same idea as config.js). ----------
+        _api.MapGet("/api/ai-connector", async () => Results.Ok(await ReadAiConnectorSettingsAsync(aiConnectorPath)));
+
+        _api.MapPut("/api/ai-connector", async (AiConnectorSettings settings) =>
+        {
+            await WriteFileWithRetryAsync(aiConnectorPath, JsonSerializer.Serialize(settings));
+            return Results.Ok();
+        });
+
+        _api.MapGet("/api/ai-models", async (string provider, string serverUrl, IAiBrokerClient broker) =>
+            Results.Ok(await broker.ListModelsAsync(ParseProvider(provider), serverUrl, CancellationToken.None)));
+
+        _api.MapPost("/api/ai-test-connection", async (AiConnectorSettings settings, IAiBrokerClient broker) =>
+            Results.Ok(await broker.TestConnectionAsync(ParseProvider(settings.Provider), settings.ServerUrl, settings.Model, CancellationToken.None)));
 
         // Stijlgids "kopiëren": a live cross-origin embed can't be
         // re-themed from here (TabStudio/LocalAiStudio's own document is
@@ -492,6 +655,69 @@ public partial class MainWindow : Window
             }
         }
     }
+
+    private static async Task<List<ComponentInfo>> ReadComponentIndexAsync(string indexPath)
+    {
+        if (!File.Exists(indexPath))
+        {
+            return [];
+        }
+
+        var json = await File.ReadAllTextAsync(indexPath);
+        return JsonSerializer.Deserialize<List<ComponentInfo>>(json) ?? [];
+    }
+
+    private static async Task<AiConnectorSettings> ReadAiConnectorSettingsAsync(string path)
+    {
+        if (!File.Exists(path))
+        {
+            await WriteFileWithRetryAsync(path, JsonSerializer.Serialize(AiConnectorSettings.Default));
+            return AiConnectorSettings.Default;
+        }
+
+        var json = await File.ReadAllTextAsync(path);
+        return JsonSerializer.Deserialize<AiConnectorSettings>(json) ?? AiConnectorSettings.Default;
+    }
+
+    private static AiProvider ParseProvider(string? provider) =>
+        Enum.TryParse<AiProvider>(provider, ignoreCase: true, out var parsed) ? parsed : AiProvider.LmStudio;
+
+    /// <summary>
+    /// Strips a markdown code fence a model sometimes wraps its answer in
+    /// (```css ... ```) despite being asked not to - kept lenient rather
+    /// than failing the request, since the CSS itself still lands in the
+    /// editor for the user to review either way.
+    /// </summary>
+    private static string StripMarkdownCodeFence(string text)
+    {
+        var trimmed = text.Trim();
+        if (!trimmed.StartsWith("```", StringComparison.Ordinal))
+        {
+            return trimmed;
+        }
+
+        var firstNewline = trimmed.IndexOf('\n');
+        if (firstNewline < 0)
+        {
+            return trimmed;
+        }
+
+        var withoutOpeningFence = trimmed[(firstNewline + 1)..];
+        var closingFenceIndex = withoutOpeningFence.LastIndexOf("```", StringComparison.Ordinal);
+        return (closingFenceIndex >= 0 ? withoutOpeningFence[..closingFenceIndex] : withoutOpeningFence).Trim();
+    }
+
+    /// <summary>Keeps letters/digits only (so it's safe as both a filename and a C# identifier); collapses everything else.</summary>
+    private static string ToSafeComponentName(string name)
+    {
+        var chars = name.Where(char.IsLetterOrDigit).ToArray();
+        var safe = new string(chars);
+        return string.IsNullOrEmpty(safe) ? "Component" : safe;
+    }
+
+    /// <summary>Capitalizes the first letter for use as a Razor component/class/file name.</summary>
+    private static string ToPascalCase(string safeName) =>
+        char.ToUpperInvariant(safeName[0]) + safeName[1..];
 
     /// <summary>Turns a route like "/" or "/songs/{Id}" into a plain file-name-safe token ("root", "songs-id").</summary>
     private static string ToSafeFileName(string path)
