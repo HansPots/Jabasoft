@@ -15,15 +15,17 @@
                 <div class="styleguide-nav-tabs">
                     <button id="tab-pages" type="button" class="nav-tab active">Pagina's</button>
                     <button id="tab-components" type="button" class="nav-tab">Componenten</button>
+                    <button id="tab-settings" type="button" class="nav-tab">Instellingen</button>
                 </div>
                 <div class="styleguide-nav-actions">
-                    <button id="ai-settings-btn" type="button" title="AI-instellingen">&#9881;</button>
                     <button id="refresh-btn" type="button" title="Pagina's verversen">&#8635;</button>
                 </div>
             </div>
             <div id="app-groups"></div>
             <div id="component-list" hidden></div>
+            <div id="settings-list" class="styleguide-nav-empty" hidden>AI Connector</div>
         </aside>
+        <div class="splitter" id="splitter-1"></div>
         <main class="styleguide-preview">
             <div class="styleguide-preview-header">
                 <span id="preview-title">Kies een pagina</span>
@@ -35,6 +37,7 @@
             </div>
             <iframe id="preview-frame" title="Paginavoorbeeld"></iframe>
         </main>
+        <div class="splitter" id="splitter-2"></div>
         <aside class="styleguide-css" id="theme-panel">
             <div class="styleguide-css-header">
                 <span>jabasoft-theme.css</span>
@@ -58,6 +61,34 @@
             <button id="materialize-btn" type="button" class="materialize-btn">Maak Blazor-component</button>
             <div id="materialize-result" class="styleguide-css-status"></div>
         </aside>
+        <aside class="styleguide-css" id="settings-panel" hidden>
+            <div class="styleguide-css-header">
+                <span>AI Connector</span>
+                <button id="ai-settings-save-btn" type="button">Opslaan</button>
+            </div>
+            <div class="settings-form">
+                <label class="floating-panel-field">
+                    <span>Provider</span>
+                    <select id="ai-provider">
+                        <option value="LmStudio">LM Studio</option>
+                        <option value="Ollama">Ollama</option>
+                    </select>
+                </label>
+                <label class="floating-panel-field">
+                    <span>Server-URL</span>
+                    <input id="ai-server-url" type="text" />
+                </label>
+                <label class="floating-panel-field">
+                    <span>Model</span>
+                    <select id="ai-model"></select>
+                </label>
+                <div class="floating-panel-actions">
+                    <button id="ai-refresh-models-btn" type="button">Modellen ophalen</button>
+                    <button id="ai-test-btn" type="button">Test verbinding</button>
+                </div>
+            </div>
+            <div id="ai-settings-status" class="styleguide-css-status"></div>
+        </aside>
     </div>
 
     <div id="picker-panel" class="floating-panel" hidden>
@@ -70,34 +101,6 @@
         <div class="floating-panel-actions">
             <button id="picker-save-btn" type="button">Opslaan als component</button>
             <button id="picker-cancel-btn" type="button">Annuleren</button>
-        </div>
-    </div>
-
-    <div id="ai-settings-panel" class="floating-panel" hidden>
-        <div class="floating-panel-header">AI-instellingen</div>
-        <label class="floating-panel-field">
-            <span>Provider</span>
-            <select id="ai-provider">
-                <option value="LmStudio">LM Studio</option>
-                <option value="Ollama">Ollama</option>
-            </select>
-        </label>
-        <label class="floating-panel-field">
-            <span>Server-URL</span>
-            <input id="ai-server-url" type="text" />
-        </label>
-        <label class="floating-panel-field">
-            <span>Model</span>
-            <select id="ai-model"></select>
-        </label>
-        <div class="floating-panel-actions">
-            <button id="ai-refresh-models-btn" type="button">Modellen ophalen</button>
-            <button id="ai-test-btn" type="button">Test verbinding</button>
-        </div>
-        <div id="ai-settings-status" class="styleguide-css-status"></div>
-        <div class="floating-panel-actions">
-            <button id="ai-settings-save-btn" type="button">Opslaan</button>
-            <button id="ai-settings-close-btn" type="button">Sluiten</button>
         </div>
     </div>
 

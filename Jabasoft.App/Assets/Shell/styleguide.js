@@ -24,6 +24,9 @@
     var materializeResult = document.getElementById("materialize-result");
     var tabPages = document.getElementById("tab-pages");
     var tabComponents = document.getElementById("tab-components");
+    var tabSettings = document.getElementById("tab-settings");
+    var settingsList = document.getElementById("settings-list");
+    var settingsPanel = document.getElementById("settings-panel");
     var selectElementBtn = document.getElementById("select-element-btn");
     var showRegionsBtn = document.getElementById("show-regions-btn");
     var pickerPanel = document.getElementById("picker-panel");
@@ -32,8 +35,6 @@
     var pickerNameInput = document.getElementById("picker-name-input");
     var pickerSaveBtn = document.getElementById("picker-save-btn");
     var pickerCancelBtn = document.getElementById("picker-cancel-btn");
-    var aiSettingsBtn = document.getElementById("ai-settings-btn");
-    var aiSettingsPanel = document.getElementById("ai-settings-panel");
     var aiProviderSelect = document.getElementById("ai-provider");
     var aiServerUrlInput = document.getElementById("ai-server-url");
     var aiModelSelect = document.getElementById("ai-model");
@@ -41,7 +42,9 @@
     var aiTestBtn = document.getElementById("ai-test-btn");
     var aiSettingsStatus = document.getElementById("ai-settings-status");
     var aiSettingsSaveBtn = document.getElementById("ai-settings-save-btn");
-    var aiSettingsCloseBtn = document.getElementById("ai-settings-close-btn");
+    var splitter1 = document.getElementById("splitter-1");
+    var splitter2 = document.getElementById("splitter-2");
+    var styleguideEl = document.querySelector(".styleguide");
 
     var lastApps = null;
     var currentApp = null;
@@ -215,26 +218,34 @@
     }
 
     // ============================================================
-    // Tabs: Pagina's / Componenten
+    // Tabs: Pagina's / Componenten / Instellingen
     // ============================================================
 
-    function showPagesTab() {
-        tabPages.classList.add("active");
+    function deactivateAllTabs() {
+        tabPages.classList.remove("active");
         tabComponents.classList.remove("active");
-        appGroups.hidden = false;
+        tabSettings.classList.remove("active");
+        appGroups.hidden = true;
         componentList.hidden = true;
-        themePanel.hidden = false;
+        settingsList.hidden = true;
+        themePanel.hidden = true;
         componentPanel.hidden = true;
+        settingsPanel.hidden = true;
+    }
+
+    function showPagesTab() {
+        deactivateAllTabs();
+        tabPages.classList.add("active");
+        appGroups.hidden = false;
+        themePanel.hidden = false;
         selectElementBtn.disabled = false;
         showRegionsBtn.disabled = false;
     }
 
     function showComponentsTab() {
-        tabPages.classList.remove("active");
+        deactivateAllTabs();
         tabComponents.classList.add("active");
-        appGroups.hidden = true;
         componentList.hidden = false;
-        themePanel.hidden = true;
         // select-element/show-regions only make sense on a captured page,
         // not on a component's own isolated preview.
         selectElementBtn.disabled = true;
@@ -242,8 +253,19 @@
         fetchComponents();
     }
 
+    function showSettingsTab() {
+        deactivateAllTabs();
+        tabSettings.classList.add("active");
+        settingsList.hidden = false;
+        settingsPanel.hidden = false;
+        selectElementBtn.disabled = true;
+        showRegionsBtn.disabled = true;
+        loadAiSettings();
+    }
+
     tabPages.addEventListener("click", showPagesTab);
     tabComponents.addEventListener("click", showComponentsTab);
+    tabSettings.addEventListener("click", showSettingsTab);
 
     // ============================================================
     // Componenten: lijst + eigen preview/CSS-editor/AI-generatie/materialize
@@ -699,19 +721,61 @@
             });
     }
 
-    aiSettingsBtn.addEventListener("click", function () {
-        aiSettingsPanel.hidden = !aiSettingsPanel.hidden;
-        if (!aiSettingsPanel.hidden) {
-            loadAiSettings();
-        }
-    });
-    aiSettingsCloseBtn.addEventListener("click", function () { aiSettingsPanel.hidden = true; });
     aiRefreshModelsBtn.addEventListener("click", refreshAiModels);
     aiTestBtn.addEventListener("click", testAiConnection);
     aiSettingsSaveBtn.addEventListener("click", saveAiSettings);
 
     refreshBtn.addEventListener("click", refreshPages);
     saveCssBtn.addEventListener("click", saveCss);
+
+    // ============================================================
+    // Splitters: drag to resize the nav/preview/right-panel columns.
+    // The grid's outer columns are fixed px (nav, right panel) with the
+    // preview column as 1fr between them - dragging a splitter just
+    // adjusts the adjacent fixed column's px width, the 1fr column
+    // absorbs the difference automatically.
+    // ============================================================
+
+    var navWidth = 280;
+    var panelWidth = 380;
+
+    function applyGridTemplate() {
+        styleguideEl.style.gridTemplateColumns = navWidth + "px 6px 1fr 6px " + panelWidth + "px";
+    }
+
+    function setupSplitter(el, onDrag) {
+        el.addEventListener("mousedown", function (e) {
+            e.preventDefault();
+            var startX = e.clientX;
+            var startNav = navWidth;
+            var startPanel = panelWidth;
+            el.classList.add("dragging");
+            document.body.style.cursor = "col-resize";
+
+            function onMove(ev) {
+                onDrag(ev.clientX - startX, startNav, startPanel);
+                applyGridTemplate();
+            }
+
+            function onUp() {
+                el.classList.remove("dragging");
+                document.body.style.cursor = "";
+                document.removeEventListener("mousemove", onMove);
+                document.removeEventListener("mouseup", onUp);
+            }
+
+            document.addEventListener("mousemove", onMove);
+            document.addEventListener("mouseup", onUp);
+        });
+    }
+
+    setupSplitter(splitter1, function (dx, startNav) {
+        navWidth = Math.max(160, Math.min(500, startNav + dx));
+    });
+
+    setupSplitter(splitter2, function (dx, startNav, startPanel) {
+        panelWidth = Math.max(260, Math.min(700, startPanel - dx));
+    });
 
     // First open: capture copies right away (covers the case where none
     // exist yet) and load the CSS editor.

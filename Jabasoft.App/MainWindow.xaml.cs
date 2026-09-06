@@ -37,6 +37,8 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
+        Width = 1400;
+        Height = 900;
         Loaded += OnLoaded;
         Closed += OnClosed;
     }

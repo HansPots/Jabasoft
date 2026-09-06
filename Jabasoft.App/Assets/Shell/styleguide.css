@@ -10,11 +10,24 @@ html, body {
 
 .styleguide {
     display: grid;
-    grid-template-columns: 220px 1fr 380px;
+    grid-template-columns: 280px 6px 1fr 6px 380px;
     height: 100vh;
     background: var(--lcars-content);
     color: var(--lcars-text-dark);
     font-family: var(--app-font-family);
+}
+
+/* Draggable dividers between nav/preview/right-panel - see the
+   setupSplitter/applyGridTemplate pair in styleguide.js. */
+.splitter {
+    cursor: col-resize;
+    background: var(--lcars-actionrail-start);
+    opacity: 0.35;
+}
+
+.splitter:hover,
+.splitter.dragging {
+    opacity: 1;
 }
 
 .styleguide-nav {
@@ -40,7 +53,13 @@ html, body {
     background: var(--lcars-black);
 }
 
-.styleguide-nav-header button {
+/* Scoped to .styleguide-nav-actions (not the whole header) so this
+   fixed-size icon-button style doesn't also clobber the .nav-tab
+   buttons (Pagina's/Componenten/Instellingen) that live in the same
+   header - .styleguide-nav-header button would beat .nav-tab's own
+   styling on specificity alone and squash the tab labels into a
+   26x26 box. */
+.styleguide-nav-actions button {
     background: var(--lcars-actionrail-start);
     color: var(--lcars-text-light);
     border: none;
@@ -52,7 +71,7 @@ html, body {
     line-height: 1;
 }
 
-.styleguide-nav-header button:disabled {
+.styleguide-nav-actions button:disabled {
     opacity: 0.5;
     cursor: default;
 }
@@ -198,18 +217,20 @@ html, body {
 
 .styleguide-nav-tabs {
     display: flex;
-    gap: 4px;
+    flex-wrap: wrap;
+    gap: 2px 6px;
 }
 
 .nav-tab {
     background: transparent;
     border: none;
     color: #999;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: bold;
     text-transform: uppercase;
-    padding: 4px 8px;
+    padding: 4px 2px;
     cursor: pointer;
+    white-space: nowrap;
 }
 
 .nav-tab.active {
@@ -249,6 +270,26 @@ html, body {
 .tool-toggle.active {
     background: var(--lcars-actionrail-start);
     color: var(--lcars-text-light);
+}
+
+/* ---------- Instellingen tab: AI Connector form ---------- */
+
+.settings-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 12px;
+}
+
+.settings-form select,
+.settings-form input[type="text"] {
+    background: #1b1b1b;
+    color: var(--lcars-text-light);
+    border: 1px solid #444;
+    border-radius: 4px;
+    padding: 6px 8px;
+    font-family: var(--app-font-family);
+    font-size: 12px;
 }
 
 /* ---------- component detail panel ---------- */
