@@ -1,13 +1,14 @@
 /* Shell-specific details not covered by the shared jabasoft-theme.css
-   (that file has the tokens and the .shell grid/menu base styles - this
-   file is Jabasoft-only polish, styled after JabaSoft.LocalAiStudio's
-   own shell (ShellHeader/ShellMenu): rounded pill nav buttons, a gold
-   sidebar-foot strip, no footer row. Loads after jabasoft-theme.css and
-   vs-theme.css, so same-selector rules here win for the LCARS theme;
-   the VS theme's own `:root[data-theme="vs"] .shell-menu ...` overrides
-   (see Jabasoft.Stylebook/Shared.UI/wwwroot/vs-theme.css) stay in charge
-   under VS regardless of load order, since that selector is more
-   specific. */
+   (tokens + .shell grid/menu base styles) or shell-menu.css (the rose-
+   sidebar shape every JabaSoft app's menu shares - see that file). This
+   file is Jabasoft-only: LCARS color overrides for the shared menu
+   shape, the header title, the app-focus (embedded app) layout, the
+   theme-picker widget, and no footer row. Loads after jabasoft-theme.css,
+   shell-menu.css and vs-theme.css, so same-selector rules here win for
+   the LCARS theme; the VS theme's own `:root[data-theme="vs"] .shell-menu
+   ...` overrides (see Jabasoft.Stylebook/Shared.UI/wwwroot/vs-theme.css)
+   stay in charge under VS regardless of load order, since that selector
+   is more specific. */
 
 .shell {
     /* Jabasoft has no footer content (unlike LocalAiStudio's
@@ -91,69 +92,27 @@
     flex-shrink: 0;
 }
 
-/* ---------- rounded sidebar shape, matching LocalAiStudio's ShellMenu ---------- */
+/* ---------- rounded sidebar shape - shared with every JabaSoft app's
+   menu, see Shared.UI/wwwroot/shell-menu.css (linked in shell.html,
+   before this file). Only the color tokens are overridden here, to the
+   LCARS palette instead of shell-menu.css's default rose/peach - the
+   shape (padding, radius, button sizing, gold strip) is identical
+   everywhere and must not be duplicated here again. ---------- */
 
 .shell-menu {
-    padding: 24px 12px 0;
-    border-radius: 30px 0 0 30px;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
+    --rose: var(--lcars-menu);
+    --peach: var(--lcars-text-light);
+    --orange: var(--lcars-footer-start);
+    --gold: var(--lcars-footer-start);
+    --black: var(--lcars-black);
 }
 
-/* ---------- nav pill buttons, matching LocalAiStudio's ShellMenu ---------- */
-
-.shell-menu .nav {
-    display: grid;
-    gap: 8px;
-}
-
-.shell-menu .nav a,
-.shell-menu .nav button {
-    height: 48px;
-    padding: 0 16px;
-    border: 2px solid transparent;
-    border-radius: 18px 18px 18px 0;
-    background: #08080d;
-    color: var(--lcars-text-light);
-    font-weight: 700;
-}
-
-.shell-menu .nav a:hover,
-.shell-menu .nav button:hover {
-    background: var(--lcars-footer-start);
-    color: var(--lcars-text-dark);
-}
-
+/* Jabasoft's nav buttons have no icons (see shell.js - plain text
+   labels), so shell-menu.css's icon-color active indicator is a no-op
+   here. A border highlight takes its place. */
 .shell-menu .nav a.active,
 .shell-menu .nav button.active {
     border-color: var(--lcars-footer-start);
-}
-
-/* ---------- theme picker, under the page list rather than in the header ---------- */
-
-.jbs-theme-select {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
-    margin-top: 12px;
-    padding: 10px 14px;
-    color: var(--lcars-text-light);
-    font-size: 12px;
-    font-weight: 700;
-    text-transform: uppercase;
-}
-
-.jbs-theme-select select {
-    padding: 4px 8px;
-    border: 1px solid rgba(0, 0, 0, 0.3);
-    border-radius: 4px;
-    background: rgba(0, 0, 0, 0.15);
-    color: inherit;
-    font: inherit;
-    text-transform: none;
-    cursor: pointer;
 }
 
 /* ---------- gold sidebar-foot strip, matching LocalAiStudio ---------- */

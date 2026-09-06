@@ -12,6 +12,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Components.WebView.Wpf;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Web.WebView2.Core;
 using Shared.Telemetry;
 
@@ -34,8 +35,6 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
-        Width = 1400;
-        Height = 900;
         Loaded += OnLoaded;
         Closed += OnClosed;
     }
@@ -78,6 +77,19 @@ public partial class MainWindow : Window
 
         _api = builder.Build();
         _api.UseCors();
+
+        // Exposes Assets/Shell over plain HTTP too (same folder as the
+        // WebView2 virtual host mapping below), purely so Stylebook's
+        // "Pagina's verversen" (see Jabasoft.Stylebook/Stylebook.Web/
+        // Program.cs's /api/capture-pages) can fetch a snapshot of it -
+        // that capture runs server-side (HttpClient), which can't reach
+        // a WebView2-only virtual host at all. Jabasoft's own shell is
+        // never viewed via this URL, only captured through it.
+        _api.UseStaticFiles(new StaticFileOptions
+        {
+            FileProvider = new PhysicalFileProvider(shellFolderForApi),
+            RequestPath = "",
+        });
 
         try
         {

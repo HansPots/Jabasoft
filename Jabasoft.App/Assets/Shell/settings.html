@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="utf-8" />
+    <title>Instellingen — Jabasoft</title>
+    <link rel="stylesheet" href="https://shared.jabasoft.local/jabasoft-theme.css" />
+    <link rel="stylesheet" href="https://shared.jabasoft.local/vs-theme.css" />
+    <link rel="stylesheet" href="https://shared.jabasoft.local/settings-page.css" />
+    <script src="https://shared.jabasoft.local/theme.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 24px;
+            background: var(--lcars-content);
+            box-sizing: border-box;
+            min-height: 100vh;
+        }
+
+        .settings-page {
+            max-width: 640px;
+        }
+    </style>
+    <script>
+        // This page loads inside Jabasoft's own content iframe, same origin
+        // as shell.html (both served from app.jabasoft.local) - with the
+        // Jabasoft header/menu chrome still visible around it (unlike an
+        // embedded app in "focus" mode, see shell.css's .shell.app-focus).
+        // Changing the theme in here needs to reach both documents: this
+        // page's own (so its background/colors update immediately) and
+        // the parent shell's (so the header/menu update too) - they don't
+        // share a DOM, only localStorage, and only this page's own reacts
+        // to that automatically.
+        function setJabasoftTheme(theme) {
+            window.jabasoftTheme.set(theme);
+            if (window.parent !== window && window.parent.jabasoftTheme) {
+                window.parent.jabasoftTheme.set(theme);
+            }
+        }
+    </script>
+</head>
+<body>
+    <section class="settings-page">
+        <h1>Instellingen</h1>
+
+        <section class="settings-group">
+            <h2>Thema</h2>
+
+            <div class="settings-field theme-picker">
+                <label>
+                    <input type="radio" name="jbs-theme" data-theme-option="lcars" onchange="setJabasoftTheme('lcars')" />
+                    LCARS
+                </label>
+                <label>
+                    <input type="radio" name="jbs-theme" data-theme-option="vs" onchange="setJabasoftTheme('vs')" />
+                    VS Code
+                </label>
+            </div>
+        </section>
+    </section>
+</body>
+</html>

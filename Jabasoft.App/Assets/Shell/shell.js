@@ -25,6 +25,8 @@
         }
     });
 
+    items.push({ label: "Instellingen", url: "settings.html" });
+
     // Token verbruik isn't HTML inside this WebView2 content iframe
     // anymore - it's BlazorWebView-hosted (a native sibling control, see
     // MainWindow.xaml/.cs), so selecting it posts a message to the WPF
@@ -77,22 +79,4 @@
             activate(0);
         }
     });
-
-    // A <select> rather than a toggle button: LCARS/VS today, but this is
-    // meant to grow - each new theme (see Jabasoft.Stylebook/Shared.UI/
-    // wwwroot) is just another <option> in shell.html, no JS changes.
-    var themeSelect = document.getElementById("theme-select");
-    if (themeSelect && window.jabasoftTheme) {
-        themeSelect.value = document.documentElement.getAttribute("data-theme") || "lcars";
-        themeSelect.addEventListener("change", function () {
-            window.jabasoftTheme.set(themeSelect.value);
-
-            // Reload whatever's currently shown (styleguide.html or a
-            // directly-embedded app) so it re-reads the new theme
-            // immediately instead of only on next navigation. No-op if
-            // the token dashboard (a different control) is what's
-            // actually visible right now.
-            content.src = content.src;
-        });
-    }
 })();

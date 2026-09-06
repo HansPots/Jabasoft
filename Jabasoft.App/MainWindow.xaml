@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
         xmlns:blazor="clr-namespace:Microsoft.AspNetCore.Components.WebView.Wpf;assembly=Microsoft.AspNetCore.Components.WebView.Wpf"
-        Title="Jabasoft" Height="900" Width="1400" Background="Black">
+        Title="Jabasoft" Height="1080" Width="1920" Background="Black">
     <Grid>
         <wv2:WebView2 x:Name="WebView" />
         <!-- Same-size sibling, shown instead of WebView when "Token
