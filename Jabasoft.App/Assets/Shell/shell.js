@@ -4,13 +4,23 @@
     var config = window.jabasoftConfig || { apps: {} };
     var nav = document.getElementById("nav");
     var content = document.getElementById("content");
+    var shell = document.querySelector(".shell");
     var items = [];
+
+    // First in the menu, always - the way back once an app has taken over
+    // most of the window (see "focus" below).
+    items.push({ label: "Home", url: "home.html" });
 
     Object.keys(config.apps || {}).forEach(function (key) {
         var app = config.apps[key];
         var url = app.mainUrl || app.developmentUrl;
         if (url) {
-            items.push({ label: app.displayName || key, url: url });
+            // "focus": embedded apps get the header and action rail
+            // hidden while active (see .shell.app-focus in shell.css) so
+            // they get most of the window instead of sharing it with
+            // Jabasoft's own chrome - only the menu stays, with Home at
+            // the top, so there's always a way back.
+            items.push({ label: app.displayName || key, url: url, focus: true });
         }
     });
 
@@ -40,6 +50,7 @@
         }
 
         postToHost("hide-token-dashboard");
+        shell.classList.toggle("app-focus", !!item.focus);
         content.src = item.url;
     }
 

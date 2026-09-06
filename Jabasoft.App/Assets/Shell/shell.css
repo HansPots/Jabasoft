@@ -20,6 +20,22 @@
         "menu    content actionrail";
 }
 
+/* An embedded app (TabStudio, LocalAiStudio - see shell.js's "focus"
+   flag) gets the header and action rail hidden while active, so it gets
+   most of the window instead of sharing it with Jabasoft's own chrome.
+   The menu stays, with "Home" pinned at the top, so there's always a way
+   back without needing the header/action rail at all. */
+.shell.app-focus {
+    grid-template-columns: var(--lcars-menu-width) 1fr;
+    grid-template-rows: 1fr;
+    grid-template-areas: "menu content";
+}
+
+.shell.app-focus .shell-header,
+.shell.app-focus .shell-actionrail {
+    display: none;
+}
+
 .shell-header {
     display: flex;
     align-items: center;
