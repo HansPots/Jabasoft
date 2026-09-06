@@ -21,17 +21,32 @@
 }
 
 /* An embedded app (TabStudio, LocalAiStudio - see shell.js's "focus"
-   flag) gets the header and action rail hidden while active, so it gets
-   most of the window instead of sharing it with Jabasoft's own chrome.
-   The menu stays, with "Home" pinned at the top, so there's always a way
-   back without needing the header/action rail at all. */
+   flag) gets the entire window while active - no Jabasoft header, menu,
+   or action rail at all, so it reads exactly like opening that app
+   standalone. The way back is a "Home" item the app adds to its OWN menu
+   (only shown there when embedded - see Shared.UI/wwwroot/embed.js and
+   jabasoft-theme.css's .jbs-home-link), which posts a message this
+   page listens for (see shell.js) instead of relying on any Jabasoft-
+   side navigation being visible. */
 .shell.app-focus {
-    grid-template-columns: var(--lcars-menu-width) 1fr;
+    grid-template-columns: 1fr;
     grid-template-rows: 1fr;
-    grid-template-areas: "menu content";
+    grid-template-areas: "content";
+    /* jabasoft-theme.css's .shell has its own padding/gap (the black
+       margin around every grid cell) and .shell-content has its own 24px
+       padding (the beige margin around the iframe) - both are meant for
+       the normal multi-cell layout. With only one cell left, those two
+       just show up as two unwanted borders around the embedded app. */
+    padding: 0;
+    gap: 0;
+}
+
+.shell.app-focus .shell-content {
+    padding: 0;
 }
 
 .shell.app-focus .shell-header,
+.shell.app-focus .shell-menu,
 .shell.app-focus .shell-actionrail {
     display: none;
 }

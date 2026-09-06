@@ -7,19 +7,20 @@
     var shell = document.querySelector(".shell");
     var items = [];
 
-    // First in the menu, always - the way back once an app has taken over
-    // most of the window (see "focus" below).
+    // First in the menu, always - what a "jabasoft:home" message (posted
+    // by the embedded app's own Home nav item, see the message listener
+    // below) returns to.
     items.push({ label: "Home", url: "home.html" });
 
     Object.keys(config.apps || {}).forEach(function (key) {
         var app = config.apps[key];
         var url = app.mainUrl || app.developmentUrl;
         if (url) {
-            // "focus": embedded apps get the header and action rail
-            // hidden while active (see .shell.app-focus in shell.css) so
-            // they get most of the window instead of sharing it with
-            // Jabasoft's own chrome - only the menu stays, with Home at
-            // the top, so there's always a way back.
+            // "focus": embedded apps get the ENTIRE window while active
+            // (see .shell.app-focus in shell.css) - no Jabasoft header,
+            // menu, or action rail at all. The app itself adds a "Home"
+            // item to its own menu (shown only when embedded - see
+            // Shared.UI/wwwroot/embed.js) that posts a message back here.
             items.push({ label: app.displayName || key, url: url, focus: true });
         }
     });
@@ -67,6 +68,16 @@
     if (items.length > 0) {
         activate(0);
     }
+
+    // The embedded app's own "Home" nav item (see Shared.UI/wwwroot/
+    // embed.js) posts this instead of navigating anywhere itself, since
+    // Jabasoft's own menu is completely hidden while an app has focus -
+    // there's nothing on this side for the user to click.
+    window.addEventListener("message", function (event) {
+        if (event.data === "jabasoft:home") {
+            activate(0);
+        }
+    });
 
     // A <select> rather than a toggle button: LCARS/VS today, but this is
     // meant to grow - each new theme (see Jabasoft.Shared/Shared.UI/
