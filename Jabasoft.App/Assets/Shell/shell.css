@@ -1,6 +1,6 @@
 /* Shell-specific details not covered by the shared jabasoft-theme.css
    (that file has the tokens and the .shell grid/menu base styles - this
-   file is Jabasoft-only polish, styled after JabaSoftLocalAiStudio's
+   file is Jabasoft-only polish, styled after JabaSoft.LocalAiStudio's
    own shell (ShellHeader/ShellMenu): rounded pill nav buttons, a gold
    sidebar-foot strip, no footer row. Loads after jabasoft-theme.css and
    vs-theme.css, so same-selector rules here win for the LCARS theme;

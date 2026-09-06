@@ -1,7 +1,7 @@
 # Jabasoft
 
 WPF-shell voor de hele JabaSoft-familie. Vanuit hier open je de andere apps
-(`JabaSoft.TabStudio`, `JabaSoftLocalAiStudio`) en zie je het gezamenlijke
+(`JabaSoft.TabStudio`, `JabaSoft.LocalAiStudio`) en zie je het gezamenlijke
 token-verbruik.
 
 ## Architectuur
