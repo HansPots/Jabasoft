@@ -5,7 +5,7 @@
    sidebar-foot strip, no footer row. Loads after jabasoft-theme.css and
    vs-theme.css, so same-selector rules here win for the LCARS theme;
    the VS theme's own `:root[data-theme="vs"] .shell-menu ...` overrides
-   (see Jabasoft.Shared/Shared.UI/wwwroot/vs-theme.css) stay in charge
+   (see Jabasoft.Stylebook/Shared.UI/wwwroot/vs-theme.css) stay in charge
    under VS regardless of load order, since that selector is more
    specific. */
 
@@ -69,7 +69,7 @@
 }
 
 /* VS theme's title bar is a compact ~40px strip (see
-   Jabasoft.Shared/Shared.UI/vs-theme.css's --lcars-header-height) - the
+   Jabasoft.Stylebook/Shared.UI/vs-theme.css's --lcars-header-height) - the
    28px monospace LCARS wordmark doesn't fit that silhouette, so this
    swaps it for a small dot + regular-weight UI text, the way an actual
    VS/VS Code title bar reads: quiet, not a logo. */

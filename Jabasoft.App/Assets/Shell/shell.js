@@ -30,7 +30,6 @@
     // MainWindow.xaml/.cs), so selecting it posts a message to the WPF
     // host instead of setting content.src.
     items.push({ label: "Token verbruik", special: "token-dashboard" });
-    items.push({ label: "Stijlgids", url: "styleguide.html" });
 
     function postToHost(message) {
         if (window.chrome && window.chrome.webview) {
@@ -80,7 +79,7 @@
     });
 
     // A <select> rather than a toggle button: LCARS/VS today, but this is
-    // meant to grow - each new theme (see Jabasoft.Shared/Shared.UI/
+    // meant to grow - each new theme (see Jabasoft.Stylebook/Shared.UI/
     // wwwroot) is just another <option> in shell.html, no JS changes.
     var themeSelect = document.getElementById("theme-select");
     if (themeSelect && window.jabasoftTheme) {
