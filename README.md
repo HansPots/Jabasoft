@@ -1,8 +1,12 @@
 # Jabasoft
 
 WPF-shell voor de hele JabaSoft-familie. Vanuit hier open je de andere apps
-(`JabaSoft.TabStudio`, `JabaSoft.LocalAiStudio`) en zie je het gezamenlijke
-token-verbruik.
+(`JabaSoft.TabStudio`, `JabaSoft.LocalAiStudio`, `Jabasoft.Stylebook`), stel
+je het thema in (LCARS/Visual Studio, via het Instellingen-menu-item), en
+zie je het gezamenlijke token-verbruik.
+
+> Voor een stap-voor-stap herbouwplan van de hele JabaSoft-familie (met
+> geleerde lessen/valkuilen) zie `C:\Repos\Bewaren\JabaSoft-Herbouw\`.
 
 ## Architectuur
 
@@ -28,12 +32,17 @@ zonder een eigen webserver:
 Voor het token-verbruik-dashboard host de app zelf een kleine, in-process
 ASP.NET Core minimal API (`http://localhost:5300` standaard, instelbaar via
 `Api:BaseUrl` in `appsettings.json`) die rechtstreeks op de gedeelde
-`JabaSoftTelemetry`-database leest (via `Shared.Telemetry`, projectverwijzing
-naar `Jabasoft.Stylebook`). `Assets/Shell/dashboard.html` haalt die API op.
+`JabasoftBase`-database leest (via `Shared.Telemetry`, projectverwijzing naar
+`Jabasoft.Stylebook`). Token verbruik is **geen HTML-pagina** — het is een
+tweede, losstaande `BlazorWebView`-control naast de hoofd-`WebView2`, die
+`TokenDashboardRoot.razor` (Jabasoft.Base) host en dezelfde DI-container
+deelt. Bij selectie in het menu wisselt de zichtbaarheid tussen de twee
+controls; `JabasoftHostBridge` (singleton, `BackToShellRequested`-event) is
+het kanaal waarmee de Blazor-kant terug kan naar de HTML-shell.
 
 ## Configuratie (`Jabasoft.App/appsettings.json`)
 
-- `ConnectionStrings:JabaSoftTelemetry` — zelfde connection string als
+- `ConnectionStrings:JabasoftBase` — zelfde connection string als
   TabStudio/LocalAiStudio.
 - `SharedUi:ThemeFolder` — absoluut pad naar `Jabasoft.Stylebook/Shared.UI/wwwroot`.
   Standaard uitgegaan van `C:\Repos\Jabasoft.Stylebook\Shared.UI\wwwroot`.
@@ -67,6 +76,6 @@ Of vanuit Visual Studio: `Jabasoft.slnx` openen en op F5/Start drukken —
 het opstartproject. Het gedrag is identiek aan `dotnet run`: dezelfde
 `OnLoaded`-logica start TabStudio/LocalAiStudio zo nodig zelf op.
 
-Vereist dat SQL Server lokaal bereikbaar is voor de `JabaSoftTelemetry`-
+Vereist dat SQL Server lokaal bereikbaar is voor de `JabasoftBase`-
 database. TabStudio/LocalAiStudio hoeven niet meer los gestart te worden —
 zie hierboven — maar dat kan nog steeds (dan gebruikt Jabasoft die instance).
