@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -10,6 +11,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -17,6 +19,7 @@ using Microsoft.AspNetCore.Components.WebView.Wpf;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Web.WebView2.Core;
 using Shared.Telemetry;
+using Jabasoft.Base.SystemStats;
 
 namespace Jabasoft.App;
 
@@ -85,6 +88,12 @@ public partial class MainWindow : Window
         builder.Services.AddDbContext<TelemetryDbContext>(options => options.UseSqlServer(telemetryConnectionString));
         builder.Services.AddScoped<ITokenUsageRepository, TokenUsageRepository>();
 
+        // Feeds the shell header's "Tokens" card and footer's CPU/RAM/VRAM
+        // meters (see shell.js's pollSystemStats/pollTokenSummary) - same
+        // ISystemStatsService LocalAiStudio's ShellFooter uses, moved to
+        // Jabasoft.Base so every app can share one implementation.
+        builder.Services.AddSingleton<ISystemStatsService, WindowsSystemStatsService>();
+
         // Token verbruik: the BlazorWebView control shares this same DI
         // container (see TokenDashboardView.Services below), so
         // TokenUsageOverview (Jabasoft.Base) reads from the exact same
@@ -102,6 +111,27 @@ public partial class MainWindow : Window
 
         _api = builder.Build();
         _api.UseCors();
+
+        // Shell header/footer (shell.html + shell.js): live CPU/RAM/model
+        // VRAM for the footer meters, and a family-wide token-usage summary
+        // for the header's "Tokens" card - see Shared.UI/shell-header.css +
+        // shell-footer.css for the markup/styling these feed.
+        _api.MapGet("/api/system-stats", async (ISystemStatsService stats, CancellationToken ct) =>
+        {
+            var snapshot = await stats.GetSnapshotAsync(ct);
+            return Results.Ok(snapshot);
+        });
+
+        _api.MapGet("/api/token-summary", async (ITokenUsageRepository tokenUsage, CancellationToken ct) =>
+        {
+            // Cross-app total (unlike LocalAiStudio's own Tokens card, which
+            // is scoped to just that one app) - Jabasoft is the hub, not a
+            // caller of the broker itself, so "how much has the whole family
+            // used" is the meaningful number here, not a per-app split.
+            var entries = await tokenUsage.GetAllEntriesAsync(DateTimeOffset.MinValue, ct);
+            var totalTokens = entries.Sum(entry => entry.TotalTokens);
+            return Results.Ok(new { totalTokens, requestCount = entries.Count });
+        });
 
         // Exposes Assets/Shell over plain HTTP too (same folder as the
         // WebView2 virtual host mapping below), purely so Stylebook's

@@ -1,32 +1,23 @@
 /* Shell-specific details not covered by the shared jabasoft-theme.css
-   (tokens + .shell grid/menu base styles) or shell-menu.css (the rose-
-   sidebar shape every JabaSoft app's menu shares - see that file). This
-   file is Jabasoft-only: LCARS color overrides for the shared menu
-   shape, the header title, the app-focus (embedded app) layout, the
-   theme-picker widget, and no footer row. Loads after jabasoft-theme.css,
-   shell-menu.css and vs-theme.css, so same-selector rules here win for
-   the LCARS theme; the VS theme's own `:root[data-theme="vs"] .shell-menu
-   ...` overrides (see Jabasoft.Stylebook/Shared.UI/wwwroot/vs-theme.css)
-   stay in charge under VS regardless of load order, since that selector
-   is more specific. */
-
-.shell {
-    /* Jabasoft has no footer content (unlike LocalAiStudio's
-       ShellFooter, which shows live CPU/RAM/model stats this app has
-       nothing equivalent for) - drop the footer row entirely instead
-       of keeping an empty one. */
-    grid-template-rows: var(--lcars-header-height) minmax(0, 1fr);
-    grid-template-areas:
-        "header  header  header"
-        "menu    content actionrail";
-}
+   (tokens + .shell grid/menu base styles), shell-menu.css (the rose-
+   sidebar shape every JabaSoft app's menu shares), or shell-header.css/
+   shell-footer.css (the "JabaSoft AI Studio"-style header/footer, same
+   look as LocalAiStudio/TabStudio - see those files for the markup they
+   expect). This file is Jabasoft-only: LCARS color overrides for the
+   shared menu shape, the app-focus (embedded app) layout, and the
+   theme-picker widget. Loads after jabasoft-theme.css, shell-menu.css,
+   shell-header.css, shell-footer.css and vs-theme.css, so same-selector
+   rules here win for the LCARS theme; the VS theme's own
+   `:root[data-theme="vs"] .shell-menu ...` overrides (see
+   Jabasoft.Stylebook/Shared.UI/wwwroot/vs-theme.css) stay in charge under
+   VS regardless of load order, since that selector is more specific. */
 
 /* An embedded app (TabStudio, LocalAiStudio - see shell.js's "focus"
    flag) gets the entire window while active - no Jabasoft header, menu,
-   or action rail at all, so it reads exactly like opening that app
-   standalone. The way back is a "Home" item the app adds to its OWN menu
-   (only shown there when embedded - see Shared.UI/wwwroot/embed.js and
-   jabasoft-theme.css's .jbs-home-link), which posts a message this
+   footer, or action rail at all, so it reads exactly like opening that
+   app standalone. The way back is a "Home" item the app adds to its OWN
+   menu (only shown there when embedded - see Shared.UI/wwwroot/embed.js
+   and jabasoft-theme.css's .jbs-home-link), which posts a message this
    page listens for (see shell.js) instead of relying on any Jabasoft-
    side navigation being visible. */
 .shell.app-focus {
@@ -48,48 +39,9 @@
 
 .shell.app-focus .shell-header,
 .shell.app-focus .shell-menu,
-.shell.app-focus .shell-actionrail {
+.shell.app-focus .shell-actionrail,
+.shell.app-focus .shell-footer {
     display: none;
-}
-
-.shell-header {
-    display: flex;
-    align-items: center;
-}
-
-.jbs-header-title {
-    font-family: var(--lcars-font);
-    font-weight: bold;
-    font-size: 28px;
-    letter-spacing: 4px;
-    color: var(--lcars-text-dark);
-    height: 100%;
-    display: flex;
-    align-items: center;
-    padding-left: 24px;
-}
-
-/* VS theme's title bar is a compact ~40px strip (see
-   Jabasoft.Stylebook/Shared.UI/vs-theme.css's --lcars-header-height) - the
-   28px monospace LCARS wordmark doesn't fit that silhouette, so this
-   swaps it for a small dot + regular-weight UI text, the way an actual
-   VS/VS Code title bar reads: quiet, not a logo. */
-:root[data-theme="vs"] .jbs-header-title {
-    font-family: var(--app-font-family);
-    font-weight: 600;
-    font-size: 13px;
-    letter-spacing: normal;
-    padding-left: 12px;
-    gap: 8px;
-}
-
-:root[data-theme="vs"] .jbs-header-title::before {
-    content: "";
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: var(--lcars-actionrail-start);
-    flex-shrink: 0;
 }
 
 /* ---------- rounded sidebar shape - shared with every JabaSoft app's

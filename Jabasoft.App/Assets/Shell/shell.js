@@ -42,6 +42,54 @@
         }
     }
 
+    // ------------------------------------------------------------
+    // Shell header: "Huidige locatie"/"Actieve app" cards + rolling
+    // activity log (see Shared.UI/shell-header.css for the markup/
+    // styling these feed - same shape as LocalAiStudio's ShellHeader,
+    // just driven from plain JS here instead of Blazor state).
+    // ------------------------------------------------------------
+    var headerLocation = document.getElementById("header-location");
+    var headerActiveApp = document.getElementById("header-active-app");
+    var headerActivityLog = document.getElementById("header-activity-log");
+    var activityLines = [];
+
+    function logActivity(text) {
+        activityLines.push(text);
+        if (activityLines.length > 50) {
+            activityLines.shift();
+        }
+
+        headerActivityLog.innerHTML = "";
+        activityLines.forEach(function (line) {
+            var div = document.createElement("div");
+            div.className = "log-line";
+            div.textContent = line;
+            headerActivityLog.appendChild(div);
+        });
+        headerActivityLog.scrollTop = headerActivityLog.scrollHeight;
+    }
+
+    function updateLocationCards(item) {
+        headerLocation.innerHTML = "";
+        var dashboard = document.createElement("span");
+        dashboard.textContent = "Dashboard";
+        headerLocation.appendChild(dashboard);
+
+        if (item.focus || item.special) {
+            var sep = document.createElement("span");
+            sep.className = "sep";
+            sep.textContent = "›";
+            headerLocation.appendChild(sep);
+
+            var current = document.createElement("span");
+            current.className = "current";
+            current.textContent = item.label;
+            headerLocation.appendChild(current);
+        }
+
+        headerActiveApp.textContent = item.focus ? item.label : "Geen";
+    }
+
     function activate(index) {
         activeIndex = index;
 
@@ -51,6 +99,9 @@
         }
 
         var item = items[index];
+        updateLocationCards(item);
+        logActivity(item.label === "Home" ? "Terug naar Home" : "Geopend: " + item.label);
+
         if (item.special === "token-dashboard") {
             postToHost("show-token-dashboard");
             return;
@@ -90,6 +141,7 @@
             popout.textContent = "↗";
             popout.addEventListener("click", function (e) {
                 e.stopPropagation();
+                logActivity("Eigen venster: " + item.label);
                 postToHost("open-app-window:" + item.key);
             });
             row.appendChild(popout);
@@ -155,4 +207,79 @@
             }
         });
     }
+
+    // ------------------------------------------------------------
+    // Shell footer meters + header "Tokens" card - polls Jabasoft's own
+    // API (MainWindow.xaml.cs's /api/system-stats + /api/token-summary),
+    // not the embedded apps' - see Shared.UI/shell-footer.css for the
+    // markup/styling these feed.
+    // ------------------------------------------------------------
+    var apiBaseUrl = config.apiBaseUrl || "http://localhost:5300";
+    var footerCpu = document.getElementById("footer-cpu");
+    var footerCpuBar = document.getElementById("footer-cpu-bar");
+    var footerRam = document.getElementById("footer-ram");
+    var footerRamBar = document.getElementById("footer-ram-bar");
+    var footerVram = document.getElementById("footer-vram");
+    var footerVramBar = document.getElementById("footer-vram-bar");
+    var footerRequests = document.getElementById("footer-requests");
+    var headerTokensTotal = document.getElementById("header-tokens-total");
+    var headerTokensRequests = document.getElementById("header-tokens-requests");
+
+    function toGiB(bytes) {
+        return bytes / 1024 / 1024 / 1024;
+    }
+
+    function formatTokens(value) {
+        // "." as the thousands separator regardless of the OS locale - the
+        // same reasoning as LocalAiStudio's ShellHeader.FormatTokens: a
+        // Dutch "46.683" read the other way (as a decimal point) looks like
+        // a frozen/broken counter.
+        return value.toLocaleString("en-US").replace(/,/g, ".");
+    }
+
+    function pollSystemStats() {
+        fetch(apiBaseUrl + "/api/system-stats")
+            .then(function (r) { return r.json(); })
+            .then(function (stats) {
+                var cpuPercent = Math.round(stats.cpuPercent) + "%";
+                footerCpu.textContent = "CPU  " + cpuPercent;
+                footerCpuBar.style.setProperty("--progress", cpuPercent);
+
+                var ramUsed = toGiB(stats.ramUsedBytes).toFixed(1);
+                var ramTotal = toGiB(stats.ramTotalBytes).toFixed(1);
+                footerRam.textContent = "RAM  " + ramUsed + " / " + ramTotal + " GB";
+                footerRamBar.style.setProperty("--progress", (stats.ramTotalBytes ? (stats.ramUsedBytes / stats.ramTotalBytes * 100) : 0) + "%");
+
+                if (stats.vramUsedBytes != null && stats.vramTotalBytes != null) {
+                    var vramUsed = toGiB(stats.vramUsedBytes).toFixed(1);
+                    var vramTotal = toGiB(stats.vramTotalBytes).toFixed(1);
+                    footerVram.textContent = "MODEL VRAM  " + vramUsed + " / " + vramTotal + " GB";
+                    footerVramBar.style.setProperty("--progress", (stats.vramUsedBytes / stats.vramTotalBytes * 100) + "%");
+                } else {
+                    footerVram.textContent = "MODEL VRAM  n.b.";
+                    footerVramBar.style.setProperty("--progress", "0%");
+                }
+            })
+            .catch(function () {
+                // Transient read failure - keep showing the last known values.
+            });
+    }
+
+    function pollTokenSummary() {
+        fetch(apiBaseUrl + "/api/token-summary")
+            .then(function (r) { return r.json(); })
+            .then(function (summary) {
+                headerTokensTotal.textContent = formatTokens(summary.totalTokens);
+                headerTokensRequests.textContent = formatTokens(summary.requestCount);
+                footerRequests.textContent = "AI-VERZOEKEN  " + formatTokens(summary.requestCount);
+            })
+            .catch(function () {
+                // Transient read failure - keep showing the last known values.
+            });
+    }
+
+    pollSystemStats();
+    pollTokenSummary();
+    setInterval(pollSystemStats, 5000);
+    setInterval(pollTokenSummary, 20000);
 })();
