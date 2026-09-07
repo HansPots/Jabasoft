@@ -115,6 +115,60 @@
     border-color: var(--lcars-footer-start);
 }
 
+/* ---------- app rows: main (embed) button + "open in own window" icon,
+   same two-icons-per-row pattern as Stylebook's component list ---------- */
+
+.nav-app-row {
+    display: flex;
+    align-items: stretch;
+    gap: 4px;
+}
+
+.nav-app-row .nav-btn {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+/* Higher class-count than shell-menu.css's ".shell-menu .nav button" (3
+   classes here vs. 2 classes + 1 element there) so this wins regardless of
+   load order - without it, the shared 48px pill-button styling would also
+   apply to this small icon button. */
+.shell-menu .nav .nav-popout-btn {
+    flex: 0 0 auto;
+    width: 32px;
+    height: auto;
+    padding: 0;
+    border: 2px solid var(--lcars-actionrail-start);
+    border-radius: 8px;
+    background: transparent;
+    color: var(--lcars-text-light);
+    font-size: 14px;
+    font-weight: normal;
+    cursor: pointer;
+}
+
+.shell-menu .nav .nav-popout-btn:hover {
+    background: var(--lcars-actionrail-start);
+}
+
+/* vs-theme.css's own ".nav a/button" override (compact list-item style)
+   has higher specificity than the rule above (:root[data-theme="vs"] adds
+   two more class-level selectors) and would otherwise win under VS theme,
+   undoing the small-square sizing. Matching its specificity here, in
+   Jabasoft's own file (loaded after vs-theme.css), keeps this override
+   Jabasoft-specific rather than adding it to the shared vs-theme.css for a
+   button shape only Jabasoft currently uses. */
+:root[data-theme="vs"] .shell-menu .nav .nav-popout-btn {
+    width: 28px;
+    padding: 0;
+    border: 1px solid #3c3c3c;
+    border-radius: 4px;
+}
+
+:root[data-theme="vs"] .shell-menu .nav .nav-popout-btn:hover {
+    background: #2a2d2e;
+}
+
 /* ---------- gold sidebar-foot strip, matching LocalAiStudio ---------- */
 
 .shell-menu .sidebar-foot {

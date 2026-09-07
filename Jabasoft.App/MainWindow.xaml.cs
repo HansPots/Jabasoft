@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Net.Http;
+using System.Runtime.InteropServices;
+using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows;
@@ -31,6 +33,29 @@ public partial class MainWindow : Window
 {
     private WebApplication? _api;
     private readonly List<Process> _startedAppProcesses = new();
+
+    [DllImport("user32.dll")]
+    private static extern bool SetForegroundWindow(IntPtr hWnd);
+
+    [DllImport("user32.dll")]
+    private static extern int GetSystemMetrics(int nIndex);
+
+    [DllImport("user32.dll")]
+    private static extern bool EnumWindows(EnumWindowsProc lpEnumFunc, IntPtr lParam);
+
+    [DllImport("user32.dll")]
+    private static extern int GetWindowTextLength(IntPtr hWnd);
+
+    [DllImport("user32.dll", CharSet = CharSet.Unicode)]
+    private static extern int GetWindowText(IntPtr hWnd, StringBuilder text, int count);
+
+    [DllImport("user32.dll")]
+    private static extern bool IsWindowVisible(IntPtr hWnd);
+
+    private delegate bool EnumWindowsProc(IntPtr hWnd, IntPtr lParam);
+
+    private const int SM_CXSCREEN = 0;
+    private const int SM_CYSCREEN = 1;
 
     public MainWindow()
     {
@@ -137,7 +162,8 @@ public partial class MainWindow : Window
         // opposite direction (BlazorWebView -> "go back to the shell").
         WebView.CoreWebView2.WebMessageReceived += (_, args) =>
         {
-            switch (args.TryGetWebMessageAsString())
+            var message = args.TryGetWebMessageAsString();
+            switch (message)
             {
                 case "show-token-dashboard":
                     ShowTokenDashboard();
@@ -145,6 +171,16 @@ public partial class MainWindow : Window
                 case "hide-token-dashboard":
                     TokenDashboardView.Visibility = Visibility.Collapsed;
                     WebView.Visibility = Visibility.Visible;
+                    break;
+                default:
+                    if (message is not null && message.StartsWith("activate-app:", StringComparison.Ordinal))
+                    {
+                        HandleActivateApp(message["activate-app:".Length..], configuration);
+                    }
+                    else if (message is not null && message.StartsWith("open-app-window:", StringComparison.Ordinal))
+                    {
+                        OpenAppWindow(message["open-app-window:".Length..], configuration);
+                    }
                     break;
             }
         };
@@ -228,6 +264,13 @@ public partial class MainWindow : Window
 
         foreach (var appSection in configuration.GetSection("Apps").GetChildren())
         {
+            if (!IsAppVisible(appSection))
+            {
+                // Not shown in the menu, so no reason to auto-start its
+                // backend either - see BuildAppsConfig.
+                continue;
+            }
+
             var url = appSection["DevelopmentUrl"];
             var projectPath = appSection["ProjectPath"];
             if (string.IsNullOrWhiteSpace(url))
@@ -318,6 +361,156 @@ public partial class MainWindow : Window
     }
 
     /// <summary>
+    /// Handles a click on an app's main (embedded) menu button. If that app
+    /// already has its own window open, focuses that window instead of
+    /// embedding - an app is never shown both ways at once (see
+    /// OpenAppWindow). Otherwise tells shell.js to go ahead and embed it.
+    /// </summary>
+    private void HandleActivateApp(string key, IConfiguration configuration)
+    {
+        var existingWindow = FindWindowByTitleSubstring(GetWindowTitleHint(key, configuration));
+        if (existingWindow != IntPtr.Zero)
+        {
+            SetForegroundWindow(existingWindow);
+            return;
+        }
+
+        WebView.CoreWebView2.PostWebMessageAsString("do-activate:" + key);
+    }
+
+    /// <summary>
+    /// Opens (or refocuses) an app in its own chromeless Edge "app mode"
+    /// window - the same technique as JabaSoft.LocalAiStudio's
+    /// BrowserLauncher, just driven from here so every app gets it
+    /// consistently. Tells shell.js afterwards so it can drop the embedded
+    /// view for this app if that's what's currently showing - an app is
+    /// never open both embedded and in its own window at the same time.
+    ///
+    /// "Is it already open" is checked by searching actual OS windows by
+    /// title (see FindWindowByTitleSubstring), NOT by tracking the Process
+    /// object Process.Start returns: msedge routinely hands off a fresh
+    /// "--app=" launch to an already-running Edge instance and exits the
+    /// launching process within a fraction of a second, so
+    /// Process.HasExited goes true almost immediately even though the
+    /// window it opened is still very much open - trusting that flag let a
+    /// second click silently fall through and embed a duplicate.
+    /// </summary>
+    private void OpenAppWindow(string key, IConfiguration configuration)
+    {
+        var titleHint = GetWindowTitleHint(key, configuration);
+        var existingWindow = FindWindowByTitleSubstring(titleHint);
+        if (existingWindow != IntPtr.Zero)
+        {
+            SetForegroundWindow(existingWindow);
+            return;
+        }
+
+        var appSection = configuration.GetSection("Apps").GetSection(key);
+        var url = appSection["MainUrl"];
+        if (string.IsNullOrWhiteSpace(url))
+        {
+            url = appSection["DevelopmentUrl"];
+        }
+
+        if (string.IsNullOrWhiteSpace(url))
+        {
+            Debug.WriteLine($"Cannot open '{key}' in its own window: no MainUrl/DevelopmentUrl configured.");
+            return;
+        }
+
+        const int width = 1400;
+        const int height = 900;
+        var (x, y) = GetCenteredPosition(width, height);
+
+        var startInfo = new ProcessStartInfo
+        {
+            FileName = "msedge",
+            Arguments = $"--app={url} --window-size={width},{height} --window-position={x},{y}",
+            UseShellExecute = true,
+        };
+
+        try
+        {
+            Process.Start(startInfo);
+            WebView.CoreWebView2.PostWebMessageAsString("app-opened-in-window:" + key);
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Could not open '{key}' in its own window: {ex.Message}");
+        }
+    }
+
+    /// <summary>
+    /// "Apps:&lt;Naam&gt;:WindowTitleHint" - a substring expected to appear
+    /// in every page's &lt;title&gt; for that app (Blazor apps vary their
+    /// title per page/route, e.g. "Settings — JabaSoft Local AI Studio", so
+    /// this needs to be the part that's common across all of them, not an
+    /// exact match). Falls back to DisplayName if not configured, which
+    /// only works when the two happen to coincide (they don't for
+    /// Stylebook - its window title is "Stijlgids", not "Stylebook" - hence
+    /// the explicit hint in appsettings.json).
+    /// </summary>
+    private static string GetWindowTitleHint(string key, IConfiguration configuration)
+    {
+        var appSection = configuration.GetSection("Apps").GetSection(key);
+        return appSection["WindowTitleHint"] ?? appSection["DisplayName"] ?? key;
+    }
+
+    private static IntPtr FindWindowByTitleSubstring(string titleSubstring)
+    {
+        if (string.IsNullOrWhiteSpace(titleSubstring))
+        {
+            return IntPtr.Zero;
+        }
+
+        var found = IntPtr.Zero;
+        EnumWindows((hWnd, _) =>
+        {
+            if (!IsWindowVisible(hWnd))
+            {
+                return true;
+            }
+
+            var length = GetWindowTextLength(hWnd);
+            if (length == 0)
+            {
+                return true;
+            }
+
+            var builder = new StringBuilder(length + 1);
+            GetWindowText(hWnd, builder, builder.Capacity);
+            if (builder.ToString().Contains(titleSubstring, StringComparison.OrdinalIgnoreCase))
+            {
+                found = hWnd;
+                return false;
+            }
+
+            return true;
+        }, IntPtr.Zero);
+
+        return found;
+    }
+
+    private static (int X, int Y) GetCenteredPosition(int windowWidth, int windowHeight)
+    {
+        try
+        {
+            var screenWidth = GetSystemMetrics(SM_CXSCREEN);
+            var screenHeight = GetSystemMetrics(SM_CYSCREEN);
+            if (screenWidth <= 0 || screenHeight <= 0)
+            {
+                return (100, 100);
+            }
+
+            return (Math.Max(0, (screenWidth - windowWidth) / 2), Math.Max(0, (screenHeight - windowHeight) / 2));
+        }
+        catch
+        {
+            return (100, 100);
+        }
+    }
+
+    /// <summary>
     /// Writes config.js into the *output* Assets/Shell folder (never the
     /// source folder under source control) so shell.js/dashboard.js can
     /// read the configured app URLs and API base URL without a build step.
@@ -338,6 +531,11 @@ public partial class MainWindow : Window
         var apps = new Dictionary<string, object>();
         foreach (var appSection in configuration.GetSection("Apps").GetChildren())
         {
+            if (!IsAppVisible(appSection))
+            {
+                continue;
+            }
+
             apps[appSection.Key] = new
             {
                 displayName = appSection["DisplayName"] ?? appSection.Key,
@@ -348,6 +546,16 @@ public partial class MainWindow : Window
 
         return apps;
     }
+
+    /// <summary>
+    /// "Apps:&lt;Naam&gt;:Visible" - defaults to true when absent, so
+    /// existing/new app entries don't need it set explicitly. An app set to
+    /// false is skipped both in the menu (BuildAppsConfig) and for
+    /// auto-start (EnsureAppsRunningAsync) - no point starting a backend
+    /// for something you can't reach from the menu anyway.
+    /// </summary>
+    private static bool IsAppVisible(IConfigurationSection appSection) =>
+        !bool.TryParse(appSection["Visible"], out var visible) || visible;
 
     private void OnClosed(object? sender, EventArgs e)
     {
