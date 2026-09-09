@@ -1,17 +1,60 @@
 <Window x:Class="Jabasoft.App.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
-        xmlns:blazor="clr-namespace:Microsoft.AspNetCore.Components.WebView.Wpf;assembly=Microsoft.AspNetCore.Components.WebView.Wpf"
-        Title="Jabasoft" Height="1080" Width="1920" Background="Black">
-    <Grid>
-        <wv2:WebView2 x:Name="WebView" />
-        <!-- Same-size sibling, shown instead of WebView when "Token
-             verbruik" is selected (see JabasoftHostBridge / MainWindow.xaml.cs).
-             Two full-window controls swapped by Visibility rather than one
-             control repositioned to match an HTML region, since syncing a
-             native control's bounds to an element inside the other control
-             would need constant JS<->WPF position round-trips. -->
-        <blazor:BlazorWebView x:Name="TokenDashboardView" HostPage="wwwroot/index.html" Visibility="Hidden" IsHitTestVisible="False" />
-    </Grid>
+        Title="Jabasoft" Height="480" Width="360"
+        ResizeMode="CanMinimize"
+        Background="{DynamicResource BackgroundBrush}">
+
+    <Window.Resources>
+        <!-- Een hele app-rij is de knop (niet alleen een "Start"-tekstje
+             ernaast) - groter klikvlak, en de rij toont zijn eigen
+             hover/pressed-status net als de knoppen in Stylebook.
+             Beschikbaarheid (IsEnabled) wisselt Foreground/Background
+             expliciet, want WPF's standaard "disabled" grijs komt uit
+             SystemColors, niet uit onze eigen tokens. -->
+        <Style x:Key="AppEntryButtonStyle" TargetType="Button">
+            <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+            <Setter Property="FontFamily" Value="{StaticResource AppFontFamily}" />
+            <Setter Property="FontSize" Value="{StaticResource FontSizeBody}" />
+            <Setter Property="Margin" Value="0,0,0,8" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Bd"
+                                Background="{DynamicResource SurfaceBrush}"
+                                BorderBrush="{DynamicResource BorderBrush}"
+                                BorderThickness="1"
+                                CornerRadius="{DynamicResource RadiusMedium}"
+                                Padding="{StaticResource SpaceMedium}">
+                            <ContentPresenter HorizontalAlignment="Left" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource AccentBrush}" />
+                                <Setter Property="Foreground" Value="{DynamicResource AccentForegroundBrush}" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Foreground" Value="{DynamicResource TextMutedBrush}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+    <StackPanel Margin="24">
+        <TextBox Text="JABASOFT"
+                 Style="{StaticResource SelectableTextStyle}"
+                 FontSize="{StaticResource FontSizeTitle}"
+                 FontWeight="Bold"
+                 Margin="0,0,0,24" />
+
+        <!-- Rijen worden hier vanuit code-behind ingevuld (AppEntry-lijst
+             uit appsettings.json), zie MainWindow.xaml.cs/BuildAppList -
+             zelfde stijl als Stylebook.Playground: data-gedreven UI
+             opbouwen in C#, geen ItemsControl/MVVM-gedoe voor zoiets
+             kleins. -->
+        <StackPanel x:Name="AppList" />
+    </StackPanel>
 </Window>

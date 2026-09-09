@@ -1,81 +1,29 @@
 # Jabasoft
 
-WPF-shell voor de hele JabaSoft-familie. Vanuit hier open je de andere apps
-(`JabaSoft.TabStudio`, `JabaSoft.LocalAiStudio`, `Jabasoft.Stylebook`), stel
-je het thema in (LCARS/Visual Studio, via het Instellingen-menu-item), en
-zie je het gezamenlijke token-verbruik.
-
-> Voor een stap-voor-stap herbouwplan van de hele JabaSoft-familie (met
-> geleerde lessen/valkuilen) zie `C:\Repos\Bewaren\JabaSoft-Herbouw\`.
+De launchershell van de JabaSoft-familie: de app die je opstart en
+vanwaaruit je de andere JabaSoft-apps start.
 
 ## Architectuur
 
-Het hele venster is één `WebView2`-control (`Jabasoft.App/MainWindow.xaml`).
-De shell-chrome (header, menu, content-area) is gewone HTML/CSS/JS onder
-`Jabasoft.App/Assets/Shell/`, niet native XAML — zo kan de shell dezelfde
-`jabasoft-theme.css` gebruiken als de andere apps. De ingesloten apps
-(TabStudio, LocalAiStudio) worden getoond via een `<iframe>` in die pagina;
-er zijn geen aparte native WebView2-instances per app nodig.
+Herbouwd op de uniforme WPF-stack (zie `Jabasoft.Stylebook`'s
+geschiedenis voor waarom). `Jabasoft.App` is een losse WPF-executable,
+geen webhost, geen embedding: een klik op een geregistreerde app start
+die app's eigen `.exe` als apart proces/venster. Draait die al, dan
+komt het bestaande venster naar voren in plaats van een tweede
+exemplaar te starten.
 
-Twee virtual-host-mappings (`CoreWebView2.SetVirtualHostNameToFolderMapping`,
-ingesteld in `MainWindow.xaml.cs`) laten de shell lokale bestanden laden
-zonder een eigen webserver:
+De lijst met apps staat in `appsettings.json` (`Apps[]`: `Name`,
+`DisplayName`, `ExecutablePath`, `Available`). Een app met
+`Available: false` staat zichtbaar maar niet-klikbaar in het menu -
+"nog niet herbouwd" op de nieuwe stack.
 
-- `https://app.jabasoft.local/...` → `Assets/Shell/` (deze app zelf, vanuit
-  de build-output-map — `config.js` wordt hier bij elke start opnieuw
-  gegenereerd, dus dat bestand hoort niet in source control).
-- `https://shared.jabasoft.local/...` → `Jabasoft.Stylebook/Shared.UI/wwwroot/`
-  (rechtstreeks vanaf schijf, hetzelfde fysieke bestand als TabStudio en
-  LocalAiStudio via `_content/Shared.UI/...` laden — zie
-  `Jabasoft.Stylebook/README.md`).
+Styling komt van `Jabasoft.Stylebook/Stylebook.Components` (gedeelde
+`{DynamicResource}`-tokens/`Theme.xaml`), zodat Jabasoft er visueel
+consistent uitziet met de rest van de familie.
 
-Voor het token-verbruik-dashboard host de app zelf een kleine, in-process
-ASP.NET Core minimal API (`http://localhost:5300` standaard, instelbaar via
-`Api:BaseUrl` in `appsettings.json`) die rechtstreeks op de gedeelde
-`JabasoftBase`-database leest (via `Shared.Telemetry`, projectverwijzing naar
-`Jabasoft.Stylebook`). Token verbruik is **geen HTML-pagina** — het is een
-tweede, losstaande `BlazorWebView`-control naast de hoofd-`WebView2`, die
-`TokenDashboardRoot.razor` (Jabasoft.Base) host en dezelfde DI-container
-deelt. Bij selectie in het menu wisselt de zichtbaarheid tussen de twee
-controls; `JabasoftHostBridge` (singleton, `BackToShellRequested`-event) is
-het kanaal waarmee de Blazor-kant terug kan naar de HTML-shell.
+## Status
 
-## Configuratie (`Jabasoft.App/appsettings.json`)
-
-- `ConnectionStrings:JabasoftBase` — zelfde connection string als
-  TabStudio/LocalAiStudio.
-- `SharedUi:ThemeFolder` — absoluut pad naar `Jabasoft.Stylebook/Shared.UI/wwwroot`.
-  Standaard uitgegaan van `C:\Repos\Jabasoft.Stylebook\Shared.UI\wwwroot`.
-- `Apps:<Naam>:DevelopmentUrl` / `Apps:<Naam>:MainUrl` — waar de betreffende
-  app te bereiken is. `MainUrl` is nu leeg (nog geen IIS-hosting van de
-  main-branch ingericht); zodra dat er is, hier invullen — geen codewijziging
-  nodig. Zolang `MainUrl` leeg is, wordt `DevelopmentUrl` gebruikt.
-- `Apps:<Naam>:ProjectPath` — map van de app's web-project (bv.
-  `TabStudio.Web`), gebruikt om die app automatisch te starten (zie hieronder).
-
-## Apps automatisch starten
-
-Bij het opstarten controleert `MainWindow.xaml.cs` (`EnsureAppsRunningAsync`)
-per geconfigureerde app of `DevelopmentUrl` al bereikbaar is. Zo niet, start
-het zelf `dotnet run` in `ProjectPath` (met `ASPNETCORE_ENVIRONMENT=Development`)
-en wacht tot de app reageert (max. 45s) voordat de shell navigeert. Draait een
-app al (handmatig gestart, of van een vorige Jabasoft-sessie), dan blijft die
-met rust. Bij het sluiten van Jabasoft worden alleen de apps die het zelf
-startte weer afgesloten (`OnClosed`, met de hele procesboom). Een
-"JABASOFT WORDT GESTART..."-scherm (`Assets/Shell/loading.html`) overbrugt de
-wachttijd van een koude `dotnet run`-build.
-
-## Starten
-
-```bash
-dotnet run --project Jabasoft.App
-```
-
-Of vanuit Visual Studio: `Jabasoft.slnx` openen en op F5/Start drukken —
-`Jabasoft.App` is het enige project in de solution, dus dat wordt automatisch
-het opstartproject. Het gedrag is identiek aan `dotnet run`: dezelfde
-`OnLoaded`-logica start TabStudio/LocalAiStudio zo nodig zelf op.
-
-Vereist dat SQL Server lokaal bereikbaar is voor de `JabasoftBase`-
-database. TabStudio/LocalAiStudio hoeven niet meer los gestart te worden —
-zie hierboven — maar dat kan nog steeds (dan gebruikt Jabasoft die instance).
+v1: alleen de launcher. Geen token-dashboard, geen instellingenscherm,
+geen `Jabasoft.Base`/`Jabasoft.Broker`-integratie - die komen terug
+zodra de AI-gerelateerde apps (te beginnen met `LocalAiStudio`) zelf
+weer op de nieuwe stack bestaan.
