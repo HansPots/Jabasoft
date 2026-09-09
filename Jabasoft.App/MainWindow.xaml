@@ -1,8 +1,8 @@
 <Window x:Class="Jabasoft.App.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Jabasoft" Height="480" Width="360"
-        ResizeMode="CanMinimize"
+        xmlns:controls="clr-namespace:Stylebook.Components.Controls;assembly=Stylebook.Components"
+        Title="Jabasoft" Height="1140" Width="2560"
         Background="{DynamicResource BackgroundBrush}">
 
     <Window.Resources>
@@ -43,18 +43,42 @@
         </Style>
     </Window.Resources>
 
-    <StackPanel Margin="24">
-        <TextBox Text="JABASOFT"
-                 Style="{StaticResource SelectableTextStyle}"
-                 FontSize="{StaticResource FontSizeTitle}"
-                 FontWeight="Bold"
-                 Margin="0,0,0,24" />
+    <!-- Zelfde vaste Basis-schil (Header/Menu/Inhoud/Actie/Footer) en
+         venstermaat als Stylebook.Playground - elk JabaSoft-app-venster
+         bouwt hierop, zie project-memory. Regio-invulling voor Jabasoft
+         v1 bewust minimaal/functioneel: de app-launcherlijst in het
+         Menu-vak (dezelfde plek als Stylebook's eigen MENU-strook),
+         Header/Actie/Footer/Inhoud met simpele placeholders tot dit
+         via Stylebook gestyled wordt. -->
+    <controls:Basis x:Name="AppShell">
+        <controls:Basis.HeaderContent>
+            <TextBox Text="JABASOFT"
+                     Style="{StaticResource SelectableTextStyle}"
+                     FontSize="{StaticResource FontSizeTitle}"
+                     FontWeight="Bold" />
+        </controls:Basis.HeaderContent>
 
-        <!-- Rijen worden hier vanuit code-behind ingevuld (AppEntry-lijst
-             uit appsettings.json), zie MainWindow.xaml.cs/BuildAppList -
-             zelfde stijl als Stylebook.Playground: data-gedreven UI
-             opbouwen in C#, geen ItemsControl/MVVM-gedoe voor zoiets
-             kleins. -->
-        <StackPanel x:Name="AppList" />
-    </StackPanel>
+        <!-- MenuContent (de app-lijst) wordt in code-behind opgebouwd en
+             toegewezen (zie MainWindow.xaml.cs) - x:Name op een element
+             DAT als property-waarde aan Basis wordt meegegeven botst met
+             Basis' eigen naam-scope (MC3093), dus de StackPanel met de
+             rijen kan hier niet direct met x:Name in XAML staan. -->
+
+        <controls:Basis.ActionContent>
+            <TextBox Text="" Style="{StaticResource SelectableTextStyle}" />
+        </controls:Basis.ActionContent>
+
+        <controls:Basis.FooterContent>
+            <TextBox Text="Gereed"
+                     Style="{StaticResource SelectableTextStyle}"
+                     Foreground="{DynamicResource TextMutedBrush}" />
+        </controls:Basis.FooterContent>
+
+        <!-- MainContent (Inhoud) - via Basis' [ContentProperty]. -->
+        <TextBox Text="Kies een applicatie in het menu om te starten."
+                 Style="{StaticResource SelectableTextStyle}"
+                 Foreground="{DynamicResource TextMutedBrush}"
+                 HorizontalAlignment="Center"
+                 VerticalAlignment="Center" />
+    </controls:Basis>
 </Window>

@@ -38,8 +38,15 @@ public partial class MainWindow : Window
         return apps ?? [];
     }
 
+    /// <summary>
+    /// Bouwt de rijen in code-behind en wijst het geheel toe aan
+    /// AppShell.MenuContent - kan niet als x:Name'd element rechtstreeks
+    /// in XAML onder Basis.MenuContent staan (MC3093, zie MainWindow.xaml).
+    /// </summary>
     private void BuildAppList(List<AppEntry> apps)
     {
+        var list = new StackPanel { Margin = new Thickness(16) };
+
         foreach (var app in apps)
         {
             var button = new Button
@@ -50,8 +57,10 @@ public partial class MainWindow : Window
             };
             AutomationProperties.SetName(button, app.DisplayName);
             button.Click += (_, _) => StartOrFocusApp(app);
-            AppList.Children.Add(button);
+            list.Children.Add(button);
         }
+
+        AppShell.MenuContent = new ScrollViewer { VerticalScrollBarVisibility = ScrollBarVisibility.Auto, Content = list };
     }
 
     /// <summary>
