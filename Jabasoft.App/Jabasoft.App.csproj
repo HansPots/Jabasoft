@@ -21,6 +21,11 @@
          zodat Stylebook (en straks TabStudio/LocalAiStudio) 'm al
          draaiend aantreffen. -->
     <ProjectReference Include="..\..\Jabasoft.Base\Jabasoft.Base.csproj" />
+
+    <!-- SettingsView leest het "Instellingen"-component live uit dezelfde
+         database als Stylebook.Playground, zodat het via de Stylebook
+         gestyled kan worden zonder Jabasoft opnieuw te hoeven bouwen. -->
+    <ProjectReference Include="..\..\Jabasoft.Stylebook\Stylebook.Data\Stylebook.Data.csproj" />
   </ItemGroup>
 
   <ItemGroup>
