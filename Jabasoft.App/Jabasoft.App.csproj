@@ -15,6 +15,12 @@
          {DynamicResource}-tokens als Stylebook, zonder hier ooit een
          kleur te hoeven hardcoden. -->
     <ProjectReference Include="..\..\Jabasoft.Stylebook\Stylebook.Components\Stylebook.Components.csproj" />
+
+    <!-- AiBrokerProcessLauncher: Jabasoft is vaak de eerste app die de
+         gebruiker opstart, dus ook hier de broker alvast aanzwengelen
+         zodat Stylebook (en straks TabStudio/LocalAiStudio) 'm al
+         draaiend aantreffen. -->
+    <ProjectReference Include="..\..\Jabasoft.Base\Jabasoft.Base.csproj" />
   </ItemGroup>
 
   <ItemGroup>
