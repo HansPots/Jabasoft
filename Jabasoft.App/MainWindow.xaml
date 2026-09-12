@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:controls="clr-namespace:Stylebook.Components.Controls;assembly=Stylebook.Components"
         Title="Jabasoft" Height="1080" Width="1920"
+        WindowStartupLocation="CenterScreen"
         Background="{DynamicResource BackgroundBrush}">
 
     <Window.Resources>
