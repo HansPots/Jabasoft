@@ -5,6 +5,7 @@ using System.Text.Json;
 using System.Windows;
 using System.Windows.Automation;
 using System.Windows.Controls;
+using System.Windows.Media;
 
 namespace Jabasoft.App;
 
@@ -16,10 +17,19 @@ public partial class MainWindow : Window
     /// <summary>Gestarte processen per AppEntry.Name - zie StartOrFocusApp. Geen HasExited-polling nodig buiten wat hierin al gebeurt: elke klik checkt opnieuw.</summary>
     private readonly Dictionary<string, Process> _runningApps = [];
 
+    /// <summary>De oorspronkelijke Inhoud (het "kies een applicatie"-plaatje uit MainWindow.xaml), zodat de instellingen-knop daar weer naartoe kan terugschakelen.</summary>
+    private readonly object _defaultMainContent;
+
+    private readonly SettingsView _settingsView = new();
+
+    private bool _showingSettings;
+
     public MainWindow()
     {
         InitializeComponent();
+        _defaultMainContent = AppShell.MainContent;
         BuildAppList(LoadApps());
+        BuildActionContent();
     }
 
     /// <summary>
@@ -61,6 +71,37 @@ public partial class MainWindow : Window
         }
 
         AppShell.MenuContent = new ScrollViewer { VerticalScrollBarVisibility = ScrollBarVisibility.Auto, Content = list };
+    }
+
+    /// <summary>
+    /// De instellingen-knop in de Actie-rail - zelfde reden als
+    /// BuildAppList om dit in code-behind te doen i.p.v. rechtstreeks in
+    /// XAML (MC3093, zie MainWindow.xaml). Klikken schakelt de Inhoud om
+    /// tussen de standaardweergave en SettingsView, nogmaals klikken
+    /// schakelt terug - geen aparte "terug"-knop nodig voor deze eerste,
+    /// nog lege versie.
+    /// </summary>
+    private void BuildActionContent()
+    {
+        var settingsButton = new Button
+        {
+            Style = (Style)FindResource("IconActionButtonStyle"),
+            Content = new TextBlock
+            {
+                Text = (string)FindResource("IconSettings"),
+                FontFamily = (FontFamily)FindResource("IconFontFamily"),
+            },
+        };
+        AutomationProperties.SetName(settingsButton, "Instellingen");
+        settingsButton.Click += (_, _) => ToggleSettings();
+
+        AppShell.ActionContent = settingsButton;
+    }
+
+    private void ToggleSettings()
+    {
+        _showingSettings = !_showingSettings;
+        AppShell.MainContent = _showingSettings ? _settingsView : _defaultMainContent;
     }
 
     /// <summary>
