@@ -1,11 +1,11 @@
 <UserControl x:Class="Jabasoft.App.SettingsView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             Loaded="SettingsView_Loaded">
+             xmlns:inhoud="clr-namespace:Stylebook.Components.Regions.Inhoud;assembly=Stylebook.Components">
 
-    <!-- Host voor het live uit de Stylebook-database geladen "Instellingen"-
-         component (zie SettingsView.xaml.cs) - opnieuw geladen bij elke
-         Loaded, zodat een stylewijziging zichtbaar is zodra je hier
-         terugkomt, zonder Jabasoft.App te hoeven herstarten. -->
-    <ContentControl x:Name="Host" />
+    <!-- Host voor het echte, gecompileerde Instellingen-component (Inhoud-
+         regio, Stylebook.Components) - vroeger live uit de database
+         geparsed (XamlReader.Parse), nu gewoon een normale UserControl-
+         referentie zoals Header/Footer in MainWindow.xaml. -->
+    <inhoud:Instellingen />
 </UserControl>

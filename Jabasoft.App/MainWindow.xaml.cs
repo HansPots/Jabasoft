@@ -18,7 +18,7 @@ public partial class MainWindow : Window
     private readonly Dictionary<string, Process> _runningApps = [];
 
     /// <summary>De oorspronkelijke Inhoud (het "kies een applicatie"-plaatje uit MainWindow.xaml), zodat de instellingen-knop daar weer naartoe kan terugschakelen.</summary>
-    private readonly object _defaultMainContent;
+    private readonly object? _defaultMainContent;
 
     private readonly SettingsView _settingsView = new();
 

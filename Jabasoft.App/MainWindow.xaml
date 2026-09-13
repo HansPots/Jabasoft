@@ -2,6 +2,8 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:controls="clr-namespace:Stylebook.Components.Controls;assembly=Stylebook.Components"
+        xmlns:header="clr-namespace:Stylebook.Components.Regions.Header;assembly=Stylebook.Components"
+        xmlns:footer="clr-namespace:Stylebook.Components.Regions.Footer;assembly=Stylebook.Components"
         Title="Jabasoft" Height="1080" Width="1920"
         WindowStartupLocation="CenterScreen"
         Background="{DynamicResource BackgroundBrush}">
@@ -76,17 +78,14 @@
     <!-- Zelfde vaste Basis-schil (Header/Menu/Inhoud/Actie/Footer) als elk
          JabaSoft-app-venster, zie project-memory. Venstermaat 1920x1080 -
          de familie-standaard voor elke app behalve Stylebook (die blijft
-         breder, voor zijn drie-kolommen-opmaak). Regio-invulling voor
-         Jabasoft v1 bewust minimaal/functioneel: de app-launcherlijst in
-         het Menu-vak (dezelfde plek als Stylebook's eigen MENU-strook),
-         Header/Footer/Inhoud met simpele placeholders, Actie met de
-         instellingen-knop, tot dit via Stylebook gestyled wordt. -->
+         breder, voor zijn drie-kolommen-opmaak). Header/Footer zijn de
+         echte, gemigreerde Stylebook.Components-controls (zie
+         idempotent-sauteeing-valley.md) - Menu blijft de FUNCTIONELE
+         app-launcherlijst in code-behind (MainWindow.xaml.cs), bewust
+         niet vervangen door het decoratieve Navigatiemenu-component. -->
     <controls:Basis x:Name="AppShell">
         <controls:Basis.HeaderContent>
-            <TextBox Text="JABASOFT"
-                     Style="{StaticResource SelectableTextStyle}"
-                     FontSize="{StaticResource FontSizeTitle}"
-                     FontWeight="Bold" />
+            <header:HpoHeader />
         </controls:Basis.HeaderContent>
 
         <!-- MenuContent (de app-lijst) en ActionContent (de instellingen-
@@ -97,9 +96,7 @@
              x:Name in XAML staan. -->
 
         <controls:Basis.FooterContent>
-            <TextBox Text="Gereed"
-                     Style="{StaticResource SelectableTextStyle}"
-                     Foreground="{DynamicResource TextMutedBrush}" />
+            <footer:Footerbalk />
         </controls:Basis.FooterContent>
 
         <!-- MainContent (Inhoud) - via Basis' [ContentProperty]. -->
