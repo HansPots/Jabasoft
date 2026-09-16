@@ -34,7 +34,7 @@
         Jabasoft (Regions/Footer/Statusbalk), waar de vijf pillen samen de
         breedte verdelen. De HOOGTE blijft altijd 24.
     -->
-    <Border Height="24" CornerRadius="12"
+    <Border Height="24" CornerRadius="{DynamicResource RadiusLarge}"
             Background="{DynamicResource TextMutedBrush}"
             HorizontalAlignment="Stretch" VerticalAlignment="Center">
         <StackPanel Orientation="Horizontal" Margin="12,0" VerticalAlignment="Center">

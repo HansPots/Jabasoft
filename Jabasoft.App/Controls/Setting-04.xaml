@@ -21,7 +21,7 @@
     <!--
         Instellingenkaart: SPACING. De zwarte rand om elk van de vijf
         blokken van een pagina - header, menu, inhoud, actie en footer.
-        0 tot 5 px, met hele pixels (TickFrequency/IsSnapToTickEnabled),
+        0 tot 10 px, met hele pixels (TickFrequency/IsSnapToTickEnabled),
         want een halve pixel zou alleen maar vaag randje geven.
 
         Zelfde breedte (1568) en kaartopmaak als de andere kaarten, en
@@ -37,7 +37,7 @@
          hem plaatst er Width="Auto" op zetten en hem laten meerekken. Dat
          doet Regions/Inhoud/Instellingen, zodat het instellingenscherm in
          de app geen horizontale schuifbalk nodig heeft. -->
-    <Border MinWidth="480" CornerRadius="6" BorderThickness="2"
+    <Border MinWidth="480" CornerRadius="{DynamicResource RadiusMedium}" BorderThickness="{DynamicResource RegionBorderThickness}"
             Background="{DynamicResource SurfaceBrush}"
             BorderBrush="{DynamicResource BorderBrush}"
             HorizontalAlignment="Stretch" VerticalAlignment="Top">
@@ -45,15 +45,15 @@
             <TextBlock Text="SPACING" FontSize="{DynamicResource FontSizeTitle}" FontWeight="SemiBold"
                        Foreground="{DynamicResource Text01Brush}" />
 
-            <TextBlock x:Name="GapLabel" Text="Space around each block (header, menu, content, action, footer) &#8212; 0 px"
+            <TextBlock x:Name="GapLabel" Text="Space around each block (header, menu, content, action, footer) &#8212; 6 px"
                        Margin="0,14,0,6" FontSize="{DynamicResource FontSizeSmall}"
                        Foreground="{DynamicResource TextMutedBrush}" />
-            <Slider x:Name="GapSlider" Minimum="0" Maximum="5" Value="0"
+            <Slider x:Name="GapSlider" Minimum="0" Maximum="10" Value="6"
                     TickFrequency="1" IsSnapToTickEnabled="True"
                     ValueChanged="GapSlider_ValueChanged"
                     Style="{DynamicResource SliderAccentStyle}" />
 
-            <Button x:Name="ResetGapButton" Content="Reset to default (0 px)"
+            <Button x:Name="ResetGapButton" Content="Reset to default (6 px)"
                     Margin="0,16,0,0" Click="ResetGap_Click"
                     Style="{DynamicResource AccentButtonStyle}" />
         </StackPanel>

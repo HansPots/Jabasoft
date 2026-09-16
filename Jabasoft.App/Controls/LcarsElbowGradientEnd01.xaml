@@ -24,7 +24,7 @@
     <!-- Algemeen: LCARS-hoekblok (alleen linksonder rond), HeaderSideGradientEndBrush-kleur, 48x200. -->
     <Border theming:CornerRadiusParts.TopLeft="0"
             theming:CornerRadiusParts.TopRight="0"
-            theming:CornerRadiusParts.BottomRight="48"
+            theming:CornerRadiusParts.BottomRight="{DynamicResource RadiusElbow}"
             theming:CornerRadiusParts.BottomLeft="0"
             Background="{DynamicResource HeaderSideGradientEndBrush}"
             HorizontalAlignment="Stretch"

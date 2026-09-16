@@ -48,7 +48,7 @@
              groot als het kruisje en volgt de Foreground van de knop. -->
         <Button Width="34" Height="32" Background="Transparent" BorderThickness="0"
                 Foreground="{DynamicResource TextPrimaryBrush}">
-            <Border Width="12" Height="12" BorderThickness="1.5"
+            <Border Width="12" Height="12" BorderThickness="2"
                     BorderBrush="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" />
             <Button.Template>
                 <ControlTemplate TargetType="Button">

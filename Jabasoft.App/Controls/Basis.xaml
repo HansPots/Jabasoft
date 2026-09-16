@@ -32,15 +32,17 @@
         alleen de hoofdinhoud (kolom 2) en de ruimte tussen header/footer
         (rij 1) zijn variabel (*).
 
-        Elk van de vijf blokken heeft een Margin van RegionGapThickness: de
-        zwarte rand die met de SPACING-kaart op het instellingenscherm van
-        0 tot 5 px te zetten is (Controls/Setting-04, via
-        Theming/LayoutManager). De achtergrond van dit Grid is daarom
-        expliciet gezet - dat is wat je in die rand ziet. De rij- en
-        kolommaten hierboven veranderen NIET mee: de blokken houden hun
-        vak en krimpen binnen dat vak, zodat de pagina 1920x1080 blijft.
-        Tussen twee blokken raken twee randen elkaar, daar zie je dus het
-        dubbele van de ingestelde waarde.
+        Elk van de vijf blokken geeft ruimte aan zijn LINKER- en BOVENkant,
+        zo groot als de SPACING-instelling (Controls/Setting-04, via
+        Theming/LayoutManager). Niet rondom: dan zouden
+        twee blokken naast elkaar allebei een marge meebrengen en zag je
+        het dubbele van wat je instelt. Zo is elke ruimte precies de
+        ingestelde waarde. De onderste en rechterrand van de pagina hebben
+        geen buur die het kan doen; die komt van de opvulling op de Border
+        hieronder.
+
+        De achtergrond staat daarom op die Border - dat is wat je in al die
+        ruimtes ziet.
 
         De blokken hebben GEEN randlijn meer. Die 1px BorderBrush-lijnen
         tussen header/menu/inhoud/actie/footer waren de lichte strepen die
@@ -48,16 +50,32 @@
         komt nu van SPACING: zet je die op 0, dan is het scherm één vlak.
     -->
 
-    <Grid Background="{DynamicResource BackgroundBrush}">
+    <!-- De omhullende opvulling doet de onderste en rechterrand van de
+         pagina: de blokken hieronder geven alleen ruimte aan hun linker- en
+         bovenkant, en daar is aan die twee randen geen buur voor. -->
+    <Border Background="{DynamicResource BackgroundBrush}"
+            Padding="{DynamicResource RegionGapEndThickness}">
+    <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="210" />
+            <!-- Auto en geen vaste 210 en 24: de rij is dan precies zo hoog
+                 als wat erin staat PLUS de SPACING-rand eromheen. Die rand
+                 gaat dus niet meer van de beschikbare hoogte af - anders
+                 hield de footer bij 5 px nog maar 14 px over voor pillen
+                 die 24 hoog zijn, en werden die afgeknipt. De middenrij
+                 staat op "*" en vangt het verschil op, dus de pagina blijft
+                 1920x1080.
+
+                 Auto en niet een meegroeiende maat via DynamicResource: op
+                 een RowDefinition pikt die een latere wijziging niet op, en
+                 dan verspringt er bij het schuiven niets. -->
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
-            <RowDefinition Height="24" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
         <!-- Header: volle breedte, vaste hoogte -->
         <Border Grid.Row="0"
-                Margin="{DynamicResource RegionGapThickness}"
+                Margin="{DynamicResource RegionGapLeftTopThickness}"
                 Background="{DynamicResource SurfaceBrush}">
             <ContentPresenter Content="{Binding HeaderContent, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                HorizontalAlignment="Stretch"
@@ -73,7 +91,7 @@
             </Grid.ColumnDefinitions>
 
             <Border Grid.Column="0"
-                    Margin="{DynamicResource RegionGapThickness}"
+                    Margin="{DynamicResource RegionGapLeftTopThickness}"
                     Background="{DynamicResource SurfaceBrush}">
                 <ContentPresenter Content="{Binding MenuContent, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                    HorizontalAlignment="Stretch"
@@ -81,7 +99,7 @@
             </Border>
 
             <Border Grid.Column="1"
-                    Margin="{DynamicResource RegionGapThickness}"
+                    Margin="{DynamicResource RegionGapLeftTopThickness}"
                     Background="{DynamicResource BackgroundBrush}">
                 <ContentPresenter Content="{Binding MainContent, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                    HorizontalAlignment="Stretch"
@@ -89,7 +107,7 @@
             </Border>
 
             <Border Grid.Column="2"
-                    Margin="{DynamicResource RegionGapThickness}"
+                    Margin="{DynamicResource RegionGapLeftTopThickness}"
                     Background="{DynamicResource SurfaceBrush}">
                 <ContentPresenter Content="{Binding ActionContent, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                    HorizontalAlignment="Stretch"
@@ -99,12 +117,13 @@
 
         <!-- Footer: volle breedte, vaste hoogte -->
         <Border Grid.Row="2"
-                Margin="{DynamicResource RegionGapThickness}"
+                Margin="{DynamicResource RegionGapLeftTopThickness}"
                 Background="{DynamicResource SurfaceBrush}">
             <ContentPresenter Content="{Binding FooterContent, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                HorizontalAlignment="Stretch"
                                VerticalAlignment="Stretch" />
         </Border>
     </Grid>
+    </Border>
 
 </UserControl>

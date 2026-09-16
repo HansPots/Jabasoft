@@ -48,11 +48,12 @@
     <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
         <!-- Ook deze rand loopt mee met SPACING: op 0 sluiten de kaarten aan
              tegen de rand van het inhoudsvak. -->
-        <StackPanel Margin="{DynamicResource RegionGapThickness}">
+        <StackPanel>
             <controls:Setting01 Width="Auto" />
-            <controls:Setting02 Width="Auto" Margin="{DynamicResource RegionGapThickness}" />
-            <controls:Setting04 Width="Auto" Margin="{DynamicResource RegionGapThickness}" />
-            <controls:Setting03 Width="Auto" Margin="{DynamicResource RegionGapThickness}" />
+            <controls:Setting02 Width="Auto" Margin="{DynamicResource RegionGapTopThickness}" />
+            <controls:Setting04 Width="Auto" Margin="{DynamicResource RegionGapTopThickness}" />
+            <controls:Setting05 Width="Auto" Margin="{DynamicResource RegionGapTopThickness}" />
+            <controls:Setting03 Width="Auto" Margin="{DynamicResource RegionGapTopThickness}" />
         </StackPanel>
     </ScrollViewer>
 

@@ -31,7 +31,13 @@ public partial class Setting01 : UserControl
             return;
         }
 
+        var target = AppSettingsScope.NearestThemed(this);
         var theme = ReferenceEquals(sender, ThemeVsCode) ? Theme.VisualStudio : Theme.Lcars;
-        ThemeManager.Apply(theme, AppSettingsScope.NearestThemed(this));
+        ThemeManager.Apply(theme, target);
+
+        // De hoekstralen komen uit het thema en zijn dus net veranderd; de
+        // binnenstraal van de infoblok-titelbalk wordt daaruit afgeleid en
+        // moet opnieuw berekend worden.
+        LayoutManager.RefreshInnerRadius(target);
     }
 }

@@ -23,7 +23,7 @@
     <Border theming:CornerRadiusParts.TopLeft="0"
             theming:CornerRadiusParts.TopRight="0"
             theming:CornerRadiusParts.BottomRight="0"
-            theming:CornerRadiusParts.BottomLeft="48"
+            theming:CornerRadiusParts.BottomLeft="{DynamicResource RadiusElbow}"
             Background="{DynamicResource HeaderSideGradientEndBrush}"
             HorizontalAlignment="Stretch"
             VerticalAlignment="Stretch" />

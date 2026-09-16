@@ -33,7 +33,7 @@
         Jabasoft (Regions/Footer/Statusbalk), waar de vijf pillen samen de
         breedte verdelen. De HOOGTE blijft altijd 24.
     -->
-    <Border Height="24" CornerRadius="12"
+    <Border Height="24" CornerRadius="{DynamicResource RadiusLarge}"
             Background="{DynamicResource BorderBrush}"
             HorizontalAlignment="Stretch" VerticalAlignment="Center">
         <Grid Margin="12,0">
@@ -58,9 +58,9 @@
                 <!-- Spoor over de volle breedte, daaroverheen de vulling in
                      kolom 0 - zo blijft het spoor zichtbaar waar nog geen
                      vulling is. -->
-                <Border Grid.ColumnSpan="2" CornerRadius="2"
+                <Border Grid.ColumnSpan="2" CornerRadius="{DynamicResource RadiusSmall}"
                         Background="{DynamicResource BackgroundBrush}" Opacity="0.25" />
-                <Border Grid.Column="0" CornerRadius="2"
+                <Border Grid.Column="0" CornerRadius="{DynamicResource RadiusSmall}"
                         Background="{DynamicResource BackgroundBrush}" />
             </Grid>
         </Grid>

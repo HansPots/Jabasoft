@@ -44,7 +44,7 @@
 
                 <Border HorizontalAlignment="Stretch"
                         VerticalAlignment="Top"
-                        theming:CornerRadiusParts.TopLeft="36"
+                        theming:CornerRadiusParts.TopLeft="{DynamicResource RadiusBar}"
                         theming:CornerRadiusParts.TopRight="0"
                         theming:CornerRadiusParts.BottomRight="0"
                         theming:CornerRadiusParts.BottomLeft="0"

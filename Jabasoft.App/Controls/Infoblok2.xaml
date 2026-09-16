@@ -26,8 +26,8 @@
     -->
     <Border Background="{DynamicResource SurfaceBrush}"
             BorderBrush="{DynamicResource BorderBrush}"
-            BorderThickness="2"
-            CornerRadius="6"
+            BorderThickness="{DynamicResource RegionBorderThickness}"
+            CornerRadius="{DynamicResource RadiusMedium}"
             HorizontalAlignment="Stretch">
         <StackPanel>
             <!-- Hoekstraal 5, niet 6: de buitenrand heeft straal 6 met een
@@ -39,7 +39,7 @@
                  centreert zichzelf verticaal. Padding links 8 = dezelfde
                  inspringing als de bodytekst hieronder (StackPanel Margin links 8),
                  zodat "InfoBlok" en de bodytekst exact onder elkaar beginnen. -->
-            <Border Background="{DynamicResource BorderBrush}" CornerRadius="4,4,0,0" Height="24" Padding="8,0">
+            <Border Background="{DynamicResource BorderBrush}" CornerRadius="{DynamicResource RegionBorderInnerRadius}" Height="24" Padding="8,0">
                 <TextBlock Text="InfoBlok" FontSize="18" Foreground="{DynamicResource Text01Brush}" VerticalAlignment="Center" TextWrapping="Wrap" Height="24" HorizontalAlignment="Left" TextAlignment="Center" />
             </Border>
             <StackPanel Margin="8">

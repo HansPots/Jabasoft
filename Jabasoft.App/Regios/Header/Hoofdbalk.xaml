@@ -78,20 +78,25 @@
                 <ColumnDefinition Width="48" />
             </Grid.ColumnDefinitions>
 
-            <!-- Height="Auto" zet de eigen hoogte van de elleboog (200) uit,
+            <!-- Alleen verticale marge: links en rechts liggen deze twee
+                 tegen de rand van het headerblok, en die heeft zijn eigen
+                 SPACING-rand al. Een marge rondom zou die ruimte daar
+                 verdubbelen.
+
+                 Height="Auto" zet de eigen hoogte van de elleboog (200) uit,
                  zodat hij precies deze rij vult. Er wordt dus NIETS meer
                  weggeknipt: de ronding onderaan staat er helemaal op, en
                  wat er boven wegvalt is toch recht. Eerder hing hier een
                  ClipToBounds-Border omheen, en die sneed juist de ronding
                  er onderaan af. -->
-            <controls:LcarsElbowGradientEnd Grid.Column="0" Height="Auto" VerticalAlignment="Stretch" />
+            <controls:LcarsElbowGradientEnd Grid.Column="0" Height="Auto" Margin="{DynamicResource RegionGapTopThickness}" VerticalAlignment="Stretch" />
 
-            <controls:Infoblok3 Grid.Column="1" Width="Auto" Height="Auto" Margin="{DynamicResource RegionGapThickness}" VerticalAlignment="Stretch" />
-            <controls:Infoblok2 Grid.Column="2" Width="Auto" Height="Auto" Margin="{DynamicResource RegionGapThickness}" VerticalAlignment="Stretch" />
-            <controls:Infoblok3 Grid.Column="3" Width="Auto" Height="Auto" Margin="{DynamicResource RegionGapThickness}" VerticalAlignment="Stretch" />
-            <controls:Infoblok2 Grid.Column="4" Width="Auto" Height="Auto" Margin="{DynamicResource RegionGapThickness}" VerticalAlignment="Stretch" />
+            <controls:Infoblok3 Grid.Column="1" Width="Auto" Height="Auto" Margin="{DynamicResource RegionGapLeftTopThickness}" VerticalAlignment="Stretch" />
+            <controls:Infoblok2 Grid.Column="2" Width="Auto" Height="Auto" Margin="{DynamicResource RegionGapLeftTopThickness}" VerticalAlignment="Stretch" />
+            <controls:Infoblok3 Grid.Column="3" Width="Auto" Height="Auto" Margin="{DynamicResource RegionGapLeftTopThickness}" VerticalAlignment="Stretch" />
+            <controls:Infoblok2 Grid.Column="4" Width="Auto" Height="Auto" Margin="{DynamicResource RegionGapLeftTopThickness}" VerticalAlignment="Stretch" />
 
-            <controls:LcarsElbowGradientEnd01 Grid.Column="5" Height="Auto" VerticalAlignment="Stretch" />
+            <controls:LcarsElbowGradientEnd01 Grid.Column="5" Height="Auto" Margin="{DynamicResource RegionGapLeftTopThickness}" VerticalAlignment="Stretch" />
         </Grid>
 
         <!-- Het beeldmerk ligt over de kleurbalk heen, net als in het

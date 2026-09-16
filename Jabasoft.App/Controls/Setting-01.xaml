@@ -34,7 +34,7 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="RadioButton">
-                        <Border x:Name="Bd" CornerRadius="6" BorderThickness="1" Padding="14,0"
+                        <Border x:Name="Bd" CornerRadius="{DynamicResource RadiusMedium}" BorderThickness="2" Padding="14,0"
                                 Background="{DynamicResource BackgroundBrush}"
                                 BorderBrush="{DynamicResource BorderBrush}">
                             <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
@@ -73,7 +73,7 @@
          hem plaatst er Width="Auto" op zetten en hem laten meerekken. Dat
          doet Regions/Inhoud/Instellingen, zodat het instellingenscherm in
          de app geen horizontale schuifbalk nodig heeft. -->
-    <Border MinWidth="480" CornerRadius="6" BorderThickness="2"
+    <Border MinWidth="480" CornerRadius="{DynamicResource RadiusMedium}" BorderThickness="{DynamicResource RegionBorderThickness}"
             Background="{DynamicResource SurfaceBrush}"
             BorderBrush="{DynamicResource BorderBrush}"
             HorizontalAlignment="Stretch" VerticalAlignment="Top">

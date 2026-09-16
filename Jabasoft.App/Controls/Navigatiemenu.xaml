@@ -52,8 +52,8 @@
 
             <Border Grid.RowSpan="2"
                     Background="{DynamicResource TextMutedBrush}"
-                    theming:CornerRadiusParts.TopLeft="48"
-                    theming:CornerRadiusParts.BottomLeft="48"/>
+                    theming:CornerRadiusParts.TopLeft="{DynamicResource RadiusElbow}"
+                    theming:CornerRadiusParts.BottomLeft="{DynamicResource RadiusElbow}"/>
 
             <StackPanel Grid.Row="0"
                         theming:MarginParts.Left="{DynamicResource SpaceMedium}"
@@ -171,7 +171,7 @@
                      breedte van het blok. -->
                 <Border Background="{DynamicResource BackgroundBrush}"
                         HorizontalAlignment="Stretch"
-                        Height="8" />
+                        Height="{DynamicResource RegionGapSize}" />
 
                 <!-- Versie-indicator: wordt bij iedere wijziging aan deze app
                      handmatig opgehoogd (laatste cijfer +1). -->
@@ -179,7 +179,7 @@
                         theming:CornerRadiusParts.TopLeft="0"
                         theming:CornerRadiusParts.TopRight="0"
                         theming:CornerRadiusParts.BottomRight="0"
-                        theming:CornerRadiusParts.BottomLeft="48"
+                        theming:CornerRadiusParts.BottomLeft="{DynamicResource RadiusElbow}"
                         Background="{DynamicResource AccentBrush}"
                         HorizontalAlignment="Stretch"
                         Height="40">
@@ -190,7 +190,7 @@
                                Margin="30,0,16,0"
                                VerticalAlignment="Center"
                                TextAlignment="Right"
-                               Text="V 0.1.0.46" />
+                               Text="V 0.1.0.57" />
                 </Border>
             </StackPanel>
         </Grid>

@@ -4,7 +4,7 @@
              xmlns:controls="clr-namespace:Jabasoft.App.Controls"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             mc:Ignorable="d" Height="24"
+             mc:Ignorable="d" d:DesignHeight="24"
              d:DesignWidth="1920">
 
     <!-- Design-time-only: geeft Visual Studio/Blend's Designer een
@@ -29,8 +29,11 @@
         van dat component uit (288/384/436) zodat de kolom de maat bepaalt;
         zonder dat zouden ze op hun oorspronkelijke breedte blijven staan.
 
-        De HOOGTE verandert nooit: 24 op dit component en 24 op elke pil,
-        gelijk aan de footerrij in Basis.xaml. Tussen de pillen 8px lucht,
+        GEEN vaste hoogte op dit component: het is zo hoog als de pillen
+        (24) plus de SPACING-rand die ze eromheen krijgen. Stond hier wel
+        een vaste 24, dan ging die rand van de pillen af en werden ze bij
+        SPACING 5 tot 14 px afgeknipt. De footerrij in Basis staat op Auto
+        en volgt dit, dus de footer groeit netjes mee. Tussen de pillen 8px lucht,
         aan de buitenkanten niet - dat is de ruimte die de SPACING-
         instelling eventueel al geeft.
     -->
@@ -43,11 +46,11 @@
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
-        <controls:Footer01 Grid.Column="0" Width="Auto" Margin="{DynamicResource RegionGapThickness}" />
-        <controls:Footer02 Grid.Column="1" Width="Auto" Margin="{DynamicResource RegionGapThickness}" />
-        <controls:Footer03 Grid.Column="2" Width="Auto" Margin="{DynamicResource RegionGapThickness}" />
-        <controls:Footer04 Grid.Column="3" Width="Auto" Margin="{DynamicResource RegionGapThickness}" />
-        <controls:Footer05 Grid.Column="4" Width="Auto" Margin="{DynamicResource RegionGapThickness}" />
+        <controls:Footer01 Grid.Column="0" Width="Auto" />
+        <controls:Footer02 Grid.Column="1" Width="Auto" Margin="{DynamicResource RegionGapLeftThickness}" />
+        <controls:Footer03 Grid.Column="2" Width="Auto" Margin="{DynamicResource RegionGapLeftThickness}" />
+        <controls:Footer04 Grid.Column="3" Width="Auto" Margin="{DynamicResource RegionGapLeftThickness}" />
+        <controls:Footer05 Grid.Column="4" Width="Auto" Margin="{DynamicResource RegionGapLeftThickness}" />
     </Grid>
 
 </UserControl>
