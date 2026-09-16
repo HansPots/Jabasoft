@@ -9,12 +9,20 @@
                 <!-- Shared typography/styles every real app merges in -
                      see Stylebook.Components/Styles/Theme.xaml. -->
                 <ResourceDictionary Source="pack://application:,,,/Stylebook.Components;component/Styles/Theme.xaml" />
-                <!-- Jabasoft v1 has no database of its own, so no
-                     DB-driven live theme (unlike Stylebook.Playground) -
-                     just the static Visual Studio palette, same
-                     "fixed look, always" choice Stylebook.Playground's
-                     own chrome makes. -->
-                <ResourceDictionary Source="pack://application:,,,/Stylebook.Components;component/Styles/Themes/VisualStudio.xaml" />
+                <!-- LCARS is het startthema: dat is de huisstijl waarin de
+                     componenten ontworpen worden, dus zo hoort de app er bij
+                     het opstarten uit te zien. Het is geen VAST thema meer -
+                     de THEMA-kaart op het instellingenscherm
+                     (Stylebook.Components/Controls/Setting-01) wisselt dit
+                     hier live om via ThemeManager. Daarom moet deze regel
+                     rechtstreeks in Application.Resources staan en niet
+                     genest in Theme.xaml; zie de toelichting daar.
+
+                     Dit moet ook gelijk blijven aan de stand waarop die
+                     kaart begint (ThemeLcars staat op IsChecked="True"),
+                     anders zegt de kaart LCARS terwijl er iets anders
+                     draait - en doet klikken op LCARS niets. -->
+                <ResourceDictionary Source="pack://application:,,,/Stylebook.Components;component/Styles/Themes/Lcars.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>

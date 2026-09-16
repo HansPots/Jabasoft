@@ -6,6 +6,8 @@ using System.Windows;
 using System.Windows.Automation;
 using System.Windows.Controls;
 using System.Windows.Media;
+using Stylebook.Components.Controls;
+using InhoudSchermen = Stylebook.Components.Regions.Inhoud;
 
 namespace Jabasoft.App;
 
@@ -14,11 +16,16 @@ namespace Jabasoft.App;
 /// </summary>
 public partial class MainWindow : Window
 {
+    /// <summary>De naam in appsettings.json van de app die de Stylebook-knop start.</summary>
+    private const string StylebookAppName = "Stylebook";
+
     /// <summary>Gestarte processen per AppEntry.Name - zie StartOrFocusApp. Geen HasExited-polling nodig buiten wat hierin al gebeurt: elke klik checkt opnieuw.</summary>
     private readonly Dictionary<string, Process> _runningApps = [];
 
-    /// <summary>De oorspronkelijke Inhoud (het "kies een applicatie"-plaatje uit MainWindow.xaml), zodat de instellingen-knop daar weer naartoe kan terugschakelen.</summary>
-    private readonly object? _defaultMainContent;
+    private readonly List<AppEntry> _apps = LoadApps();
+
+    /// <summary>De twee schermen waar het menu tussen schakelt. Eén keer gemaakt en hergebruikt, zodat wat je erin invult niet weg is als je even naar het andere scherm kijkt.</summary>
+    private readonly InhoudSchermen.Hoofdscherm _hoofdscherm = new();
 
     private readonly SettingsView _settingsView = new();
 
@@ -27,9 +34,9 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
-        _defaultMainContent = AppShell.MainContent;
-        BuildAppList(LoadApps());
+        BuildMenu();
         BuildActionContent();
+        ShowContent(settings: false);
     }
 
     /// <summary>
@@ -37,6 +44,11 @@ public partial class MainWindow : Window
     /// System.Text.Json op een platte array, geen
     /// Microsoft.Extensions.Configuration nodig voor zoiets simpels
     /// (geen geneste/typed settings-binding, alleen een lijst objecten).
+    ///
+    /// Sinds het menu uit vaste knoppen bestaat wordt hier alleen nog het
+    /// PAD naar Stylebook uit gehaald; de lijst wordt niet meer als menu
+    /// getoond. De overige entries blijven staan voor als ze een knop
+    /// krijgen.
     /// </summary>
     private static List<AppEntry> LoadApps()
     {
@@ -49,37 +61,52 @@ public partial class MainWindow : Window
     }
 
     /// <summary>
-    /// Bouwt de rijen in code-behind en wijst het geheel toe aan
-    /// AppShell.MenuContent - kan niet als x:Name'd element rechtstreeks
-    /// in XAML onder Basis.MenuContent staan (MC3093, zie MainWindow.xaml).
+    /// Zet het gedeelde Navigatiemenu in het Menu-vak. Het menu meldt
+    /// alleen WELKE knop is aangeklikt; wat daarop gebeurt staat hier,
+    /// zodat het component zelf niets van Jabasoft hoeft te weten.
+    ///
+    /// In code-behind en niet rechtstreeks in XAML, om dezelfde reden als
+    /// voorheen: een x:Name'd element dat als property-waarde aan
+    /// Hoofdscherm wordt meegegeven botst met diens naam-scope (MC3093,
+    /// zie MainWindow.xaml).
     /// </summary>
-    private void BuildAppList(List<AppEntry> apps)
+    private void BuildMenu()
     {
-        var list = new StackPanel { Margin = new Thickness(16) };
+        var menu = new Navigatiemenu();
+        AutomationProperties.SetName(menu, "Hoofdmenu");
+        menu.ItemSelected += (_, item) => Navigate(item);
+        AppShell.MenuContent = menu;
+    }
 
-        foreach (var app in apps)
+    private void Navigate(NavigatiemenuItem item)
+    {
+        switch (item)
         {
-            var button = new Button
-            {
-                Style = (Style)FindResource("AppEntryButtonStyle"),
-                Content = app.Available ? app.DisplayName : $"{app.DisplayName} (nog niet herbouwd)",
-                IsEnabled = app.Available,
-            };
-            AutomationProperties.SetName(button, app.DisplayName);
-            button.Click += (_, _) => StartOrFocusApp(app);
-            list.Children.Add(button);
+            case NavigatiemenuItem.Stylebook:
+                StartStylebook();
+                break;
+            case NavigatiemenuItem.Settings:
+                ShowContent(settings: true);
+                break;
+            default:
+                ShowContent(settings: false);
+                break;
         }
+    }
 
-        AppShell.MenuContent = new ScrollViewer { VerticalScrollBarVisibility = ScrollBarVisibility.Auto, Content = list };
+    /// <summary>Zet het inhoudsvak op één van de twee schermen. Alle wegen ernaartoe (menu én de knop in de Actie-rail) lopen hierlangs, zodat die twee elkaar niet tegenspreken.</summary>
+    private void ShowContent(bool settings)
+    {
+        _showingSettings = settings;
+        AppShell.MainContent = settings ? _settingsView : _hoofdscherm;
     }
 
     /// <summary>
     /// De instellingen-knop in de Actie-rail - zelfde reden als
-    /// BuildAppList om dit in code-behind te doen i.p.v. rechtstreeks in
-    /// XAML (MC3093, zie MainWindow.xaml). Klikken schakelt de Inhoud om
-    /// tussen de standaardweergave en SettingsView, nogmaals klikken
-    /// schakelt terug - geen aparte "terug"-knop nodig voor deze eerste,
-    /// nog lege versie.
+    /// BuildMenu om dit in code-behind te doen i.p.v. rechtstreeks in
+    /// XAML (MC3093, zie MainWindow.xaml). Klikken schakelt heen en weer
+    /// tussen het hoofdscherm en de instellingen; hij deelt zijn stand met
+    /// de Settings-knop in het menu.
     /// </summary>
     private void BuildActionContent()
     {
@@ -93,15 +120,17 @@ public partial class MainWindow : Window
             },
         };
         AutomationProperties.SetName(settingsButton, "Instellingen");
-        settingsButton.Click += (_, _) => ToggleSettings();
+        settingsButton.Click += (_, _) => ShowContent(!_showingSettings);
 
         AppShell.ActionContent = settingsButton;
     }
 
-    private void ToggleSettings()
+    private void StartStylebook()
     {
-        _showingSettings = !_showingSettings;
-        AppShell.MainContent = _showingSettings ? _settingsView : _defaultMainContent;
+        if (_apps.FirstOrDefault(app => app.Name == StylebookAppName) is { Available: true } stylebook)
+        {
+            StartOrFocusApp(stylebook);
+        }
     }
 
     /// <summary>

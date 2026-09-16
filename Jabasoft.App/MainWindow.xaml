@@ -80,22 +80,17 @@
          ActionContent, precies zoals Basis zelf werkt. Venstermaat
          1920x1080 - de familie-standaard voor elke app behalve
          Stylebook (die blijft breder, voor zijn drie-kolommen-opmaak).
-         Menu blijft de FUNCTIONELE app-launcherlijst in code-behind
-         (MainWindow.xaml.cs), bewust niet vervangen door het
-         decoratieve Navigatiemenu-component. -->
+         Het Menu is het gedeelde Navigatiemenu-component met de knoppen
+         Main/Stylebook/Settings; de oude app-launcherlijst is vervallen,
+         alleen Stylebook is als knop overgebleven. -->
     <apps:Hoofdscherm x:Name="AppShell">
-        <!-- MenuContent (de app-lijst) en ActionContent (de instellingen-
-             knop) worden in code-behind opgebouwd en toegewezen (zie
-             MainWindow.xaml.cs) - x:Name op een element DAT als
-             property-waarde aan Hoofdscherm wordt meegegeven botst met
-             Hoofdscherm's eigen naam-scope (MC3093), dus kunnen ze hier
-             niet direct met x:Name in XAML staan. -->
-
-        <!-- MainContent (Inhoud) - via Hoofdscherm's [ContentProperty]. -->
-        <TextBox Text="Kies een applicatie in het menu om te starten."
-                 Style="{StaticResource SelectableTextStyle}"
-                 Foreground="{DynamicResource TextMutedBrush}"
-                 HorizontalAlignment="Center"
-                 VerticalAlignment="Center" />
+        <!-- Menu, Inhoud en Actie worden alle drie in code-behind gevuld
+             (zie MainWindow.xaml.cs): het Navigatiemenu, het scherm waar
+             dat menu naartoe schakelt, en de instellingen-knop. Ze kunnen
+             hier niet met x:Name in XAML staan - een x:Name'd element DAT
+             als property-waarde aan Hoofdscherm wordt meegegeven botst met
+             diens eigen naam-scope (MC3093). Vandaar ook geen inhoud meer
+             tussen deze tags: het inhoudsvak wordt bij het opstarten
+             meteen op het Hoofdscherm-component gezet. -->
     </apps:Hoofdscherm>
 </Window>
