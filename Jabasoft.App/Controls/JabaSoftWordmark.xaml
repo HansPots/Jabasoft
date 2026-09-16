@@ -1,0 +1,102 @@
+<UserControl x:Class="Jabasoft.App.Controls.JabaSoftWordmark"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="clr-namespace:Jabasoft.App.Controls"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d"
+             FontFamily="{StaticResource LogoFontFamily}">
+
+    <!-- Design-time-only: geeft Visual Studio/Blend's Designer een
+         thema-context (kleuren, lettertype) - deze class library heeft
+         zelf geen App.xaml die dat normaal doet. mc:Ignorable="d" zorgt
+         dat dit bij het echt compileren/draaien volledig wegvalt. -->
+    <d:UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/Stylebook.Components;component/Styles/Theme.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/Stylebook.Components;component/Styles/Themes/Lcars.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </d:UserControl.Resources>
+
+    <!--
+        Algemeen: het "JabaSoft the Application"-beeldmerk, op een balk in
+        de achtergrondkleur.
+
+        De balk is NIET op een vaste breedte gezet: de Border krijgt geen
+        Width en staat links uitgelijnd, dus hij krimpt en groeit precies
+        met het beeldmerk mee. Beide kolommen van het raster staan op Auto,
+        en de tweede kolom bevat de applicatienaam - wordt die naam langer,
+        dan wordt de kolom breder, het raster breder en dus de balk breder.
+        Links en rechts blijft er altijd SpaceLarge (24) over, vandaar
+        Padding="24,0". Boven en onder staat niets: de hoogte volgt de
+        letters.
+
+        Let op: 24 staat hier als getal en niet als
+        Padding="{DynamicResource SpaceLarge}", omdat SpaceLarge een
+        Thickness van 24 RONDOM is - dat zou er ook 24 boven en onder bij
+        zetten.
+
+        Boven en onder moet er juist zo min mogelijk zwart staan, vandaar
+        de negatieve marge op het raster hieronder. Die opvulling komt niet
+        van de Border (Padding is daar 0) maar van het lettertype zelf: een
+        TextBlock van 48px reserveert ruim 60px regelhoogte, ook als er in
+        "Jaba" geen stok of staart zit die zo hoog of laag komt. Gemeten in
+        Segoe UI bleef er 16px leeg boven de letters en 7px onder de
+        applicatienaam; die twee worden hier weggetrokken. De letters zelf
+        verschuiven niet t.o.v. elkaar - alleen de balk krimpt eromheen.
+
+        Dat die twee getallen blijven kloppen, hangt eraan dat het
+        lettertype hier vastligt: bovenaan staat daarom
+        FontFamily="{StaticResource LogoFontFamily}" op het UserControl
+        zelf. Dit is een beeldmerk, geen interfacetekst - het hoort niet
+        mee te wisselen met de lettertype-instelling van de gebruiker. Zou
+        het dat wel doen, dan klopt niet alleen deze trimming niet meer,
+        maar ook de 101 bij "Soft" hieronder; de hele opbouw is op Segoe UI
+        uitgemeten. Zie Styles/Typography.xaml voor waarom LogoFontFamily
+        los staat van AppFontFamily.
+    -->
+    <Border Background="{DynamicResource BackgroundBrush}"
+            Padding="24,0"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top">
+        <Grid Margin="0,-16,0,-7">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="3*"/>
+                <RowDefinition Height="1*"/>
+            </Grid.RowDefinitions>
+
+            <TextBlock Grid.Row="0" Grid.RowSpan="2" Grid.Column="0"
+                       Text="Jaba"
+                       FontWeight="Bold"
+                       FontSize="48"
+                       Foreground="{DynamicResource AccentBrush}"
+                       VerticalAlignment="Bottom"/>
+
+            <TextBlock Grid.Row="0"
+                       Text="Soft"
+                       FontWeight="Bold"
+                       FontSize="36"
+                       Foreground="{DynamicResource Text01Brush}"
+                       VerticalAlignment="Top"
+                       Margin="101,4,1,0" Grid.RowSpan="2" Grid.ColumnSpan="2"/>
+
+            <!-- Geen vaste tekst meer: de applicatie zet straks
+                 ApplicationName (zie JabaSoftWordmark.xaml.cs). Staat die
+                 niet gezet, dan blijft "the Application" staan. -->
+            <TextBlock Grid.Row="1" Grid.Column="1"
+                       Text="{Binding ApplicationName, RelativeSource={RelativeSource AncestorType={x:Type controls:JabaSoftWordmark}}}"
+                       FontSize="12"
+                       Foreground="{DynamicResource TextMutedBrush}"
+                       HorizontalAlignment="Right"
+                       VerticalAlignment="Bottom"
+                       Margin="0,0,0,8"/>
+        </Grid>
+    </Border>
+
+</UserControl>

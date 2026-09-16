@@ -1,0 +1,59 @@
+<UserControl x:Class="Jabasoft.App.Regios.Inhoud.Instellingen"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="clr-namespace:Jabasoft.App.Controls"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d">
+
+    <!-- Design-time-only: geeft Visual Studio/Blend's Designer een
+         thema-context (kleuren, lettertype) - deze class library heeft
+         zelf geen App.xaml die dat normaal doet. mc:Ignorable="d" zorgt
+         dat dit bij het echt compileren/draaien volledig wegvalt. -->
+    <d:UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/Stylebook.Components;component/Styles/Theme.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/Stylebook.Components;component/Styles/Themes/Lcars.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </d:UserControl.Resources>
+
+    <!--
+        Inhoud-regio component: Jabasoft.App's instellingenscherm - waar de
+        Settings-knop in het menu en de knop in de Actie-rail naartoe
+        schakelen (zie Jabasoft.App/MainWindow.xaml.cs). Vroeger via
+        XamlReader.Parse live uit de database gelezen door SettingsView, nu
+        een echt, gecompileerd component dat SettingsView rechtstreeks host.
+
+        Dit component IS de instellingenpagina van Jabasoft: het stapelt de
+        losse kaarten uit Controls/ onder elkaar, in deze volgorde:
+        Setting-01 THEMA, Setting-02 FONT, Setting-04 SPACING en
+        Setting-03 REFRESH TIME. De nummers lopen dus niet gelijk met de
+        volgorde op het scherm - SPACING kwam er later bij maar hoort op de
+        derde plek. Een kaart erbij of eraf is één regel hier; de kaart
+        zelf blijft op zichzelf te bekijken in de Controls-modus van het
+        Stylebook.
+
+        Width="Auto" op elke kaart zet hun eigen standaardbreedte (1568)
+        uit, zodat ze hier meerekken met het inhoudsvak. Die standaard
+        blijft wel op de kaarten zelf staan - anders zouden ze op het
+        Regions-canvas in het Stylebook inklappen.
+
+        Omdat er niets meer opzij wegvalt staat de horizontale schuifbalk
+        UIT; met "Auto" zou hij bij een pixel afrondingsverschil alsnog
+        verschijnen. Verticaal blijft hij op Auto, want meer kaarten dan er
+        passen kan gewoon.
+    -->
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+        <!-- Ook deze rand loopt mee met SPACING: op 0 sluiten de kaarten aan
+             tegen de rand van het inhoudsvak. -->
+        <StackPanel Margin="{DynamicResource RegionGapThickness}">
+            <controls:Setting01 Width="Auto" />
+            <controls:Setting02 Width="Auto" Margin="{DynamicResource RegionGapThickness}" />
+            <controls:Setting04 Width="Auto" Margin="{DynamicResource RegionGapThickness}" />
+            <controls:Setting03 Width="Auto" Margin="{DynamicResource RegionGapThickness}" />
+        </StackPanel>
+    </ScrollViewer>
+
+</UserControl>

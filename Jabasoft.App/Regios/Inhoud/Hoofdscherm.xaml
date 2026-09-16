@@ -1,0 +1,46 @@
+<UserControl x:Class="Jabasoft.App.Regios.Inhoud.Hoofdscherm"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d"
+             d:DesignWidth="1616" d:DesignHeight="846">
+
+    <!-- Design-time-only: geeft Visual Studio/Blend's Designer een
+         thema-context (kleuren, lettertype) - deze class library heeft
+         zelf geen App.xaml die dat normaal doet. mc:Ignorable="d" zorgt
+         dat dit bij het echt compileren/draaien volledig wegvalt. -->
+    <d:UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/Stylebook.Components;component/Styles/Theme.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/Stylebook.Components;component/Styles/Themes/Lcars.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </d:UserControl.Resources>
+
+    <!--
+        Inhoud-regio component: het startscherm van Jabasoft - waar de
+        Main-knop in het menu naartoe schakelt (zie Controls/Navigatiemenu
+        en Jabasoft.App/MainWindow.xaml.cs).
+
+        Nog leeg, net zoals Instellingen dat was voordat de
+        instellingenkaarten er in kwamen. Vul 'm in het Stylebook: maak een
+        regioconcept onder Inhoud en zet de controls erin, of bouw hier
+        rechtstreeks verder.
+
+        Let op de naam: er bestaat ook Apps/Jabasoft/Hoofdscherm, en dat is
+        iets anders - dat is de hele Basis-schil van de PAGINA (header,
+        menu, inhoud, actie, footer bij elkaar). Dit hier is alleen wat er
+        in het inhoudsvak van die schil komt te staan. Andere namespace,
+        dus ze bijten elkaar niet.
+    -->
+    <Grid>
+        <TextBox Text="Hoofdscherm - nog niets hier."
+                 Style="{DynamicResource SelectableTextStyle}"
+                 Foreground="{DynamicResource TextMutedBrush}"
+                 HorizontalAlignment="Center"
+                 VerticalAlignment="Center" />
+    </Grid>
+
+</UserControl>

@@ -6,8 +6,8 @@ using System.Windows;
 using System.Windows.Automation;
 using System.Windows.Controls;
 using System.Windows.Media;
-using Stylebook.Components.Controls;
-using InhoudSchermen = Stylebook.Components.Regions.Inhoud;
+using Jabasoft.App.Controls;
+using InhoudSchermen = Jabasoft.App.Regios.Inhoud;
 
 namespace Jabasoft.App;
 

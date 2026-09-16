@@ -1,0 +1,51 @@
+<UserControl x:Class="Jabasoft.App.Paginas.Hoofdscherm"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="clr-namespace:Jabasoft.App.Controls"
+             xmlns:header="clr-namespace:Jabasoft.App.Regios.Header"
+             xmlns:footer="clr-namespace:Jabasoft.App.Regios.Footer"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d"
+             d:DesignWidth="1920" d:DesignHeight="1080">
+
+    <!-- Design-time-only: geeft Visual Studio/Blend's Designer een
+         thema-context (kleuren, lettertype) - deze class library heeft
+         zelf geen App.xaml die dat normaal doet. mc:Ignorable="d" zorgt
+         dat dit bij het echt compileren/draaien volledig wegvalt. -->
+    <d:UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/Stylebook.Components;component/Styles/Theme.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/Stylebook.Components;component/Styles/Themes/Lcars.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </d:UserControl.Resources>
+
+    <!--
+        De opgeslagen paginacompositie voor Jabasoft's hoofdscherm - een
+        Basis met de Header en de Footer er al in gebakken: Hoofdbalk en
+        Statusbalk. Die twee rekken mee in de breedte maar nooit in de
+        hoogte (210 en 24), zie hun eigen bestanden.
+
+        Menu/Inhoud/Actie zijn BEWUST niet gebakken: die vult de echte,
+        draaiende Jabasoft.App in code-behind (het Navigatiemenu, het
+        scherm waar dat menu naartoe schakelt, en de instellingen-knop -
+        zie Jabasoft.App/MainWindow.xaml.cs). Dit component geeft die drie
+        slots gewoon door aan zijn eigen MenuContent/MainContent/
+        ActionContent-properties, precies zoals Basis zelf al werkt.
+
+        Bestaat vooral zodat Stylebook.Playground dit hoofdscherm kan
+        tonen/beoordelen zonder een projectverwijzing naar Jabasoft.App
+        nodig te hebben - zie idempotent-sauteeing-valley.md.
+    -->
+    <controls:Basis x:Name="Shell">
+        <controls:Basis.HeaderContent>
+            <header:Hoofdbalk />
+        </controls:Basis.HeaderContent>
+        <controls:Basis.FooterContent>
+            <footer:Statusbalk />
+        </controls:Basis.FooterContent>
+    </controls:Basis>
+
+</UserControl>

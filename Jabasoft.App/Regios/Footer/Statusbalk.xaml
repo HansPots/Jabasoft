@@ -1,0 +1,53 @@
+<UserControl x:Class="Jabasoft.App.Regios.Footer.Statusbalk"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="clr-namespace:Jabasoft.App.Controls"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d" Height="24"
+             d:DesignWidth="1920">
+
+    <!-- Design-time-only: geeft Visual Studio/Blend's Designer een
+         thema-context (kleuren, lettertype) - deze class library heeft
+         zelf geen App.xaml die dat normaal doet. mc:Ignorable="d" zorgt
+         dat dit bij het echt compileren/draaien volledig wegvalt. -->
+    <d:UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/Stylebook.Components;component/Styles/Theme.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/Stylebook.Components;component/Styles/Themes/Lcars.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </d:UserControl.Resources>
+
+    <!--
+        Footer-regio component: de vijf statuspillen op een rij.
+
+        Vijf gelijke sterkolommen, dus elke pil krijgt exact een vijfde van
+        de breedte en ze rekken alle vijf mee als het venster breder of
+        smaller wordt. Width="Auto" op elke pil zet de eigen vaste breedte
+        van dat component uit (288/384/436) zodat de kolom de maat bepaalt;
+        zonder dat zouden ze op hun oorspronkelijke breedte blijven staan.
+
+        De HOOGTE verandert nooit: 24 op dit component en 24 op elke pil,
+        gelijk aan de footerrij in Basis.xaml. Tussen de pillen 8px lucht,
+        aan de buitenkanten niet - dat is de ruimte die de SPACING-
+        instelling eventueel al geeft.
+    -->
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <controls:Footer01 Grid.Column="0" Width="Auto" Margin="{DynamicResource RegionGapThickness}" />
+        <controls:Footer02 Grid.Column="1" Width="Auto" Margin="{DynamicResource RegionGapThickness}" />
+        <controls:Footer03 Grid.Column="2" Width="Auto" Margin="{DynamicResource RegionGapThickness}" />
+        <controls:Footer04 Grid.Column="3" Width="Auto" Margin="{DynamicResource RegionGapThickness}" />
+        <controls:Footer05 Grid.Column="4" Width="Auto" Margin="{DynamicResource RegionGapThickness}" />
+    </Grid>
+
+</UserControl>

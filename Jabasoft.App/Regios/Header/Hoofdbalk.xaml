@@ -1,0 +1,111 @@
+<UserControl x:Class="Jabasoft.App.Regios.Header.Hoofdbalk"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="clr-namespace:Jabasoft.App.Controls"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d" Height="210"
+             d:DesignWidth="1920">
+
+    <!-- Design-time-only: geeft Visual Studio/Blend's Designer een
+         thema-context (kleuren, lettertype) - deze class library heeft
+         zelf geen App.xaml die dat normaal doet. mc:Ignorable="d" zorgt
+         dat dit bij het echt compileren/draaien volledig wegvalt. -->
+    <d:UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/Stylebook.Components;component/Styles/Theme.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/Stylebook.Components;component/Styles/Themes/Lcars.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </d:UserControl.Resources>
+
+    <!--
+        Header van Jabasoft, gebouwd naar het regioconcept Header/Main uit
+        het Stylebook. Dat concept blijft van de gebruiker en wordt hier
+        niet door aangeraakt; dit is de vaste, meeschalende uitvoering
+        ervan voor de app.
+
+        Opbouw, van buiten naar binnen:
+        - Bovenrij (zo hoog als de balk, 36): de kleurbalk met daarover het beeldmerk, en
+          rechts de vensterknopjes. De balk loopt over de volle breedte
+          tot aan die knopjes.
+        - Onderrij: links en rechts een LCARS-elleboog als zijkant, en
+          DAARTUSSEN de vier infoblokken. Die twee elleboogjes staan dus
+          niet bovenin - ze vormen de linker- en rechterrand van het
+          onderste deel, precies zoals in het concept (X -5 en X 1872,
+          over de hele resterende hoogte).
+
+        Wat meerekt: de kleurbalk en de vier infoblokken. Wat blijft: de
+        elleboogjes (48 breed), de vensterknopjes en het beeldmerk. De
+        HOOGTE verandert nooit - 210, gelijk aan de headerrij in Basis.
+        Daarom nergens een Viewbox: die schaalt uniform en zou de hoogte
+        meetrekken.
+    -->
+    <Grid>
+        <Grid.RowDefinitions>
+            <!-- Auto en geen vaste 41: dan is deze rij precies zo hoog als
+                 de balk zelf (36) en zit er geen dode ruimte onder. De
+                 afstand tot de infoblokken komt daardoor volledig uit hun
+                 eigen RegionGapThickness-marge - op SPACING 0 sluiten ze
+                 dus aan, en draai je SPACING op dan lopen ze mee. -->
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!-- Bovenrij: balk + vensterknopjes. -->
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <controls:HeaderGradientBar04 Grid.Column="0" Width="Auto" VerticalAlignment="Top" />
+            <!-- Rechts uitgelijnd met de rand van het vlak: er staat niets
+                 meer achter deze knopjes, dus de kleurbalk ernaast loopt
+                 ook 48px verder door dan eerst. -->
+            <controls:WindowControlButtons Grid.Column="1" VerticalAlignment="Top" Margin="0,4,0,0" />
+        </Grid>
+
+        <!-- Onderrij: elleboog | vier infoblokken | elleboog. -->
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="48" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="48" />
+            </Grid.ColumnDefinitions>
+
+            <!-- Height="Auto" zet de eigen hoogte van de elleboog (200) uit,
+                 zodat hij precies deze rij vult. Er wordt dus NIETS meer
+                 weggeknipt: de ronding onderaan staat er helemaal op, en
+                 wat er boven wegvalt is toch recht. Eerder hing hier een
+                 ClipToBounds-Border omheen, en die sneed juist de ronding
+                 er onderaan af. -->
+            <controls:LcarsElbowGradientEnd Grid.Column="0" Height="Auto" VerticalAlignment="Stretch" />
+
+            <controls:Infoblok3 Grid.Column="1" Width="Auto" Height="Auto" Margin="{DynamicResource RegionGapThickness}" VerticalAlignment="Stretch" />
+            <controls:Infoblok2 Grid.Column="2" Width="Auto" Height="Auto" Margin="{DynamicResource RegionGapThickness}" VerticalAlignment="Stretch" />
+            <controls:Infoblok3 Grid.Column="3" Width="Auto" Height="Auto" Margin="{DynamicResource RegionGapThickness}" VerticalAlignment="Stretch" />
+            <controls:Infoblok2 Grid.Column="4" Width="Auto" Height="Auto" Margin="{DynamicResource RegionGapThickness}" VerticalAlignment="Stretch" />
+
+            <controls:LcarsElbowGradientEnd01 Grid.Column="5" Height="Auto" VerticalAlignment="Stretch" />
+        </Grid>
+
+        <!-- Het beeldmerk ligt over de kleurbalk heen, net als in het
+             concept (X 82, Y -2). Staat daarom buiten de rijen, in een
+             eigen laag bovenop.
+
+             RowSpan="2" is geen detail: zonder Grid.Row viel dit in rij 0,
+             en omdat het beeldmerk hoger is dan de balk rekte het die rij
+             op. Dat waren de 2 px zwart die er tussen de balk en de
+             infoblokken bleven staan. Over beide rijen laten lopen haalt
+             hem uit die Auto-berekening. -->
+        <controls:JabaSoftWordmark Grid.Row="0" Grid.RowSpan="2"
+                                   HorizontalAlignment="Left" VerticalAlignment="Top"
+                                   Margin="82,-2,0,0" />
+    </Grid>
+
+</UserControl>

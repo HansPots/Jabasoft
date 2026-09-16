@@ -1,7 +1,7 @@
 <Window x:Class="Jabasoft.App.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:apps="clr-namespace:Stylebook.Components.Apps.Jabasoft;assembly=Stylebook.Components"
+        xmlns:apps="clr-namespace:Jabasoft.App.Paginas"
         Title="Jabasoft" Height="1080" Width="1920"
         WindowStartupLocation="CenterScreen"
         Background="{DynamicResource BackgroundBrush}">
@@ -73,14 +73,18 @@
         </Style>
     </Window.Resources>
 
-    <!-- Jabasoft's opgeslagen paginacompositie (Stylebook.Components/
-         Apps/Jabasoft/Hoofdscherm.xaml) - Header/Footer zitten daar al
-         in gebakken (HpoHeader/Footerbalk); Menu/Inhoud/Actie geeft
-         Hoofdscherm door aan zijn eigen MenuContent/MainContent/
-         ActionContent, precies zoals Basis zelf werkt. Venstermaat
-         1920x1080 - de familie-standaard voor elke app behalve
-         Stylebook (die blijft breder, voor zijn drie-kolommen-opmaak).
-         Het Menu is het gedeelde Navigatiemenu-component met de knoppen
+    <!-- Jabasoft's paginaschil (Paginas/Hoofdscherm.xaml) - een Basis uit
+         Stylebook.Components met daarin onze eigen Hoofdbalk en
+         Statusbalk. Menu/Inhoud/Actie geeft die schil door aan zijn eigen
+         MenuContent/MainContent/ActionContent, precies zoals Basis zelf
+         werkt. Venstermaat 1920x1080 - de familie-standaard voor elke app
+         behalve Stylebook (die blijft breder, voor zijn
+         drie-kolommen-opmaak).
+
+         De schermen van deze app staan in DIT project (Paginas/ en
+         Regios/), niet in Stylebook.Components: die bibliotheek levert de
+         gedeelde bouwstenen, wij zetten ze hier in elkaar. Het Menu is
+         wel zo'n gedeelde bouwsteen (Navigatiemenu), met de knoppen
          Main/Stylebook/Settings; de oude app-launcherlijst is vervallen,
          alleen Stylebook is als knop overgebleven. -->
     <apps:Hoofdscherm x:Name="AppShell">

@@ -1,0 +1,110 @@
+<UserControl x:Class="Jabasoft.App.Controls.Basis"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d"
+             d:DesignWidth="1920" d:DesignHeight="1080">
+
+    <!-- Design-time-only: geeft Visual Studio/Blend's Designer een
+         thema-context (kleuren, lettertype) - deze class library heeft
+         zelf geen App.xaml die dat normaal doet. mc:Ignorable="d" zorgt
+         dat dit bij het echt compileren/draaien volledig wegvalt. -->
+    <d:UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/Stylebook.Components;component/Styles/Theme.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/Stylebook.Components;component/Styles/Themes/Lcars.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </d:UserControl.Resources>
+
+    <!--
+        Standaard app-schil: header en footer over de volle breedte,
+        daartussen een vaste linker menustrook en een vaste rechter
+        actiestrook rond de meebewegende hoofdinhoud. Elke regio heeft een
+        eigen content-slot (HeaderContent/MenuContent/MainContent/
+        ActionContent/FooterContent, zie Basis.xaml.cs) - géén ervan heet
+        "Content", want die inherited property is al intern in gebruik
+        voor deze rij/kolom-Grid zelf.
+
+        Vaste maten: Header 210px, Footer 24px, Menu 256px, Action 48px -
+        alleen de hoofdinhoud (kolom 2) en de ruimte tussen header/footer
+        (rij 1) zijn variabel (*).
+
+        Elk van de vijf blokken heeft een Margin van RegionGapThickness: de
+        zwarte rand die met de SPACING-kaart op het instellingenscherm van
+        0 tot 5 px te zetten is (Controls/Setting-04, via
+        Theming/LayoutManager). De achtergrond van dit Grid is daarom
+        expliciet gezet - dat is wat je in die rand ziet. De rij- en
+        kolommaten hierboven veranderen NIET mee: de blokken houden hun
+        vak en krimpen binnen dat vak, zodat de pagina 1920x1080 blijft.
+        Tussen twee blokken raken twee randen elkaar, daar zie je dus het
+        dubbele van de ingestelde waarde.
+
+        De blokken hebben GEEN randlijn meer. Die 1px BorderBrush-lijnen
+        tussen header/menu/inhoud/actie/footer waren de lichte strepen die
+        je over het hele scherm zag lopen. De scheiding tussen de blokken
+        komt nu van SPACING: zet je die op 0, dan is het scherm één vlak.
+    -->
+
+    <Grid Background="{DynamicResource BackgroundBrush}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="210" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="24" />
+        </Grid.RowDefinitions>
+
+        <!-- Header: volle breedte, vaste hoogte -->
+        <Border Grid.Row="0"
+                Margin="{DynamicResource RegionGapThickness}"
+                Background="{DynamicResource SurfaceBrush}">
+            <ContentPresenter Content="{Binding HeaderContent, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                               HorizontalAlignment="Stretch"
+                               VerticalAlignment="Stretch" />
+        </Border>
+
+        <!-- Midden: menu | hoofdinhoud | action, elk vaste breedte behalve de hoofdinhoud -->
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="256" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="48" />
+            </Grid.ColumnDefinitions>
+
+            <Border Grid.Column="0"
+                    Margin="{DynamicResource RegionGapThickness}"
+                    Background="{DynamicResource SurfaceBrush}">
+                <ContentPresenter Content="{Binding MenuContent, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                   HorizontalAlignment="Stretch"
+                                   VerticalAlignment="Stretch" />
+            </Border>
+
+            <Border Grid.Column="1"
+                    Margin="{DynamicResource RegionGapThickness}"
+                    Background="{DynamicResource BackgroundBrush}">
+                <ContentPresenter Content="{Binding MainContent, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                   HorizontalAlignment="Stretch"
+                                   VerticalAlignment="Stretch" />
+            </Border>
+
+            <Border Grid.Column="2"
+                    Margin="{DynamicResource RegionGapThickness}"
+                    Background="{DynamicResource SurfaceBrush}">
+                <ContentPresenter Content="{Binding ActionContent, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                   HorizontalAlignment="Stretch"
+                                   VerticalAlignment="Stretch" />
+            </Border>
+        </Grid>
+
+        <!-- Footer: volle breedte, vaste hoogte -->
+        <Border Grid.Row="2"
+                Margin="{DynamicResource RegionGapThickness}"
+                Background="{DynamicResource SurfaceBrush}">
+            <ContentPresenter Content="{Binding FooterContent, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                               HorizontalAlignment="Stretch"
+                               VerticalAlignment="Stretch" />
+        </Border>
+    </Grid>
+
+</UserControl>
