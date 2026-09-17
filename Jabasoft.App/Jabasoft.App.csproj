@@ -6,6 +6,12 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
+
+    <!-- Het pictogram van de applicatie: zowel het .exe-bestand in de
+         verkenner als het venster en de taakbalk krijgen dit. Ook de
+         snelkoppeling op het bureaublad leest het hiervandaan, dus die
+         blijft kloppen zonder dat er een los .ico ergens naast staat. -->
+    <ApplicationIcon>Jabasoft.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>

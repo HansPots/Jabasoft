@@ -124,6 +124,37 @@
                     </Button.Template>
                 </Button>
 
+                <!-- Tokens: het verbruiksoverzicht van de AI-aanroepen. -->
+                <Button x:Name="TokensButton" Content="Tokens" Click="MenuItem_Click" Foreground="{DynamicResource AccentForegroundBrush}" FontSize="{DynamicResource FontSizeTitle}" FontWeight="SemiBold" HorizontalContentAlignment="Left"
+                        theming:MarginParts.Bottom="{DynamicResource SpaceSmall}">
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <Border x:Name="Bd" Background="{DynamicResource AccentBrush}"
+                                    theming:CornerRadiusParts.TopLeft="{DynamicResource RadiusXLarge}"
+                                    theming:CornerRadiusParts.TopRight="{DynamicResource RadiusXLarge}"
+                                    theming:CornerRadiusParts.BottomRight="{DynamicResource RadiusXLarge}"
+                                    theming:PaddingParts.Left="{DynamicResource SpaceMedium}"
+                                    theming:PaddingParts.Top="{DynamicResource SpaceSmall}"
+                                    theming:PaddingParts.Right="{DynamicResource SpaceMedium}"
+                                    theming:PaddingParts.Bottom="{DynamicResource SpaceSmall}">
+                                <StackPanel Orientation="Horizontal">
+                                    <Path Data="M5,9.2h3V19H5V9.2z M10.6,5h2.8v14h-2.8V5z M16.2,13H19v6h-2.8V13z" Fill="{DynamicResource Text01Brush}" Width="18" Height="18" Stretch="Uniform" VerticalAlignment="Center"
+                                          theming:MarginParts.Right="{DynamicResource SpaceSmall}" />
+                                    <ContentPresenter HorizontalAlignment="Left" VerticalAlignment="Center" />
+                                </StackPanel>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="Bd" Property="Background" Value="{DynamicResource AccentBrushDark}" />
+                                </Trigger>
+                                <Trigger Property="IsPressed" Value="True">
+                                    <Setter TargetName="Bd" Property="Background" Value="{DynamicResource AccentBrushDark}" />
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Button.Template>
+                </Button>
+
                 <Button x:Name="SettingsButton" Content="Settings" Click="MenuItem_Click" Foreground="{DynamicResource AccentForegroundBrush}" FontSize="{DynamicResource FontSizeTitle}" FontWeight="SemiBold" HorizontalContentAlignment="Left"
                         theming:MarginParts.Bottom="{DynamicResource SpaceSmall}">
                     <Button.Template>
@@ -190,10 +221,12 @@
                                Margin="30,0,16,0"
                                VerticalAlignment="Center"
                                TextAlignment="Right"
-                               Text="V 0.1.0.67" />
+                               Text="V 0.1.0.75" />
                 </Border>
             </StackPanel>
         </Grid>
     </Border>
 
 </UserControl>
+
+

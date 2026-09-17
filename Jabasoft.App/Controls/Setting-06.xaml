@@ -1,0 +1,169 @@
+<UserControl x:Class="Jabasoft.App.Controls.Setting06"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d" Width="1568">
+
+    <!-- Design-time-only: geeft Visual Studio/Blend's Designer een
+         thema-context (kleuren, lettertype) - deze class library heeft
+         zelf geen App.xaml die dat normaal doet. mc:Ignorable="d" zorgt
+         dat dit bij het echt compileren/draaien volledig wegvalt. -->
+    <d:UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/Stylebook.Components;component/Styles/Theme.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/Stylebook.Components;component/Styles/Themes/Lcars.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </d:UserControl.Resources>
+
+    <UserControl.Resources>
+        <!--
+            Serverkeuze-knop: dezelfde pilknop als de themakiezer op kaart 1.
+            Bewust een eigen kopie en niet gedeeld: het Stylebook levert de
+            gedeelde stijlen (SliderAccentStyle, AccentButtonStyle) en deze
+            hoort daar nog niet bij - deze app bouwt zijn eigen kaarten.
+        -->
+        <Style x:Key="ServerChoiceStyle" TargetType="RadioButton">
+            <Setter Property="Height" Value="34" />
+            <Setter Property="FontSize" Value="{DynamicResource FontSizeSmall}" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Foreground" Value="{DynamicResource Text01Brush}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="RadioButton">
+                        <Border x:Name="Bd" CornerRadius="{DynamicResource RadiusMedium}" BorderThickness="2" Padding="14,0"
+                                Background="{DynamicResource BackgroundBrush}"
+                                BorderBrush="{DynamicResource BorderBrush}">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <Ellipse x:Name="Dot" Width="9" Height="9"
+                                         Fill="{DynamicResource Text01Brush}" VerticalAlignment="Center" />
+                                <ContentPresenter Margin="9,0,0,0" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+                                <Setter TargetName="Dot" Property="Fill" Value="{DynamicResource AccentBrush}" />
+                                <Setter Property="Foreground" Value="{DynamicResource AccentBrush}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Invoerveld in themakleuren. Het Stylebook heeft wel een stijl
+             voor een TextBox die als LABEL dienstdoet (SelectableTextStyle),
+             maar nog geen echt invoerveld - vandaar hier. -->
+        <Style x:Key="InputBoxStyle" TargetType="TextBox">
+            <Setter Property="Height" Value="34" />
+            <Setter Property="Padding" Value="10,0" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="Background" Value="{DynamicResource BackgroundBrush}" />
+            <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+            <Setter Property="CaretBrush" Value="{DynamicResource AccentBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
+            <Setter Property="BorderThickness" Value="2" />
+            <Setter Property="FontFamily" Value="{StaticResource AppFontFamily}" />
+            <Setter Property="FontSize" Value="{StaticResource FontSizeBody}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Border x:Name="Bd" CornerRadius="{DynamicResource RadiusMedium}"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}">
+                            <ScrollViewer x:Name="PART_ContentHost" Margin="{TemplateBinding Padding}"
+                                          VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+
+    <!--
+        Instellingenkaart AI: welke AI-server er gebruikt wordt en met welke
+        twee modellen. Dit is de enige kaart die iets instelt wat NIET van
+        deze applicatie is: de waarde staat bij de broker en geldt dus voor
+        alle JabaSoft-applicaties tegelijk. Vandaar ook geen terugzetknop
+        zoals bij de andere kaarten - je zet het voor iedereen om.
+
+        De keuzelijsten worden gevuld met de modellen die de broker op de
+        ingestelde server aantreft. Is die niet bereikbaar, dan blijft de
+        bewaarde naam gewoon staan en zegt de regel onderaan wat er aan de
+        hand is - je instelling raak je er dus niet mee kwijt.
+
+        Zelfde breedte (1568) en kaartopmaak als de andere kaarten.
+    -->
+    <Border MinWidth="480" CornerRadius="{DynamicResource RadiusMedium}" BorderThickness="{DynamicResource RegionBorderThickness}"
+            Background="{DynamicResource SurfaceBrush}"
+            BorderBrush="{DynamicResource BorderBrush}"
+            HorizontalAlignment="Stretch" VerticalAlignment="Top">
+        <StackPanel Margin="20,16">
+            <TextBlock Text="AI" FontSize="{DynamicResource FontSizeTitle}" FontWeight="SemiBold"
+                       Foreground="{DynamicResource Text01Brush}" />
+
+            <TextBlock Text="Server" Margin="0,14,0,4" FontSize="{DynamicResource FontSizeSmall}"
+                       Foreground="{DynamicResource TextMutedBrush}" />
+            <StackPanel Orientation="Horizontal">
+                <RadioButton x:Name="ProviderLmStudio" Content="LM Studio" GroupName="AiServer"
+                             AutomationProperties.AutomationId="AiServerLmStudio"
+                             Checked="Provider_Checked" Style="{DynamicResource ServerChoiceStyle}" />
+                <RadioButton x:Name="ProviderOllama" Content="Ollama" GroupName="AiServer" Margin="8,0,0,0"
+                             AutomationProperties.AutomationId="AiServerOllama"
+                             Checked="Provider_Checked" Style="{DynamicResource ServerChoiceStyle}" />
+            </StackPanel>
+
+            <TextBlock Text="Server address" Margin="0,16,0,4" FontSize="{DynamicResource FontSizeSmall}"
+                       Foreground="{DynamicResource TextMutedBrush}" />
+            <TextBox x:Name="ServerUrlBox" Style="{DynamicResource InputBoxStyle}"
+                     AutomationProperties.AutomationId="AiServerUrl"
+                     LostFocus="ServerUrl_LostFocus" KeyDown="ServerUrl_KeyDown" />
+
+            <!-- De twee modellen naast elkaar: de kaart is breed genoeg, en
+                 zo staat bij elkaar wat bij elkaar hoort. -->
+            <Grid Margin="0,16,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="16" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0">
+                    <TextBlock Text="Chat model" Margin="0,0,0,4" FontSize="{DynamicResource FontSizeSmall}"
+                               Foreground="{DynamicResource TextMutedBrush}" />
+                    <ComboBox x:Name="ChatModelPicker" Height="34"
+                              AutomationProperties.AutomationId="AiChatModel"
+                              SelectionChanged="Model_SelectionChanged" />
+                </StackPanel>
+
+                <StackPanel Grid.Column="2">
+                    <TextBlock Text="Embedding model" Margin="0,0,0,4" FontSize="{DynamicResource FontSizeSmall}"
+                               Foreground="{DynamicResource TextMutedBrush}" />
+                    <ComboBox x:Name="EmbedModelPicker" Height="34"
+                              AutomationProperties.AutomationId="AiEmbedModel"
+                              SelectionChanged="Model_SelectionChanged" />
+                </StackPanel>
+            </Grid>
+
+            <StackPanel Orientation="Horizontal" Margin="0,16,0,0">
+                <Button x:Name="RefreshModelsButton" Content="Refresh model list"
+                        AutomationProperties.AutomationId="AiRefreshModels"
+                        Click="RefreshModels_Click" Style="{DynamicResource AccentButtonStyle}" />
+                <TextBlock x:Name="StatusText" Margin="14,0,0,0" VerticalAlignment="Center"
+                           AutomationProperties.AutomationId="AiStatus"
+                           FontSize="{DynamicResource FontSizeSmall}"
+                           Foreground="{DynamicResource TextMutedBrush}" />
+            </StackPanel>
+        </StackPanel>
+    </Border>
+
+</UserControl>

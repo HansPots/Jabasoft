@@ -7,5 +7,5 @@
          regio, Stylebook.Components) - vroeger live uit de database
          geparsed (XamlReader.Parse), nu gewoon een normale UserControl-
          referentie zoals Header/Footer in MainWindow.xaml. -->
-    <inhoud:Instellingen />
+    <inhoud:Instellingen x:Name="Pagina" />
 </UserControl>

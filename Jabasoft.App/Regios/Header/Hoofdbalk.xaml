@@ -43,7 +43,10 @@
         Daarom nergens een Viewbox: die schaalt uniform en zou de hoogte
         meetrekken.
     -->
-    <Grid>
+    <!-- Background="Transparent" en niet leeg gelaten: een Grid zonder
+         achtergrond vangt geen muisklikken op, en dan is er niets om het
+         venster mee te verslepen op de plekken waar geen balk ligt. -->
+    <Grid Background="Transparent" MouseLeftButtonDown="Titelstrook_MouseLeftButtonDown">
         <Grid.RowDefinitions>
             <!-- Auto en geen vaste 41: dan is deze rij precies zo hoog als
                  de balk zelf (36) en zit er geen dode ruimte onder. De
@@ -94,7 +97,10 @@
 
             <controls:Infoblok3 Grid.Column="1" Width="Auto" Height="Auto" Margin="{DynamicResource RegionGapLeftTopThickness}" VerticalAlignment="Stretch" />
             <controls:Infoblok2 Grid.Column="2" Width="Auto" Height="Auto" Margin="{DynamicResource RegionGapLeftTopThickness}" VerticalAlignment="Stretch" />
-            <controls:Infoblok3 Grid.Column="3" Width="Auto" Height="Auto" Margin="{DynamicResource RegionGapLeftTopThickness}" VerticalAlignment="Stretch" />
+            <!-- Het derde blok is het tokenverbruik: het totaal en de drie
+                 zwaarste modellen. Het volledige overzicht staat op de
+                 Tokens-pagina in het menu. -->
+            <controls:Tokenblok Grid.Column="3" Width="Auto" Height="Auto" Margin="{DynamicResource RegionGapLeftTopThickness}" VerticalAlignment="Stretch" />
             <controls:Activity Grid.Column="4" Width="Auto" Height="Auto" Margin="{DynamicResource RegionGapLeftTopThickness}" VerticalAlignment="Stretch" />
 
             <controls:LcarsElbowGradientEnd01 Grid.Column="5" Height="Auto" Margin="{DynamicResource RegionGapLeftTopThickness}" VerticalAlignment="Stretch" />

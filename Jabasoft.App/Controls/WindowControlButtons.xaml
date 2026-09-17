@@ -19,11 +19,19 @@
     </d:UserControl.Resources>
 
     <!-- Algemeen: rij van drie vensterknopjes (minimaliseren/herstellen/
-         sluiten) - puur decoratief, geen echte window-commando's
-         gekoppeld. Ook gebruikt (inline gekopieerd) in HpoHeader. -->
+         sluiten). Ze bedienen het venster waar dit component in zit -
+         zie de code-behind; dat venster wordt niet doorgegeven maar
+         opgezocht, zodat dit component overal inzetbaar blijft.
+
+         In Jabasoft VERVANGEN ze de titelbalk van Windows (MainWindow
+         staat op WindowStyle="None"), dus als deze drie het niet doen
+         is het venster niet meer te sluiten. -->
     <StackPanel Orientation="Horizontal">
 
-        <Button Width="34" Height="32" Background="Transparent" BorderThickness="0"
+        <Button x:Name="MinimizeButton" Click="Minimize_Click"
+                AutomationProperties.AutomationId="VensterMinimaliseren"
+                ToolTip="Minimaliseren"
+                Width="34" Height="32" Background="Transparent" BorderThickness="0"
                 Foreground="{DynamicResource TextPrimaryBrush}"
                 FontSize="{DynamicResource FontSizeTitle}"
                 Content="&#8212;">
@@ -46,10 +54,31 @@
              terug op een lettertype waarin het maar 8x8 px wordt (gemeten bij
              FontSizeTitle), terwijl het kruisje 12x13 is. Dit kader is even
              groot als het kruisje en volgt de Foreground van de knop. -->
-        <Button Width="34" Height="32" Background="Transparent" BorderThickness="0"
+        <Button x:Name="RestoreButton" Click="Restore_Click"
+                AutomationProperties.AutomationId="VensterHerstellen"
+                ToolTip="Maximaliseren"
+                Width="34" Height="32" Background="Transparent" BorderThickness="0"
                 Foreground="{DynamicResource TextPrimaryBrush}">
-            <Border Width="12" Height="12" BorderThickness="2"
-                    BorderBrush="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" />
+            <!-- Twee tekeningen op dezelfde plek: een enkel kader zolang
+                 het venster op zijn gewone maat staat, twee kadertjes
+                 over elkaar als het gemaximaliseerd is. De code-behind
+                 wisselt ze om bij elke toestandswissel, zodat het knopje
+                 laat zien wat het GAAT doen in plaats van altijd
+                 hetzelfde te tonen. -->
+            <Grid Width="12" Height="12">
+                <Border x:Name="MaximizeGlyph"
+                        Width="12" Height="12" BorderThickness="2"
+                        BorderBrush="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" />
+                <Grid x:Name="RestoreGlyph" Visibility="Collapsed">
+                    <Border Width="9" Height="9" BorderThickness="2"
+                            HorizontalAlignment="Right" VerticalAlignment="Top"
+                            BorderBrush="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" />
+                    <Border Width="9" Height="9" BorderThickness="2"
+                            HorizontalAlignment="Left" VerticalAlignment="Bottom"
+                            Background="{DynamicResource BackgroundBrush}"
+                            BorderBrush="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" />
+                </Grid>
+            </Grid>
             <Button.Template>
                 <ControlTemplate TargetType="Button">
                     <Border x:Name="Bd" Background="{TemplateBinding Background}">
@@ -64,7 +93,10 @@
             </Button.Template>
         </Button>
 
-        <Button Width="34" Height="32" Background="Transparent" BorderThickness="0"
+        <Button x:Name="CloseButton" Click="Close_Click"
+                AutomationProperties.AutomationId="VensterSluiten"
+                ToolTip="Sluiten"
+                Width="34" Height="32" Background="Transparent" BorderThickness="0"
                 Foreground="{DynamicResource TextPrimaryBrush}"
                 FontSize="{DynamicResource FontSizeTitle}"
                 Content="&#10005;">

@@ -14,4 +14,7 @@ public partial class SettingsView : UserControl
     {
         InitializeComponent();
     }
+
+    /// <summary>De instellingenpagina zelf - voor wie bij een van de kaarten moet zijn (zie MainWindow's gezondheidscontrole).</summary>
+    public Regios.Inhoud.Instellingen Instellingen => Pagina;
 }

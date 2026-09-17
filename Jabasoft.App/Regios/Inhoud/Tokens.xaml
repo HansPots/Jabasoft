@@ -1,0 +1,56 @@
+<UserControl x:Class="Jabasoft.App.Regios.Inhoud.Tokens"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="clr-namespace:Jabasoft.App.Controls"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d">
+
+    <!-- Design-time-only: geeft Visual Studio/Blend's Designer een
+         thema-context (kleuren, lettertype) - deze class library heeft
+         zelf geen App.xaml die dat normaal doet. mc:Ignorable="d" zorgt
+         dat dit bij het echt compileren/draaien volledig wegvalt. -->
+    <d:UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/Stylebook.Components;component/Styles/Theme.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/Stylebook.Components;component/Styles/Themes/Lcars.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </d:UserControl.Resources>
+
+    <!--
+        Inhoud-regio component: het tokenoverzicht van Jabasoft, waar de
+        Tokens-knop in het menu naartoe schakelt.
+
+        Opzet gelijk aan het instellingenscherm: een schuifvak met kaarten
+        onder elkaar, dezelfde marges en dezelfde meelopende SPACING. Boven
+        het totaal van alles, daaronder een kaart per week die je kunt
+        openklappen.
+
+        De weken worden hier in code-behind bijgemaakt en niet in XAML: hoeveel
+        het er zijn hangt af van wat er in de database staat.
+    -->
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+        <!-- Ruimte rechts, zodat de kaarten niet tegen de schuifbalk aan
+             liggen. Volgt de SPACING-instelling, net als al het andere. -->
+        <StackPanel Margin="{DynamicResource RegionGapRightThickness}">
+            <controls:Tokentotaal x:Name="Totaal" Width="Auto" />
+
+            <TextBlock x:Name="MeldingText" Visibility="Collapsed"
+                       AutomationProperties.AutomationId="TokensMelding"
+                       Margin="20,16,0,0"
+                       FontSize="{DynamicResource FontSizeSmall}"
+                       Foreground="{DynamicResource TextMutedBrush}" />
+
+            <ItemsControl x:Name="Weken">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+            </ItemsControl>
+        </StackPanel>
+    </ScrollViewer>
+
+</UserControl>

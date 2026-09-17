@@ -32,18 +32,31 @@ public partial class MainWindow : Window
 
     private readonly SettingsView _settingsView = new();
 
-    private BrokerLogReader? _brokerLog;
+    /// <summary>Het tokenoverzicht. Ook één keer gemaakt en hergebruikt; het ververst zichzelf als het weer in beeld komt.</summary>
+    private readonly InhoudSchermen.Tokens _tokens = new();
 
-    private bool _showingSettings;
+    /// <summary>De verbinding met de broker: levert de AI-instelling en de lijst met aanwezige modellen aan de gezondheidscontrole.</summary>
+    private readonly IAiBrokerClient _broker = AiBrokerClient.CreateDefault();
+
+    private BrokerLogReader? _brokerLog;
 
     public MainWindow()
     {
         InitializeComponent();
+
+        // Hoort bij de WindowChrome in MainWindow.xaml: zonder titelbalk
+        // maximaliseert Windows dit venster over de taakbalk heen.
+        Layout.MaximizeBounds.Apply(this);
+
         BuildMenu();
         WireActionRail();
-        ShowContent(settings: false);
+        ShowContent(NavigatiemenuItem.Main);
         StartActivityLog();
         StartHealthCheck();
+
+        // Een ander AI-model kan de gezondheid omgooien - opnieuw
+        // controleren dus, zodat de pil klopt met wat er net gekozen is.
+        _settingsView.Instellingen.Ai.SettingsSaved += (_, _) => StartHealthCheck();
     }
 
     /// <summary>
@@ -117,7 +130,16 @@ public partial class MainWindow : Window
             return;
         }
 
-        var monitor = new HealthMonitor([new AiBrokerHealthCheck()]);
+        // Op volgorde: eerst moet de broker draaien (die wordt zo nodig
+        // opgestart, en blijft zolang oranje), en pas daarna valt er te
+        // vragen of de ingestelde modellen ook echt op de AI-server staan.
+        var monitor = new HealthMonitor(
+        [
+            new AiBrokerHealthCheck(),
+            new AiModelsHealthCheck(_broker),
+            new DatabaseHealthCheck(_broker),
+        ]);
+
         footer.Observe(monitor);
 
         // Elke stap van de controle ook in het Activity-blok, zodat je daar
@@ -131,26 +153,28 @@ public partial class MainWindow : Window
 
     private void Navigate(NavigatiemenuItem item)
     {
-        switch (item)
+        // Stylebook is geen scherm van deze app maar een eigen applicatie;
+        // de rest schakelt het inhoudsvak om.
+        if (item == NavigatiemenuItem.Stylebook)
         {
-            case NavigatiemenuItem.Stylebook:
-                StartStylebook();
-                break;
-            case NavigatiemenuItem.Settings:
-                ShowContent(settings: true);
-                break;
-            default:
-                ShowContent(settings: false);
-                break;
+            StartStylebook();
+            return;
         }
+
+        ShowContent(item);
     }
 
-    /// <summary>Zet het inhoudsvak op één van de twee schermen. Alle wegen ernaartoe (menu én de knop in de Actie-rail) lopen hierlangs, zodat die twee elkaar niet tegenspreken.</summary>
-    private void ShowContent(bool settings)
+    /// <summary>
+    /// Zet het inhoudsvak op één van de schermen. Alle wegen ernaartoe
+    /// (menu én de knop in de Actie-rail) lopen hierlangs, zodat die twee
+    /// elkaar niet tegenspreken.
+    /// </summary>
+    private void ShowContent(NavigatiemenuItem item) => AppShell.MainContent = item switch
     {
-        _showingSettings = settings;
-        AppShell.MainContent = settings ? _settingsView : _hoofdscherm;
-    }
+        NavigatiemenuItem.Settings => _settingsView,
+        NavigatiemenuItem.Tokens => _tokens,
+        _ => _hoofdscherm,
+    };
 
     /// <summary>
     /// De actierail zit ingebakken in de paginaschil, dus hij hoeft hier

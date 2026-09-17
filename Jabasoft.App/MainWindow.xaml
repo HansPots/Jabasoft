@@ -4,7 +4,34 @@
         xmlns:apps="clr-namespace:Jabasoft.App.Paginas"
         Title="Jabasoft" Height="1080" Width="1920"
         WindowStartupLocation="CenterScreen"
+        WindowStyle="None"
         Background="{DynamicResource BackgroundBrush}">
+
+    <!-- Geen titelbalk van Windows: de header heeft zijn eigen
+         vensterknopjes (Controls/WindowControlButtons) en zou er anders
+         twee boven elkaar krijgen.
+
+         WindowStyle="None" alleen is niet genoeg - dan raak je met de
+         titelbalk ook alles kwijt wat Windows eraan vasthangt: slepen,
+         randen pakken om te verslepen, en een gemaximaliseerd venster dat
+         netjes voor de taakbalk stopt. WindowChrome geeft dat terug:
+
+         - CaptionHeight 0: Windows claimt zelf GEEN sleepstrook bovenin.
+           Dat doet de header zelf (Regios/Header/Hoofdbalk), want alleen
+           de bovenste strook daarvan mag slepen - de infoblokken eronder
+           hebben splitters die je moet kunnen pakken.
+         - ResizeBorderThickness 6: de onzichtbare rand waarmee je het
+           venster groter of kleiner sleept.
+         - GlassFrameThickness 0 en CornerRadius 0: geen schaduwrand en
+           geen afgeronde hoeken van Windows eroverheen; de vorm komt
+           volledig uit het thema. -->
+    <WindowChrome.WindowChrome>
+        <WindowChrome CaptionHeight="0"
+                      ResizeBorderThickness="6"
+                      GlassFrameThickness="0"
+                      CornerRadius="0"
+                      UseAeroCaptionButtons="False" />
+    </WindowChrome.WindowChrome>
 
     <Window.Resources>
         <!-- Een hele app-rij is de knop (niet alleen een "Start"-tekstje

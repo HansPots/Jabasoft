@@ -1,0 +1,101 @@
+<UserControl x:Class="Jabasoft.App.Controls.Tokenblok"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d" Height="166" Width="450">
+
+    <!-- Design-time-only: geeft Visual Studio/Blend's Designer een
+         thema-context (kleuren, lettertype) - deze class library heeft
+         zelf geen App.xaml die dat normaal doet. mc:Ignorable="d" zorgt
+         dat dit bij het echt compileren/draaien volledig wegvalt. -->
+    <d:UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/Stylebook.Components;component/Styles/Theme.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/Stylebook.Components;component/Styles/Themes/Lcars.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </d:UserControl.Resources>
+
+    <!--
+        Header-regio component: het tokenverbruik in het kort. Zelfde kader
+        en titelbalk als Infoblok2/3 - dit component neemt in de header de
+        plek van het derde infoblok in.
+
+        Boven het totaal in de accentkleur, daaronder de drie modellen die
+        er de meeste tokens aan hebben uitgegeven. Het volledige overzicht,
+        met de weken en de losse aanroepen, staat op de Tokens-pagina.
+
+        De cijfers komen van de broker (die leest de gedeelde tabel uit) en
+        worden ververst op de REFRESH TIME uit de instellingen, net als de
+        meters in de footer.
+    -->
+    <Border Background="{DynamicResource SurfaceBrush}"
+            BorderBrush="{DynamicResource BorderBrush}"
+            BorderThickness="{DynamicResource RegionBorderThickness}"
+            CornerRadius="{DynamicResource RadiusMedium}"
+            HorizontalAlignment="Stretch">
+        <StackPanel>
+            <!-- Zelfde titelbalk als de andere infoblokken: vaste hoogte 24,
+                 binnenstraal die meeloopt met de randdikte (zie
+                 RegionBorderInnerRadius), en 8 padding links zodat de titel
+                 exact boven de eerste kolom hieronder begint. -->
+            <Border Background="{DynamicResource BorderBrush}" CornerRadius="{DynamicResource RegionBorderInnerRadius}" Height="24" Padding="8,0">
+                <TextBlock Text="Tokens" FontSize="18" Foreground="{DynamicResource Text01Brush}" VerticalAlignment="Center" HorizontalAlignment="Left" />
+            </Border>
+
+            <!-- Hoogte 116 = dezelfde bodyhoogte als de andere infoblokken,
+                 zodat dit blok even hoog blijft. De laatste rij is "*" en
+                 vangt de restruimte op. -->
+            <Grid Margin="8" Height="116">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="40" />
+                    <RowDefinition Height="22" />
+                    <RowDefinition Height="22" />
+                    <RowDefinition Height="22" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <!-- Zelfde indeling als de modelregels eronder: benaming
+                     links, getal rechts. Het totaal is groot en in de
+                     accentkleur, want dat is het getal waar je in één
+                     oogopslag naar kijkt. -->
+                <TextBlock Grid.Row="0" Grid.Column="0" Text="tokens totaal"
+                           VerticalAlignment="Center" Margin="0,0,12,0"
+                           FontSize="{DynamicResource FontSizeSmall}"
+                           Foreground="{DynamicResource TextMutedBrush}" />
+                <TextBlock x:Name="TotaalText" Grid.Row="0" Grid.Column="1" Text="0"
+                           AutomationProperties.AutomationId="TokenblokTotaal"
+                           FontSize="32" FontWeight="Bold" VerticalAlignment="Center" TextAlignment="Right"
+                           Foreground="{DynamicResource AccentBrush}" />
+
+                <!-- Top 3 per model. Vaste rijen in plaats van een lijst: het
+                     zijn er altijd precies drie, en zo staan ze op dezelfde
+                     plek ook als er nog maar één model gebruikt is. -->
+                <TextBlock x:Name="Model1" Grid.Row="1" Grid.Column="0" Text="" TextTrimming="CharacterEllipsis"
+                           AutomationProperties.AutomationId="TokenblokModel1"
+                           Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center" Margin="0,0,12,0" />
+                <TextBlock x:Name="Waarde1" Grid.Row="1" Grid.Column="1" Text="" TextAlignment="Right"
+                           Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center" />
+
+                <TextBlock x:Name="Model2" Grid.Row="2" Grid.Column="0" Text="" TextTrimming="CharacterEllipsis"
+                           AutomationProperties.AutomationId="TokenblokModel2"
+                           Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center" Margin="0,0,12,0" />
+                <TextBlock x:Name="Waarde2" Grid.Row="2" Grid.Column="1" Text="" TextAlignment="Right"
+                           Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center" />
+
+                <TextBlock x:Name="Model3" Grid.Row="3" Grid.Column="0" Text="" TextTrimming="CharacterEllipsis"
+                           AutomationProperties.AutomationId="TokenblokModel3"
+                           Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center" Margin="0,0,12,0" />
+                <TextBlock x:Name="Waarde3" Grid.Row="3" Grid.Column="1" Text="" TextAlignment="Right"
+                           Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center" />
+            </Grid>
+        </StackPanel>
+    </Border>
+
+</UserControl>

@@ -12,6 +12,9 @@ public enum NavigatiemenuItem
     /// <summary>De Stylebook-applicatie openen.</summary>
     Stylebook,
 
+    /// <summary>Het tokenverbruik van de AI-aanroepen.</summary>
+    Tokens,
+
     /// <summary>Het instellingenscherm van de app.</summary>
     Settings,
 }
@@ -45,6 +48,7 @@ public partial class Navigatiemenu : UserControl
         var item = sender switch
         {
             _ when ReferenceEquals(sender, StylebookButton) => NavigatiemenuItem.Stylebook,
+            _ when ReferenceEquals(sender, TokensButton) => NavigatiemenuItem.Tokens,
             _ when ReferenceEquals(sender, SettingsButton) => NavigatiemenuItem.Settings,
             _ => NavigatiemenuItem.Main,
         };
