@@ -35,6 +35,15 @@ public partial class MainWindow : Window
     /// <summary>Het tokenoverzicht. Ook één keer gemaakt en hergebruikt; het ververst zichzelf als het weer in beeld komt.</summary>
     private readonly InhoudSchermen.Tokens _tokens = new();
 
+    /// <summary>Het gezondheidsoverzicht. Kijkt mee met dezelfde monitor als de pil in de footer.</summary>
+    private readonly InhoudSchermen.Health _health = new();
+
+    /// <summary>De bewaking van deze app. Eén per applicatie: de pil en het gezondheidsscherm kijken allebei hiernaar.</summary>
+    private HealthMonitor? _monitor;
+
+    /// <summary>Het menu zelf, om te kunnen zeggen welke pagina open staat.</summary>
+    private Navigatiemenu? _menu;
+
     /// <summary>De verbinding met de broker: levert de AI-instelling en de lijst met aanwezige modellen aan de gezondheidscontrole.</summary>
     private readonly IAiBrokerClient _broker = AiBrokerClient.CreateDefault();
 
@@ -47,6 +56,14 @@ public partial class MainWindow : Window
         // Hoort bij de WindowChrome in MainWindow.xaml: zonder titelbalk
         // maximaliseert Windows dit venster over de taakbalk heen.
         Layout.MaximizeBounds.Apply(this);
+
+        // Lettertype en venstermaat kunnen pas als er een venster is; de
+        // rest is in App.OnStartup al gezet.
+        Layout.Preferences.ApplyToWindow(this);
+
+        // Waar het venster stond onthouden we bij het sluiten - net als de
+        // splitterposities, zodat je het niet elke keer opnieuw neerzet.
+        Closing += (_, _) => Layout.Preferences.BewaarVenster(this);
 
         BuildMenu();
         WireActionRail();
@@ -92,10 +109,10 @@ public partial class MainWindow : Window
     /// </summary>
     private void BuildMenu()
     {
-        var menu = new Navigatiemenu();
-        AutomationProperties.SetName(menu, "Hoofdmenu");
-        menu.ItemSelected += (_, item) => Navigate(item);
-        AppShell.MenuContent = menu;
+        _menu = new Navigatiemenu();
+        AutomationProperties.SetName(_menu, "Hoofdmenu");
+        _menu.ItemSelected += (_, item) => Navigate(item);
+        AppShell.MenuContent = _menu;
     }
 
     /// <summary>
@@ -130,25 +147,35 @@ public partial class MainWindow : Window
             return;
         }
 
-        // Op volgorde: eerst moet de broker draaien (die wordt zo nodig
-        // opgestart, en blijft zolang oranje), en pas daarna valt er te
-        // vragen of de ingestelde modellen ook echt op de AI-server staan.
-        var monitor = new HealthMonitor(
-        [
-            new AiBrokerHealthCheck(),
-            new AiModelsHealthCheck(_broker),
-            new DatabaseHealthCheck(_broker),
-        ]);
+        // De monitor wordt één keer gemaakt en daarna hergebruikt: het
+        // gezondheidsscherm hangt eraan, en "opnieuw controleren" laat
+        // dezelfde monitor nog eens lopen.
+        if (_monitor is null)
+        {
+            // Op volgorde van afhankelijkheid: eerst de broker (die wordt zo
+            // nodig opgestart, en blijft zolang oranje), dan de AI-server
+            // erachter, dan of de ingestelde modellen daar echt staan, en
+            // tot slot de gedeelde database. Ze worden allemaal gedaan, ook
+            // als er onderweg een faalt - zie HealthMonitor.
+            _monitor = new HealthMonitor(
+            [
+                new AiBrokerHealthCheck(),
+                new AiServerHealthCheck(_broker),
+                new AiModelsHealthCheck(_broker),
+                new DatabaseHealthCheck(_broker),
+            ]);
 
-        footer.Observe(monitor);
+            footer.Observe(_monitor);
+            _health.Observe(_monitor);
 
-        // Elke stap van de controle ook in het Activity-blok, zodat je daar
-        // terugleest wat er bij het opstarten gebeurd is.
-        monitor.Changed += (_, status) => ActivityLog.Shared.Add("app", status.Message);
+            // Elke stap van de controle ook in het Activity-blok, zodat je daar
+            // terugleest wat er bij het opstarten gebeurd is.
+            _monitor.Changed += (_, status) => ActivityLog.Shared.Add("app", status.Message);
+        }
 
         // Niet awaiten: het venster mag meteen verschijnen, de pil vult
         // zichzelf bij terwijl de controle loopt.
-        _ = monitor.RunAsync();
+        _ = _monitor.RunAsync();
     }
 
     private void Navigate(NavigatiemenuItem item)
@@ -169,12 +196,24 @@ public partial class MainWindow : Window
     /// (menu én de knop in de Actie-rail) lopen hierlangs, zodat die twee
     /// elkaar niet tegenspreken.
     /// </summary>
-    private void ShowContent(NavigatiemenuItem item) => AppShell.MainContent = item switch
+    private void ShowContent(NavigatiemenuItem item)
     {
-        NavigatiemenuItem.Settings => _settingsView,
-        NavigatiemenuItem.Tokens => _tokens,
-        _ => _hoofdscherm,
-    };
+        AppShell.MainContent = item switch
+        {
+            NavigatiemenuItem.Settings => _settingsView,
+            NavigatiemenuItem.Tokens => _tokens,
+            NavigatiemenuItem.Health => _health,
+            _ => _hoofdscherm,
+        };
+
+        // Het menu markeert de knop van de pagina die nu open staat. Hier en
+        // niet bij de klik: ook een schakeling die ergens anders vandaan komt
+        // (de actierail, of straks een knop op het hoofdscherm) komt hierlangs.
+        if (_menu is not null)
+        {
+            _menu.Active = item;
+        }
+    }
 
     /// <summary>
     /// De actierail zit ingebakken in de paginaschil, dus hij hoeft hier

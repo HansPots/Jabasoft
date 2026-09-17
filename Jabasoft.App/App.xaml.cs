@@ -12,6 +12,11 @@ public partial class App : Application
     {
         base.OnStartup(e);
 
+        // Vóór het venster: taal, thema, lettertype, marges en ververstijd
+        // staan dan meteen goed in plaats van dat je het scherm ziet
+        // omklappen. Zie Layout/Preferences.
+        Layout.Preferences.Apply(this);
+
         // Fire-and-forget, niet afgewacht: Jabasoft roept zelf nooit de AI
         // aan, alleen de apps die je er straks vanuit start doen dat - de
         // launcher-lijst hoeft niet te wachten tot de broker (die tot 45s

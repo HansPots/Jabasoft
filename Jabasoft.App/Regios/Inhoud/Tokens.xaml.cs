@@ -1,6 +1,7 @@
 using System.Windows;
 using System.Windows.Controls;
 using Jabasoft.App.Controls;
+using Jabasoft.App.Taal;
 using Jabasoft.Base.AiBroker;
 
 namespace Jabasoft.App.Regios.Inhoud;
@@ -36,7 +37,7 @@ public partial class Tokens : UserControl
 
         if (weken.Count == 0)
         {
-            Melden("Nog geen AI-aanroepen vastgelegd. Zodra een applicatie de broker gebruikt, verschijnt hier een week.");
+            Melden(Teksten.Van(this, "T_TokensLeeg", "Nog geen AI-aanroepen vastgelegd."));
             return;
         }
 

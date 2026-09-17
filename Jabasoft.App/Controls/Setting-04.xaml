@@ -42,10 +42,10 @@
             BorderBrush="{DynamicResource BorderBrush}"
             HorizontalAlignment="Stretch" VerticalAlignment="Top">
         <StackPanel Margin="20,16">
-            <TextBlock Text="SPACING" FontSize="{DynamicResource FontSizeTitle}" FontWeight="SemiBold"
+            <TextBlock Text="{DynamicResource T_SpacingTitel}" FontSize="{DynamicResource FontSizeTitle}" FontWeight="SemiBold"
                        Foreground="{DynamicResource Text01Brush}" />
 
-            <TextBlock x:Name="GapLabel" Text="Space around each block (header, menu, content, action, footer) &#8212; 6 px"
+            <TextBlock x:Name="GapLabel" Text=""
                        Margin="0,14,0,6" FontSize="{DynamicResource FontSizeSmall}"
                        Foreground="{DynamicResource TextMutedBrush}" />
             <Slider x:Name="GapSlider" Minimum="0" Maximum="10" Value="6"
@@ -53,7 +53,7 @@
                     ValueChanged="GapSlider_ValueChanged"
                     Style="{DynamicResource SliderAccentStyle}" />
 
-            <Button x:Name="ResetGapButton" Content="Reset to default (6 px)"
+            <Button x:Name="ResetGapButton" Content="{DynamicResource T_SpacingTerug}"
                     Margin="0,16,0,0" Click="ResetGap_Click"
                     Style="{DynamicResource AccentButtonStyle}" />
         </StackPanel>

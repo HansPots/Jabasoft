@@ -42,10 +42,10 @@
             BorderBrush="{DynamicResource BorderBrush}"
             HorizontalAlignment="Stretch" VerticalAlignment="Top">
         <StackPanel Margin="20,16">
-            <TextBlock Text="FONT" FontSize="{DynamicResource FontSizeTitle}" FontWeight="SemiBold"
+            <TextBlock Text="{DynamicResource T_FontTitel}" FontSize="{DynamicResource FontSizeTitle}" FontWeight="SemiBold"
                        Foreground="{DynamicResource Text01Brush}" />
 
-            <TextBlock Text="Font" Margin="0,14,0,4" FontSize="{DynamicResource FontSizeSmall}"
+            <TextBlock Text="{DynamicResource T_FontKeuze}" Margin="0,14,0,4" FontSize="{DynamicResource FontSizeSmall}"
                        Foreground="{DynamicResource TextMutedBrush}" />
             <ComboBox x:Name="FontPicker" Height="34" SelectedIndex="0" SelectionChanged="FontPicker_SelectionChanged">
                 <ComboBoxItem Content="Segoe UI" />
@@ -64,12 +64,12 @@
             <Grid Height="42" Margin="0,16,0,0">
                 <Rectangle RadiusX="4" RadiusY="4" StrokeThickness="1" StrokeDashArray="4 3"
                            Stroke="{DynamicResource BorderBrush}" Fill="Transparent" />
-                <TextBlock x:Name="PreviewText" Text="This is what the interface will look like."
+                <TextBlock x:Name="PreviewText" Text="{DynamicResource T_FontVoorbeeld}"
                            Margin="14,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center"
                            Foreground="{DynamicResource Text01Brush}" />
             </Grid>
 
-            <Button x:Name="ResetFontButton" Content="Reset to default (Segoe UI, 16 px)"
+            <Button x:Name="ResetFontButton" Content="{DynamicResource T_FontTerug}"
                     Margin="0,16,0,0" Click="ResetFont_Click" Style="{DynamicResource AccentButtonStyle}" />
         </StackPanel>
     </Border>

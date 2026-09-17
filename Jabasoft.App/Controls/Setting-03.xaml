@@ -41,10 +41,10 @@
             BorderBrush="{DynamicResource BorderBrush}"
             HorizontalAlignment="Stretch" VerticalAlignment="Top">
         <StackPanel Margin="20,16">
-            <TextBlock Text="REFRESH TIME" FontSize="{DynamicResource FontSizeTitle}" FontWeight="SemiBold"
+            <TextBlock Text="{DynamicResource T_RefreshTitel}" FontSize="{DynamicResource FontSizeTitle}" FontWeight="SemiBold"
                        Foreground="{DynamicResource Text01Brush}" />
 
-            <TextBlock x:Name="IntervalLabel" Text="Footer refresh time (CPU/RAM/Model VRAM) &#8212; 5 sec"
+            <TextBlock x:Name="IntervalLabel" Text=""
                        Margin="0,14,0,6" FontSize="{DynamicResource FontSizeSmall}"
                        Foreground="{DynamicResource TextMutedBrush}" />
             <Slider x:Name="IntervalSlider" Minimum="1" Maximum="60" Value="5"
@@ -52,7 +52,7 @@
                     ValueChanged="IntervalSlider_ValueChanged"
                     Style="{DynamicResource SliderAccentStyle}" />
 
-            <Button x:Name="ResetIntervalButton" Content="Reset to default (5 sec)" Click="ResetInterval_Click"
+            <Button x:Name="ResetIntervalButton" Content="{DynamicResource T_RefreshTerug}" Click="ResetInterval_Click"
                     Margin="0,16,0,0" Style="{DynamicResource AccentButtonStyle}" />
         </StackPanel>
     </Border>

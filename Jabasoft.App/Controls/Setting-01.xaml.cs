@@ -1,5 +1,6 @@
 using System.Windows;
 using System.Windows.Controls;
+using Jabasoft.App.Layout;
 using Stylebook.Components.Theming;
 
 namespace Jabasoft.App.Controls;
@@ -7,9 +8,40 @@ namespace Jabasoft.App.Controls;
 /// <summary>Interaction logic for Setting-01.xaml - see that file for what it looks like.</summary>
 public partial class Setting01 : UserControl
 {
+    /// <summary>Aan terwijl de kaart zichzelf op de bewaarde stand zet - dan mag een vinkje niets uitlokken.</summary>
+    private bool _laden;
+
     public Setting01()
     {
         InitializeComponent();
+
+        Loaded += OnLoaded;
+    }
+
+    /// <summary>
+    /// Zet de knoppen op het thema dat bij het opstarten al toegepast is
+    /// (zie Layout/Preferences). Zonder dit zegt de kaart altijd LCARS,
+    /// ook als de app in het andere thema opgekomen is - en dan doet
+    /// klikken op LCARS niets.
+    /// </summary>
+    private void OnLoaded(object sender, RoutedEventArgs e)
+    {
+        _laden = true;
+        try
+        {
+            if (Preferences.Thema == Theme.VisualStudio)
+            {
+                ThemeVsCode.IsChecked = true;
+            }
+            else
+            {
+                ThemeLcars.IsChecked = true;
+            }
+        }
+        finally
+        {
+            _laden = false;
+        }
     }
 
     /// <summary>
@@ -26,7 +58,7 @@ public partial class Setting01 : UserControl
     /// </summary>
     private void Theme_Checked(object sender, RoutedEventArgs e)
     {
-        if (!IsLoaded)
+        if (!IsLoaded || _laden)
         {
             return;
         }
@@ -39,5 +71,7 @@ public partial class Setting01 : UserControl
         // binnenstraal van de infoblok-titelbalk wordt daaruit afgeleid en
         // moet opnieuw berekend worden.
         LayoutManager.RefreshInnerRadius(target);
+
+        Preferences.BewaarThema(theme);
     }
 }

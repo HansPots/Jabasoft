@@ -1,4 +1,4 @@
-<UserControl x:Class="Jabasoft.App.Controls.Tokentotaal"
+<UserControl x:Class="Jabasoft.App.Controls.Healthkaart"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -19,43 +19,43 @@
     </d:UserControl.Resources>
 
     <!--
-        De balk bovenaan het tokenoverzicht: alles bij elkaar opgeteld,
-        over alle weken en alle applicaties heen.
+        Eén controle in het gezondheidsoverzicht: een bolletje in dezelfde
+        drie kleuren als de SYSTEM HEALTH-pil, de naam, en daaronder in één
+        regel wat er gevonden is. Rechts hoe lang die controle duurde -
+        daar zie je aan welke voorziening traag opkomt.
 
-        Zelfde kaartopmaak en breedte als de instellingenkaarten - het
-        tokenscherm is bewust in dezelfde stijl gebouwd, zodat het
-        herkenbaar bij elkaar hoort.
+        Zelfde kaartopmaak en breedte als de instellingenkaarten.
     -->
     <Border MinWidth="480" CornerRadius="{DynamicResource RadiusMedium}" BorderThickness="{DynamicResource RegionBorderThickness}"
             Background="{DynamicResource SurfaceBrush}"
             BorderBrush="{DynamicResource BorderBrush}"
             HorizontalAlignment="Stretch" VerticalAlignment="Top">
-        <Grid Margin="20,16">
+        <Grid Margin="20,14">
             <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
 
-            <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                <TextBlock Text="{DynamicResource T_TokensTitel}" FontSize="{DynamicResource FontSizeTitle}" FontWeight="SemiBold"
-                           Foreground="{DynamicResource Text01Brush}" />
-                <TextBlock x:Name="Onderschrift" Margin="0,6,0,0"
-                           AutomationProperties.AutomationId="TokensOnderschrift"
-                           FontSize="{DynamicResource FontSizeSmall}"
-                           Foreground="{DynamicResource TextMutedBrush}"
-                           Text="{DynamicResource T_TokensNietsGeteld}" />
-            </StackPanel>
+            <Ellipse x:Name="Bolletje" Grid.Column="0" Width="14" Height="14"
+                     VerticalAlignment="Center" Margin="0,0,14,0"
+                     Fill="{DynamicResource HealthBusyBrush}" />
 
-            <!-- Het getal waar het om gaat, rechts en groot. -->
-            <StackPanel Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Right">
-                <TextBlock x:Name="TotaalText" Text="0"
-                           AutomationProperties.AutomationId="TokensTotaal"
-                           FontSize="42" FontWeight="Bold" HorizontalAlignment="Right"
-                           Foreground="{DynamicResource AccentBrush}" />
-                <TextBlock Text="{DynamicResource T_TokensTotaal}" HorizontalAlignment="Right"
+            <StackPanel Grid.Column="1">
+                <TextBlock x:Name="NaamText" Text="controle"
+                           AutomationProperties.AutomationId="HealthkaartNaam"
+                           FontSize="{DynamicResource FontSizeTitle}" FontWeight="SemiBold"
+                           Foreground="{DynamicResource Text01Brush}" />
+                <TextBlock x:Name="MeldingText" Text="" Margin="0,4,0,0" TextWrapping="Wrap"
+                           AutomationProperties.AutomationId="HealthkaartMelding"
                            FontSize="{DynamicResource FontSizeSmall}"
                            Foreground="{DynamicResource TextMutedBrush}" />
             </StackPanel>
+
+            <TextBlock x:Name="DuurText" Grid.Column="2" Text=""
+                       VerticalAlignment="Center" Margin="14,0,0,0"
+                       FontSize="{DynamicResource FontSizeSmall}"
+                       Foreground="{DynamicResource TextMutedBrush}" />
         </Grid>
     </Border>
 

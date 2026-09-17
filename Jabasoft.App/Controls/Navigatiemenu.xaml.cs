@@ -15,6 +15,9 @@ public enum NavigatiemenuItem
     /// <summary>Het tokenverbruik van de AI-aanroepen.</summary>
     Tokens,
 
+    /// <summary>Het gezondheidsoverzicht: wat er wel en niet draait.</summary>
+    Health,
+
     /// <summary>Het instellingenscherm van de app.</summary>
     Settings,
 }
@@ -34,6 +37,62 @@ public partial class Navigatiemenu : UserControl
     public Navigatiemenu()
     {
         InitializeComponent();
+
+        ToonActief();
+    }
+
+    private NavigatiemenuItem _actief = NavigatiemenuItem.Main;
+
+    /// <summary>
+    /// Welke pagina er nu open staat. De applicatie zet dit; het menu weet
+    /// zelf niet waar een knop naartoe leidt - zie de toelichting bij
+    /// ItemSelected.
+    ///
+    /// Stylebook staat er bewust niet tussen als blijvende stand: die knop
+    /// start een andere applicatie en verandert het inhoudsvak niet. Zou hij
+    /// gemarkeerd blijven, dan lijkt het of je "in" Stylebook zit terwijl je
+    /// naar het hoofdscherm kijkt.
+    /// </summary>
+    public NavigatiemenuItem Active
+    {
+        get => _actief;
+        set
+        {
+            if (value == NavigatiemenuItem.Stylebook || _actief == value)
+            {
+                return;
+            }
+
+            _actief = value;
+            ToonActief();
+        }
+    }
+
+    /// <summary>
+    /// De actieve knop wordt omgekeerd: zwart vlak met een accentrand en
+    /// accenttekst, in plaats van een vol accentvlak met zwarte tekst.
+    /// Dezelfde taal als de keuzeknoppen op de instellingenkaarten, waar
+    /// "gekozen" er ook zo uitziet.
+    ///
+    /// Met SetResourceReference en niet met een vaste kleur: dan blijft het
+    /// meelopen als je van thema wisselt terwijl deze pagina open staat.
+    /// </summary>
+    private void ToonActief()
+    {
+        Zet(MainButton, _actief == NavigatiemenuItem.Main);
+        Zet(TokensButton, _actief == NavigatiemenuItem.Tokens);
+        Zet(HealthButton, _actief == NavigatiemenuItem.Health);
+        Zet(SettingsButton, _actief == NavigatiemenuItem.Settings);
+
+        // Stylebook is een handeling, geen bestemming: nooit gemarkeerd.
+        Zet(StylebookButton, false);
+    }
+
+    private static void Zet(Button knop, bool actief)
+    {
+        knop.SetResourceReference(BackgroundProperty, actief ? "BackgroundBrush" : "AccentBrush");
+        knop.SetResourceReference(ForegroundProperty, actief ? "AccentBrush" : "AccentForegroundBrush");
+        knop.BorderThickness = new Thickness(actief ? 2 : 0);
     }
 
     /// <summary>De versietekst onderin de balk - elke app zet hier zijn eigen versienummer in.</summary>
@@ -49,6 +108,7 @@ public partial class Navigatiemenu : UserControl
         {
             _ when ReferenceEquals(sender, StylebookButton) => NavigatiemenuItem.Stylebook,
             _ when ReferenceEquals(sender, TokensButton) => NavigatiemenuItem.Tokens,
+            _ when ReferenceEquals(sender, HealthButton) => NavigatiemenuItem.Health,
             _ when ReferenceEquals(sender, SettingsButton) => NavigatiemenuItem.Settings,
             _ => NavigatiemenuItem.Main,
         };

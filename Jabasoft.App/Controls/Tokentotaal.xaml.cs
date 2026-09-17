@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Windows.Controls;
+using Jabasoft.App.Taal;
 using Jabasoft.Base.AiBroker;
 
 namespace Jabasoft.App.Controls;
@@ -30,15 +31,16 @@ public partial class Tokentotaal : UserControl
         TotaalText.Text = totaal.ToString("N0", CultureInfo.CurrentCulture);
 
         Onderschrift.Text = aanroepen == 0
-            ? "Nog niets geteld"
-            : string.Format(
-                CultureInfo.CurrentCulture,
+            ? Teksten.Van(this, "T_TokensNietsGeteld", "Nog niets geteld")
+            : Teksten.Vul(
+                this,
+                "T_TokensSamenvattingFormaat",
                 "{0:N0} prompt · {1:N0} antwoord · {2:N0} {3} · {4} {5}",
                 prompt,
                 antwoord,
                 aanroepen,
-                aanroepen == 1 ? "aanroep" : "aanroepen",
+                Teksten.Van(this, aanroepen == 1 ? "T_TokensAanroep" : "T_TokensAanroepen", aanroepen == 1 ? "aanroep" : "aanroepen"),
                 weken.Count,
-                weken.Count == 1 ? "week" : "weken");
+                Teksten.Van(this, weken.Count == 1 ? "T_TokensWeek" : "T_TokensWeken", weken.Count == 1 ? "week" : "weken"));
     }
 }

@@ -2,6 +2,8 @@ using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using Jabasoft.App.Layout;
+using Jabasoft.App.Taal;
 using Stylebook.Components.Theming;
 
 namespace Jabasoft.App.Controls;
@@ -13,9 +15,59 @@ public partial class Setting02 : UserControl
 
     private const double DefaultFontSize = 16;
 
+    /// <summary>Aan terwijl de kaart zichzelf op de bewaarde stand zet.</summary>
+    private bool _laden;
+
     public Setting02()
     {
         InitializeComponent();
+
+        Loaded += OnLoaded;
+        Unloaded += (_, _) => LanguageManager.Changed -= OnTaalGewisseld;
+    }
+
+    /// <summary>Zet de keuzelijst en de schuifbalk op wat er bewaard is.</summary>
+    private void OnLoaded(object sender, RoutedEventArgs e)
+    {
+        LanguageManager.Changed -= OnTaalGewisseld;
+        LanguageManager.Changed += OnTaalGewisseld;
+
+        _laden = true;
+        try
+        {
+            var naam = Preferences.Lettertype;
+            for (var i = 0; i < FontPicker.Items.Count; i++)
+            {
+                if (FontPicker.Items[i] is ComboBoxItem { Content: string keuze } &&
+                    string.Equals(keuze, naam, StringComparison.OrdinalIgnoreCase))
+                {
+                    FontPicker.SelectedIndex = i;
+                    break;
+                }
+            }
+
+            SizeSlider.Value = Preferences.Tekstgrootte;
+        }
+        finally
+        {
+            _laden = false;
+        }
+
+        ToonGrootte(SizeSlider.Value);
+    }
+
+    /// <summary>De regel boven de schuifbalk wordt in code samengesteld, dus die moet bij een taalwissel opnieuw gezet worden.</summary>
+    private void OnTaalGewisseld(object? sender, EventArgs e) => ToonGrootte(SizeSlider.Value);
+
+    private void ToonGrootte(double waarde)
+    {
+        if (SizeLabel is null)
+        {
+            return;
+        }
+
+        var sjabloon = TryFindResource("T_FontGrootteFormaat") as string ?? "Text size ({0} px)";
+        SizeLabel.Text = string.Format(CultureInfo.CurrentCulture, sjabloon, (int)Math.Round(waarde));
     }
 
     /// <summary>
@@ -34,6 +86,8 @@ public partial class Setting02 : UserControl
 
         root.FontFamily = new FontFamily(SelectedFontName());
         root.FontSize = Math.Round(SizeSlider.Value);
+
+        Preferences.BewaarLettertype(SelectedFontName(), Math.Round(SizeSlider.Value));
     }
 
     private string SelectedFontName() =>
@@ -43,7 +97,7 @@ public partial class Setting02 : UserControl
     {
         // Vuurt al tijdens het inladen (SelectedIndex staat in de XAML) -
         // dan hangt deze kaart nog nergens en is er niets om te zetten.
-        if (!IsLoaded)
+        if (!IsLoaded || _laden)
         {
             return;
         }
@@ -58,12 +112,9 @@ public partial class Setting02 : UserControl
             return;
         }
 
-        SizeLabel.Text = string.Format(
-            CultureInfo.InvariantCulture,
-            "Text size ({0} px)",
-            (int)Math.Round(e.NewValue));
+        ToonGrootte(e.NewValue);
 
-        if (IsLoaded)
+        if (IsLoaded && !_laden)
         {
             ApplyFont();
         }

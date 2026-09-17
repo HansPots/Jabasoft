@@ -46,7 +46,7 @@
             <!-- Titelbalk, gelijk aan die van de infoblokken ernaast. -->
             <Border Grid.Row="0" Background="{DynamicResource BorderBrush}"
                     CornerRadius="{DynamicResource RegionBorderInnerRadius}" Height="24" Padding="8,0">
-                <TextBlock Text="Activity" FontSize="18" Foreground="{DynamicResource Text01Brush}"
+                <TextBlock Text="{DynamicResource T_Activiteit}" FontSize="18" Foreground="{DynamicResource Text01Brush}"
                            VerticalAlignment="Center" HorizontalAlignment="Left" />
             </Border>
 

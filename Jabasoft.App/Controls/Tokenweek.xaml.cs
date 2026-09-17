@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
+using Jabasoft.App.Taal;
 using Jabasoft.Base.AiBroker;
 
 namespace Jabasoft.App.Controls;
@@ -45,15 +46,16 @@ public partial class Tokenweek : UserControl
         // "week 38" leest prettiger dan de sleutel zelf; het jaartal staat
         // toch al in de periode eronder.
         var nummer = week.Week.Split('W') is { Length: 2 } delen ? delen[1] : week.Week;
-        WeekText.Text = string.Format(CultureInfo.CurrentCulture, "week {0}", nummer.TrimStart('0'));
+        WeekText.Text = Teksten.Vul(this, "T_TokensWeekFormaat", "week {0}", nummer.TrimStart('0'));
 
-        PeriodeText.Text = string.Format(
-            CultureInfo.CurrentCulture,
+        PeriodeText.Text = Teksten.Vul(
+            this,
+            "T_TokensPeriodeFormaat",
             "{0:d MMMM} t/m {1:d MMMM yyyy} · {2:N0} {3}",
             week.Start,
             week.End,
             week.Calls,
-            week.Calls == 1 ? "aanroep" : "aanroepen");
+            Teksten.Van(this, week.Calls == 1 ? "T_TokensAanroep" : "T_TokensAanroepen", week.Calls == 1 ? "aanroep" : "aanroepen"));
 
         TotaalText.Text = week.TotalTokens.ToString("N0", CultureInfo.CurrentCulture);
     }
@@ -73,7 +75,7 @@ public partial class Tokenweek : UserControl
                 regel.TotalTokens.ToString("N0", CultureInfo.CurrentCulture)))
             .ToList();
 
-        Melden(regels.Count == 0 ? "Geen regels gevonden voor deze week." : null);
+        Melden(regels.Count == 0 ? Teksten.Van(this, "T_TokensGeenRegels", "Geen regels gevonden voor deze week.") : null);
     }
 
     /// <summary>Een mededeling in plaats van regels - bijvoorbeeld terwijl er opgehaald wordt.</summary>
@@ -99,7 +101,7 @@ public partial class Tokenweek : UserControl
         }
 
         _opgehaald = true;
-        Melden("Ophalen…");
+        Melden(Teksten.Van(this, "T_TokensOphalen", "Ophalen…"));
         Openklappen?.Invoke(this, Week);
     }
 }

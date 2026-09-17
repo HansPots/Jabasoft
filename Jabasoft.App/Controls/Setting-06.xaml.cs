@@ -2,6 +2,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using Jabasoft.Base.AiBroker;
+using Jabasoft.App.Taal;
 using Jabasoft.Base.Logging;
 
 namespace Jabasoft.App.Controls;
@@ -38,7 +39,14 @@ public partial class Setting06 : UserControl
     {
         InitializeComponent();
 
-        Loaded += async (_, _) => await LaadAsync();
+        Loaded += async (_, _) =>
+        {
+            LanguageManager.Changed -= OnTaalGewisseld;
+            LanguageManager.Changed += OnTaalGewisseld;
+            await LaadAsync();
+        };
+
+        Unloaded += (_, _) => LanguageManager.Changed -= OnTaalGewisseld;
     }
 
     /// <summary>
@@ -55,7 +63,7 @@ public partial class Setting06 : UserControl
     /// </summary>
     private async Task LaadAsync()
     {
-        Meld("Loading…");
+        Meld(Teksten.Van(this, "T_AiLaden", "Loading…"));
 
         var result = await _broker.GetSettingsAsync(CancellationToken.None);
         _settings = result.Settings;
@@ -74,7 +82,7 @@ public partial class Setting06 : UserControl
 
         if (!result.Success)
         {
-            Meld($"Broker not reachable: {result.ErrorMessage}");
+            Meld(Teksten.Vul(this, "T_AiBrokerWegFormaat", "Broker not reachable: {0}", result.ErrorMessage));
             return;
         }
 
@@ -87,7 +95,7 @@ public partial class Setting06 : UserControl
     /// </summary>
     private async Task VulModellenAsync()
     {
-        Meld("Loading models…");
+        Meld(Teksten.Van(this, "T_AiModellenLaden", "Loading models…"));
 
         var lijst = await _broker.ListConfiguredModelsAsync(CancellationToken.None);
         var namen = lijst.Models.ToList();
@@ -105,7 +113,7 @@ public partial class Setting06 : UserControl
 
         if (!lijst.Success)
         {
-            Meld($"No model list from {_settings.ActiveServerUrl}: {lijst.ErrorMessage}");
+            Meld(Teksten.Vul(this, "T_AiGeenLijstFormaat", "No model list from {0}: {1}", _settings.ActiveServerUrl, lijst.ErrorMessage));
             return;
         }
 
@@ -114,8 +122,8 @@ public partial class Setting06 : UserControl
             .ToList();
 
         Meld(ontbreekt.Count > 0
-            ? $"{namen.Count} models found — not present: {string.Join(", ", ontbreekt)}"
-            : $"{namen.Count} models found on {_settings.ActiveServerUrl}");
+            ? Teksten.Vul(this, "T_AiOntbreektFormaat", "{0} models found — not present: {1}", namen.Count, string.Join(", ", ontbreekt))
+            : Teksten.Vul(this, "T_AiGevondenFormaat", "{0} models found on {1}", namen.Count, _settings.ActiveServerUrl));
     }
 
     /// <summary>
@@ -163,7 +171,7 @@ public partial class Setting06 : UserControl
         var result = await _broker.SaveSettingsAsync(nieuw, CancellationToken.None);
         if (!result.Success)
         {
-            Meld($"Not saved: {result.ErrorMessage}");
+            Meld(Teksten.Vul(this, "T_AiNietBewaardFormaat", "Not saved: {0}", result.ErrorMessage));
             return;
         }
 
@@ -176,6 +184,9 @@ public partial class Setting06 : UserControl
     }
 
     private void Meld(string tekst) => StatusText.Text = tekst;
+
+    /// <summary>De meldingregel staat in de oude taal tot hij opnieuw opgebouwd wordt - dus dat doen we.</summary>
+    private async void OnTaalGewisseld(object? sender, EventArgs e) => await VulModellenAsync();
 
     /// <summary>
     /// Andere serversoort gekozen. Alleen de SOORT gaat om: het adres en de

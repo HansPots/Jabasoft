@@ -108,10 +108,10 @@
             BorderBrush="{DynamicResource BorderBrush}"
             HorizontalAlignment="Stretch" VerticalAlignment="Top">
         <StackPanel Margin="20,16">
-            <TextBlock Text="AI" FontSize="{DynamicResource FontSizeTitle}" FontWeight="SemiBold"
+            <TextBlock Text="{DynamicResource T_AiTitel}" FontSize="{DynamicResource FontSizeTitle}" FontWeight="SemiBold"
                        Foreground="{DynamicResource Text01Brush}" />
 
-            <TextBlock Text="Server" Margin="0,14,0,4" FontSize="{DynamicResource FontSizeSmall}"
+            <TextBlock Text="{DynamicResource T_AiServer}" Margin="0,14,0,4" FontSize="{DynamicResource FontSizeSmall}"
                        Foreground="{DynamicResource TextMutedBrush}" />
             <StackPanel Orientation="Horizontal">
                 <RadioButton x:Name="ProviderLmStudio" Content="LM Studio" GroupName="AiServer"
@@ -122,7 +122,7 @@
                              Checked="Provider_Checked" Style="{DynamicResource ServerChoiceStyle}" />
             </StackPanel>
 
-            <TextBlock Text="Server address" Margin="0,16,0,4" FontSize="{DynamicResource FontSizeSmall}"
+            <TextBlock Text="{DynamicResource T_AiAdres}" Margin="0,16,0,4" FontSize="{DynamicResource FontSizeSmall}"
                        Foreground="{DynamicResource TextMutedBrush}" />
             <TextBox x:Name="ServerUrlBox" Style="{DynamicResource InputBoxStyle}"
                      AutomationProperties.AutomationId="AiServerUrl"
@@ -138,7 +138,7 @@
                 </Grid.ColumnDefinitions>
 
                 <StackPanel Grid.Column="0">
-                    <TextBlock Text="Chat model" Margin="0,0,0,4" FontSize="{DynamicResource FontSizeSmall}"
+                    <TextBlock Text="{DynamicResource T_AiChatmodel}" Margin="0,0,0,4" FontSize="{DynamicResource FontSizeSmall}"
                                Foreground="{DynamicResource TextMutedBrush}" />
                     <ComboBox x:Name="ChatModelPicker" Height="34"
                               AutomationProperties.AutomationId="AiChatModel"
@@ -146,7 +146,7 @@
                 </StackPanel>
 
                 <StackPanel Grid.Column="2">
-                    <TextBlock Text="Embedding model" Margin="0,0,0,4" FontSize="{DynamicResource FontSizeSmall}"
+                    <TextBlock Text="{DynamicResource T_AiEmbeddingmodel}" Margin="0,0,0,4" FontSize="{DynamicResource FontSizeSmall}"
                                Foreground="{DynamicResource TextMutedBrush}" />
                     <ComboBox x:Name="EmbedModelPicker" Height="34"
                               AutomationProperties.AutomationId="AiEmbedModel"
@@ -155,7 +155,7 @@
             </Grid>
 
             <StackPanel Orientation="Horizontal" Margin="0,16,0,0">
-                <Button x:Name="RefreshModelsButton" Content="Refresh model list"
+                <Button x:Name="RefreshModelsButton" Content="{DynamicResource T_AiVernieuwen}"
                         AutomationProperties.AutomationId="AiRefreshModels"
                         Click="RefreshModels_Click" Style="{DynamicResource AccentButtonStyle}" />
                 <TextBlock x:Name="StatusText" Margin="14,0,0,0" VerticalAlignment="Center"

@@ -35,10 +35,10 @@
             BorderBrush="{DynamicResource BorderBrush}"
             HorizontalAlignment="Stretch" VerticalAlignment="Top">
         <StackPanel Margin="20,16">
-            <TextBlock Text="BORDER" FontSize="{DynamicResource FontSizeTitle}" FontWeight="SemiBold"
+            <TextBlock Text="{DynamicResource T_BorderTitel}" FontSize="{DynamicResource FontSizeTitle}" FontWeight="SemiBold"
                        Foreground="{DynamicResource Text01Brush}" />
 
-            <TextBlock x:Name="BorderLabel" Text="Border around cards and info blocks &#8212; 3 px"
+            <TextBlock x:Name="BorderLabel" Text=""
                        Margin="0,14,0,6" FontSize="{DynamicResource FontSizeSmall}"
                        Foreground="{DynamicResource TextMutedBrush}" />
             <Slider x:Name="BorderSlider" Minimum="0" Maximum="10" Value="3"
@@ -46,7 +46,7 @@
                     ValueChanged="BorderSlider_ValueChanged"
                     Style="{DynamicResource SliderAccentStyle}" />
 
-            <Button x:Name="ResetBorderButton" Content="Reset to default (3 px)"
+            <Button x:Name="ResetBorderButton" Content="{DynamicResource T_BorderTerug}"
                     Margin="0,16,0,0" Click="ResetBorder_Click"
                     Style="{DynamicResource AccentButtonStyle}" />
         </StackPanel>

@@ -64,11 +64,13 @@
                 <!-- Main: terug naar het hoofdscherm. Welk scherm dat is,
                      bepaalt de app die dit menu gebruikt - zie de notitie
                      hierboven over ItemSelected. -->
-                <Button x:Name="MainButton" Content="Main" Click="MenuItem_Click" Foreground="{DynamicResource AccentForegroundBrush}" FontSize="{DynamicResource FontSizeTitle}" FontWeight="SemiBold" HorizontalContentAlignment="Left"
+                <Button x:Name="MainButton" Content="{DynamicResource T_MenuMain}" Click="MenuItem_Click" Foreground="{DynamicResource AccentForegroundBrush}" Background="{DynamicResource AccentBrush}" BorderBrush="{DynamicResource AccentBrush}" BorderThickness="0" FontSize="{DynamicResource FontSizeTitle}" FontWeight="SemiBold" HorizontalContentAlignment="Left"
                         theming:MarginParts.Bottom="{DynamicResource SpaceSmall}">
                     <Button.Template>
                         <ControlTemplate TargetType="Button">
-                            <Border x:Name="Bd" Background="{DynamicResource AccentBrush}"
+                            <Border x:Name="Bd" Background="{TemplateBinding Background}"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}"
                                     theming:CornerRadiusParts.TopLeft="{DynamicResource RadiusXLarge}"
                                     theming:CornerRadiusParts.TopRight="{DynamicResource RadiusXLarge}"
                                     theming:CornerRadiusParts.BottomRight="{DynamicResource RadiusXLarge}"
@@ -94,11 +96,13 @@
                     </Button.Template>
                 </Button>
 
-                <Button x:Name="StylebookButton" Content="Stylebook" Click="MenuItem_Click" Foreground="{DynamicResource AccentForegroundBrush}" FontSize="{DynamicResource FontSizeTitle}" FontWeight="SemiBold" HorizontalContentAlignment="Left"
+                <Button x:Name="StylebookButton" Content="{DynamicResource T_MenuStylebook}" Click="MenuItem_Click" Foreground="{DynamicResource AccentForegroundBrush}" Background="{DynamicResource AccentBrush}" BorderBrush="{DynamicResource AccentBrush}" BorderThickness="0" FontSize="{DynamicResource FontSizeTitle}" FontWeight="SemiBold" HorizontalContentAlignment="Left"
                         theming:MarginParts.Bottom="{DynamicResource SpaceSmall}">
                     <Button.Template>
                         <ControlTemplate TargetType="Button">
-                            <Border x:Name="Bd" Background="{DynamicResource AccentBrush}"
+                            <Border x:Name="Bd" Background="{TemplateBinding Background}"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}"
                                     theming:CornerRadiusParts.TopLeft="{DynamicResource RadiusXLarge}"
                                     theming:CornerRadiusParts.TopRight="{DynamicResource RadiusXLarge}"
                                     theming:CornerRadiusParts.BottomRight="{DynamicResource RadiusXLarge}"
@@ -125,11 +129,13 @@
                 </Button>
 
                 <!-- Tokens: het verbruiksoverzicht van de AI-aanroepen. -->
-                <Button x:Name="TokensButton" Content="Tokens" Click="MenuItem_Click" Foreground="{DynamicResource AccentForegroundBrush}" FontSize="{DynamicResource FontSizeTitle}" FontWeight="SemiBold" HorizontalContentAlignment="Left"
+                <Button x:Name="TokensButton" Content="{DynamicResource T_MenuTokens}" Click="MenuItem_Click" Foreground="{DynamicResource AccentForegroundBrush}" Background="{DynamicResource AccentBrush}" BorderBrush="{DynamicResource AccentBrush}" BorderThickness="0" FontSize="{DynamicResource FontSizeTitle}" FontWeight="SemiBold" HorizontalContentAlignment="Left"
                         theming:MarginParts.Bottom="{DynamicResource SpaceSmall}">
                     <Button.Template>
                         <ControlTemplate TargetType="Button">
-                            <Border x:Name="Bd" Background="{DynamicResource AccentBrush}"
+                            <Border x:Name="Bd" Background="{TemplateBinding Background}"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}"
                                     theming:CornerRadiusParts.TopLeft="{DynamicResource RadiusXLarge}"
                                     theming:CornerRadiusParts.TopRight="{DynamicResource RadiusXLarge}"
                                     theming:CornerRadiusParts.BottomRight="{DynamicResource RadiusXLarge}"
@@ -155,11 +161,46 @@
                     </Button.Template>
                 </Button>
 
-                <Button x:Name="SettingsButton" Content="Settings" Click="MenuItem_Click" Foreground="{DynamicResource AccentForegroundBrush}" FontSize="{DynamicResource FontSizeTitle}" FontWeight="SemiBold" HorizontalContentAlignment="Left"
+                <!-- Health: wat er wel en niet draait. -->
+                <Button x:Name="HealthButton" Content="{DynamicResource T_MenuHealth}" Click="MenuItem_Click" Foreground="{DynamicResource AccentForegroundBrush}" Background="{DynamicResource AccentBrush}" BorderBrush="{DynamicResource AccentBrush}" BorderThickness="0" FontSize="{DynamicResource FontSizeTitle}" FontWeight="SemiBold" HorizontalContentAlignment="Left"
                         theming:MarginParts.Bottom="{DynamicResource SpaceSmall}">
                     <Button.Template>
                         <ControlTemplate TargetType="Button">
-                            <Border x:Name="Bd" Background="{DynamicResource AccentBrush}"
+                            <Border x:Name="Bd" Background="{TemplateBinding Background}"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                    theming:CornerRadiusParts.TopLeft="{DynamicResource RadiusXLarge}"
+                                    theming:CornerRadiusParts.TopRight="{DynamicResource RadiusXLarge}"
+                                    theming:CornerRadiusParts.BottomRight="{DynamicResource RadiusXLarge}"
+                                    theming:PaddingParts.Left="{DynamicResource SpaceMedium}"
+                                    theming:PaddingParts.Top="{DynamicResource SpaceSmall}"
+                                    theming:PaddingParts.Right="{DynamicResource SpaceMedium}"
+                                    theming:PaddingParts.Bottom="{DynamicResource SpaceSmall}">
+                                <StackPanel Orientation="Horizontal">
+                                    <Path Data="M13.5,2H6C4.9,2,4,2.9,4,4v16c0,1.1,0.9,2,2,2h12c1.1,0,2-0.9,2-2V8.5L13.5,2z M12.5,17.5l-3-3l1.4-1.4l1.6,1.6l3.6-3.6l1.4,1.4L12.5,17.5z" Fill="{DynamicResource Text01Brush}" Width="18" Height="18" Stretch="Uniform" VerticalAlignment="Center"
+                                          theming:MarginParts.Right="{DynamicResource SpaceSmall}" />
+                                    <ContentPresenter HorizontalAlignment="Left" VerticalAlignment="Center" />
+                                </StackPanel>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="Bd" Property="Background" Value="{DynamicResource AccentBrushDark}" />
+                                </Trigger>
+                                <Trigger Property="IsPressed" Value="True">
+                                    <Setter TargetName="Bd" Property="Background" Value="{DynamicResource AccentBrushDark}" />
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Button.Template>
+                </Button>
+
+                <Button x:Name="SettingsButton" Content="{DynamicResource T_MenuSettings}" Click="MenuItem_Click" Foreground="{DynamicResource AccentForegroundBrush}" Background="{DynamicResource AccentBrush}" BorderBrush="{DynamicResource AccentBrush}" BorderThickness="0" FontSize="{DynamicResource FontSizeTitle}" FontWeight="SemiBold" HorizontalContentAlignment="Left"
+                        theming:MarginParts.Bottom="{DynamicResource SpaceSmall}">
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <Border x:Name="Bd" Background="{TemplateBinding Background}"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}"
                                     theming:CornerRadiusParts.TopLeft="{DynamicResource RadiusXLarge}"
                                     theming:CornerRadiusParts.TopRight="{DynamicResource RadiusXLarge}"
                                     theming:CornerRadiusParts.BottomRight="{DynamicResource RadiusXLarge}"
@@ -221,12 +262,17 @@
                                Margin="30,0,16,0"
                                VerticalAlignment="Center"
                                TextAlignment="Right"
-                               Text="V 0.1.0.75" />
+                               Text="V 0.1.0.81" />
                 </Border>
             </StackPanel>
         </Grid>
     </Border>
 
 </UserControl>
+
+
+
+
+
 
 

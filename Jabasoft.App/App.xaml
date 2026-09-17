@@ -24,6 +24,15 @@
                      anders zegt de kaart LCARS terwijl er iets anders
                      draait - en doet klikken op LCARS niets. -->
                 <ResourceDictionary Source="pack://application:,,,/Stylebook.Components;component/Styles/Themes/Lcars.xaml" />
+
+                <!-- De schermteksten. Wordt net als het thema hierboven live
+                     omgewisseld, door Taal/LanguageManager, wanneer je op de
+                     TAAL-kaart een andere taal kiest. Ook deze regel moet
+                     daarom rechtstreeks hier staan en niet ergens genest.
+
+                     Nederlands is de begintaal; bij het opstarten zet
+                     Layout/Preferences er meteen de bewaarde keuze overheen. -->
+                <ResourceDictionary Source="Taal/Strings.nl.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
             <!-- Hoe vaak de metertjes in de footer zichzelf verversen. Staat

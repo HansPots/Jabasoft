@@ -55,7 +55,10 @@
                  plaats van iets toont, en de enige die voor alle
                  applicaties tegelijk geldt. De rest eronder is opmaak van
                  deze app. -->
-            <controls:Setting06 x:Name="AiKaart" Width="Auto" />
+            <!-- Taal bovenaan: die bepaalt hoe de rest van dit scherm
+                 te lezen is. -->
+            <controls:Setting07 Width="Auto" />
+            <controls:Setting06 x:Name="AiKaart" Width="Auto" Margin="{DynamicResource RegionGapTopThickness}" />
             <controls:Setting01 Width="Auto" Margin="{DynamicResource RegionGapTopThickness}" />
             <controls:Setting02 Width="Auto" Margin="{DynamicResource RegionGapTopThickness}" />
             <controls:Setting04 Width="Auto" Margin="{DynamicResource RegionGapTopThickness}" />

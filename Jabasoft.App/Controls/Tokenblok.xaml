@@ -42,7 +42,7 @@
                  RegionBorderInnerRadius), en 8 padding links zodat de titel
                  exact boven de eerste kolom hieronder begint. -->
             <Border Background="{DynamicResource BorderBrush}" CornerRadius="{DynamicResource RegionBorderInnerRadius}" Height="24" Padding="8,0">
-                <TextBlock Text="Tokens" FontSize="18" Foreground="{DynamicResource Text01Brush}" VerticalAlignment="Center" HorizontalAlignment="Left" />
+                <TextBlock Text="{DynamicResource T_TokensTitel}" FontSize="18" Foreground="{DynamicResource Text01Brush}" VerticalAlignment="Center" HorizontalAlignment="Left" />
             </Border>
 
             <!-- Hoogte 116 = dezelfde bodyhoogte als de andere infoblokken,
@@ -65,10 +65,10 @@
                      links, getal rechts. Het totaal is groot en in de
                      accentkleur, want dat is het getal waar je in één
                      oogopslag naar kijkt. -->
-                <TextBlock Grid.Row="0" Grid.Column="0" Text="tokens totaal"
+                <TextBlock Grid.Row="0" Grid.Column="0" Text="{DynamicResource T_TokensTotaal}"
                            VerticalAlignment="Center" Margin="0,0,12,0"
                            FontSize="{DynamicResource FontSizeSmall}"
-                           Foreground="{DynamicResource TextMutedBrush}" />
+                           Foreground="{DynamicResource AccentBrush}" />
                 <TextBlock x:Name="TotaalText" Grid.Row="0" Grid.Column="1" Text="0"
                            AutomationProperties.AutomationId="TokenblokTotaal"
                            FontSize="32" FontWeight="Bold" VerticalAlignment="Center" TextAlignment="Right"
@@ -79,9 +79,9 @@
                      plek ook als er nog maar één model gebruikt is. -->
                 <TextBlock x:Name="Model1" Grid.Row="1" Grid.Column="0" Text="" TextTrimming="CharacterEllipsis"
                            AutomationProperties.AutomationId="TokenblokModel1"
-                           Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center" Margin="0,0,12,0" />
+                           Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center" Margin="0,0,12,0" />
                 <TextBlock x:Name="Waarde1" Grid.Row="1" Grid.Column="1" Text="" TextAlignment="Right"
-                           Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center" />
+                           Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center" />
 
                 <TextBlock x:Name="Model2" Grid.Row="2" Grid.Column="0" Text="" TextTrimming="CharacterEllipsis"
                            AutomationProperties.AutomationId="TokenblokModel2"

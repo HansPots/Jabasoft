@@ -1,0 +1,92 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+
+    <!--
+        The English screen texts of Jabasoft - the same keys as
+        Strings.nl.xaml, and that file carries the explanation of how the
+        swapping works.
+
+        Keep both files in step: a key that only exists here shows up as
+        an empty spot when the other language is picked.
+    -->
+
+    <!-- Menu -->
+    <sys:String x:Key="T_MenuMain">Main</sys:String>
+    <sys:String x:Key="T_MenuStylebook">Stylebook</sys:String>
+    <sys:String x:Key="T_MenuTokens">Tokens</sys:String>
+    <sys:String x:Key="T_MenuHealth">Health</sys:String>
+    <sys:String x:Key="T_MenuSettings">Settings</sys:String>
+
+    <!-- Card LANGUAGE -->
+    <sys:String x:Key="T_TaalTitel">LANGUAGE</sys:String>
+
+    <!-- Card THEME -->
+    <sys:String x:Key="T_ThemaTitel">THEME</sys:String>
+
+    <!-- Card FONT -->
+    <sys:String x:Key="T_FontTitel">FONT</sys:String>
+    <sys:String x:Key="T_FontKeuze">Font</sys:String>
+    <sys:String x:Key="T_FontGrootteFormaat">Text size ({0} px)</sys:String>
+    <sys:String x:Key="T_FontVoorbeeld">This is what the interface will look like.</sys:String>
+    <sys:String x:Key="T_FontTerug">Reset to default (Segoe UI, 16 px)</sys:String>
+
+    <!-- Card SPACING -->
+    <sys:String x:Key="T_SpacingTitel">SPACING</sys:String>
+    <sys:String x:Key="T_SpacingFormaat">Space around each block (header, menu, content, action, footer) — {0} px</sys:String>
+    <sys:String x:Key="T_SpacingTerug">Reset to default (6 px)</sys:String>
+
+    <!-- Card BORDER -->
+    <sys:String x:Key="T_BorderTitel">BORDER</sys:String>
+    <sys:String x:Key="T_BorderFormaat">Border around the cards and the info blocks — {0} px</sys:String>
+    <sys:String x:Key="T_BorderTerug">Reset to default (3 px)</sys:String>
+
+    <!-- Card REFRESH TIME -->
+    <sys:String x:Key="T_RefreshTitel">REFRESH TIME</sys:String>
+    <sys:String x:Key="T_RefreshFormaat">Footer refresh time (CPU/RAM/Model VRAM) — {0} sec</sys:String>
+    <sys:String x:Key="T_RefreshTerug">Reset to default (5 sec)</sys:String>
+
+    <!-- Card AI -->
+    <sys:String x:Key="T_AiTitel">AI</sys:String>
+    <sys:String x:Key="T_AiServer">Server</sys:String>
+    <sys:String x:Key="T_AiAdres">Server address</sys:String>
+    <sys:String x:Key="T_AiChatmodel">Chat model</sys:String>
+    <sys:String x:Key="T_AiEmbeddingmodel">Embedding model</sys:String>
+    <sys:String x:Key="T_AiVernieuwen">Refresh model list</sys:String>
+    <sys:String x:Key="T_AiLaden">Loading…</sys:String>
+    <sys:String x:Key="T_AiModellenLaden">Loading models…</sys:String>
+    <sys:String x:Key="T_AiBrokerWegFormaat">Broker not reachable: {0}</sys:String>
+    <sys:String x:Key="T_AiGeenLijstFormaat">No model list from {0}: {1}</sys:String>
+    <sys:String x:Key="T_AiGevondenFormaat">{0} models found on {1}</sys:String>
+    <sys:String x:Key="T_AiOntbreektFormaat">{0} models found — not present: {1}</sys:String>
+    <sys:String x:Key="T_AiNietBewaardFormaat">Not saved: {0}</sys:String>
+
+    <!-- Tokens -->
+    <sys:String x:Key="T_TokensTitel">TOKENS</sys:String>
+    <sys:String x:Key="T_TokensTotaal">tokens total</sys:String>
+    <sys:String x:Key="T_TokensNietsGeteld">Nothing counted yet</sys:String>
+    <sys:String x:Key="T_TokensSamenvattingFormaat">{0} prompt · {1} answer · {2} {3} · {4} {5}</sys:String>
+    <sys:String x:Key="T_TokensAanroep">call</sys:String>
+    <sys:String x:Key="T_TokensAanroepen">calls</sys:String>
+    <sys:String x:Key="T_TokensWeek">week</sys:String>
+    <sys:String x:Key="T_TokensWeken">weeks</sys:String>
+    <sys:String x:Key="T_TokensWeekFormaat">week {0}</sys:String>
+    <sys:String x:Key="T_TokensPeriodeFormaat">{0:d MMMM} to {1:d MMMM yyyy} · {2} {3}</sys:String>
+    <sys:String x:Key="T_TokensLeeg">No AI calls recorded yet. As soon as an application uses the broker, a week appears here.</sys:String>
+    <sys:String x:Key="T_TokensGeenRegels">No entries found for this week.</sys:String>
+    <sys:String x:Key="T_TokensOphalen">Loading…</sys:String>
+    <sys:String x:Key="T_TokensKopTijd">time</sys:String>
+    <sys:String x:Key="T_TokensKopApp">app</sys:String>
+    <sys:String x:Key="T_TokensKopModel">model</sys:String>
+    <sys:String x:Key="T_TokensKopPrompt">prompt</sys:String>
+    <sys:String x:Key="T_TokensKopAntwoord">answer</sys:String>
+    <sys:String x:Key="T_TokensKopTotaal">total</sys:String>
+
+    <!-- Health -->
+    <sys:String x:Key="T_HealthTitel">SYSTEM HEALTH</sys:String>
+    <sys:String x:Key="T_HealthOpnieuw">Check again</sys:String>
+
+    <!-- Header -->
+    <sys:String x:Key="T_Activiteit">Activity</sys:String>
+
+</ResourceDictionary>

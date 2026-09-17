@@ -1,0 +1,101 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+
+    <!--
+        De Nederlandse schermteksten van Jabasoft.
+
+        Werkt precies als een thema: dit hele woordenboek wordt omgewisseld
+        voor Strings.en.xaml (zie Taal/LanguageManager), en omdat elke
+        tekst er met {DynamicResource} naar verwijst klapt het scherm
+        meteen om - zonder herstart, net als bij een kleurwissel.
+
+        Alleen de teksten van DIT scherm staan hier. Meldingen die uit
+        Jabasoft.Base of de broker komen (de regels van de
+        gezondheidscontrole, het activiteitenlog) blijven zoals ze zijn:
+        die kennen de taalinstelling van deze app niet.
+
+        Sleutels beginnen met T_ zodat ze in de XAML meteen herkenbaar zijn
+        als tekst en niet als kleur of maat. Een sleutel die eindigt op
+        Formaat is een sjabloon met {0} erin, ingevuld vanuit code-behind.
+    -->
+
+    <!-- Menu -->
+    <sys:String x:Key="T_MenuMain">Hoofdscherm</sys:String>
+    <sys:String x:Key="T_MenuStylebook">Stylebook</sys:String>
+    <sys:String x:Key="T_MenuTokens">Tokens</sys:String>
+    <sys:String x:Key="T_MenuHealth">Gezondheid</sys:String>
+    <sys:String x:Key="T_MenuSettings">Instellingen</sys:String>
+
+    <!-- Kaart TAAL -->
+    <sys:String x:Key="T_TaalTitel">TAAL</sys:String>
+
+    <!-- Kaart THEMA -->
+    <sys:String x:Key="T_ThemaTitel">THEMA</sys:String>
+
+    <!-- Kaart FONT -->
+    <sys:String x:Key="T_FontTitel">LETTERTYPE</sys:String>
+    <sys:String x:Key="T_FontKeuze">Lettertype</sys:String>
+    <sys:String x:Key="T_FontGrootteFormaat">Tekstgrootte ({0} px)</sys:String>
+    <sys:String x:Key="T_FontVoorbeeld">Zo komt de interface eruit te zien.</sys:String>
+    <sys:String x:Key="T_FontTerug">Terug naar standaard (Segoe UI, 16 px)</sys:String>
+
+    <!-- Kaart SPACING -->
+    <sys:String x:Key="T_SpacingTitel">TUSSENRUIMTE</sys:String>
+    <sys:String x:Key="T_SpacingFormaat">Ruimte om elk blok (header, menu, inhoud, actie, footer) — {0} px</sys:String>
+    <sys:String x:Key="T_SpacingTerug">Terug naar standaard (6 px)</sys:String>
+
+    <!-- Kaart BORDER -->
+    <sys:String x:Key="T_BorderTitel">KADERRAND</sys:String>
+    <sys:String x:Key="T_BorderFormaat">Rand om de kaarten en de infoblokken — {0} px</sys:String>
+    <sys:String x:Key="T_BorderTerug">Terug naar standaard (3 px)</sys:String>
+
+    <!-- Kaart REFRESH TIME -->
+    <sys:String x:Key="T_RefreshTitel">VERVERSTIJD</sys:String>
+    <sys:String x:Key="T_RefreshFormaat">Verversen van de meters (CPU/RAM/VRAM) — {0} sec</sys:String>
+    <sys:String x:Key="T_RefreshTerug">Terug naar standaard (5 sec)</sys:String>
+
+    <!-- Kaart AI -->
+    <sys:String x:Key="T_AiTitel">AI</sys:String>
+    <sys:String x:Key="T_AiServer">Server</sys:String>
+    <sys:String x:Key="T_AiAdres">Adres van de server</sys:String>
+    <sys:String x:Key="T_AiChatmodel">Chatmodel</sys:String>
+    <sys:String x:Key="T_AiEmbeddingmodel">Embeddingmodel</sys:String>
+    <sys:String x:Key="T_AiVernieuwen">Modellijst ophalen</sys:String>
+    <sys:String x:Key="T_AiLaden">Ophalen…</sys:String>
+    <sys:String x:Key="T_AiModellenLaden">Modellen ophalen…</sys:String>
+    <sys:String x:Key="T_AiBrokerWegFormaat">Broker niet bereikbaar: {0}</sys:String>
+    <sys:String x:Key="T_AiGeenLijstFormaat">Geen modellijst van {0}: {1}</sys:String>
+    <sys:String x:Key="T_AiGevondenFormaat">{0} modellen gevonden op {1}</sys:String>
+    <sys:String x:Key="T_AiOntbreektFormaat">{0} modellen gevonden — niet aanwezig: {1}</sys:String>
+    <sys:String x:Key="T_AiNietBewaardFormaat">Niet bewaard: {0}</sys:String>
+
+    <!-- Tokens -->
+    <sys:String x:Key="T_TokensTitel">TOKENS</sys:String>
+    <sys:String x:Key="T_TokensTotaal">tokens totaal</sys:String>
+    <sys:String x:Key="T_TokensNietsGeteld">Nog niets geteld</sys:String>
+    <sys:String x:Key="T_TokensSamenvattingFormaat">{0} prompt · {1} antwoord · {2} {3} · {4} {5}</sys:String>
+    <sys:String x:Key="T_TokensAanroep">aanroep</sys:String>
+    <sys:String x:Key="T_TokensAanroepen">aanroepen</sys:String>
+    <sys:String x:Key="T_TokensWeek">week</sys:String>
+    <sys:String x:Key="T_TokensWeken">weken</sys:String>
+    <sys:String x:Key="T_TokensWeekFormaat">week {0}</sys:String>
+    <sys:String x:Key="T_TokensPeriodeFormaat">{0:d MMMM} t/m {1:d MMMM yyyy} · {2} {3}</sys:String>
+    <sys:String x:Key="T_TokensLeeg">Nog geen AI-aanroepen vastgelegd. Zodra een applicatie de broker gebruikt, verschijnt hier een week.</sys:String>
+    <sys:String x:Key="T_TokensGeenRegels">Geen regels gevonden voor deze week.</sys:String>
+    <sys:String x:Key="T_TokensOphalen">Ophalen…</sys:String>
+    <sys:String x:Key="T_TokensKopTijd">tijd</sys:String>
+    <sys:String x:Key="T_TokensKopApp">app</sys:String>
+    <sys:String x:Key="T_TokensKopModel">model</sys:String>
+    <sys:String x:Key="T_TokensKopPrompt">prompt</sys:String>
+    <sys:String x:Key="T_TokensKopAntwoord">antwoord</sys:String>
+    <sys:String x:Key="T_TokensKopTotaal">totaal</sys:String>
+
+    <!-- Gezondheid -->
+    <sys:String x:Key="T_HealthTitel">SYSTEM HEALTH</sys:String>
+    <sys:String x:Key="T_HealthOpnieuw">Opnieuw controleren</sys:String>
+
+    <!-- Header -->
+    <sys:String x:Key="T_Activiteit">Activiteit</sys:String>
+
+</ResourceDictionary>
