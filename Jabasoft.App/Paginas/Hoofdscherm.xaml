@@ -4,6 +4,7 @@
              xmlns:controls="clr-namespace:Jabasoft.App.Controls"
              xmlns:header="clr-namespace:Jabasoft.App.Regios.Header"
              xmlns:footer="clr-namespace:Jabasoft.App.Regios.Footer"
+             xmlns:actie="clr-namespace:Jabasoft.App.Regios.Actie"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              mc:Ignorable="d"
@@ -46,6 +47,11 @@
         <controls:Basis.FooterContent>
             <footer:Statusbalk />
         </controls:Basis.FooterContent>
+        <!-- De actierail zit hier ingebakken en niet per scherm opgebouwd,
+             zodat hij op elke pagina staat. -->
+        <controls:Basis.ActionContent>
+            <actie:Actiebalk />
+        </controls:Basis.ActionContent>
     </controls:Basis>
 
 </UserControl>

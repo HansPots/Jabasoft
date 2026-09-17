@@ -7,6 +7,9 @@ using System.Windows.Automation;
 using System.Windows.Controls;
 using System.Windows.Media;
 using Jabasoft.App.Controls;
+using Jabasoft.Base.AiBroker;
+using Jabasoft.Base.Health;
+using Jabasoft.Base.Logging;
 using InhoudSchermen = Jabasoft.App.Regios.Inhoud;
 
 namespace Jabasoft.App;
@@ -29,14 +32,18 @@ public partial class MainWindow : Window
 
     private readonly SettingsView _settingsView = new();
 
+    private BrokerLogReader? _brokerLog;
+
     private bool _showingSettings;
 
     public MainWindow()
     {
         InitializeComponent();
         BuildMenu();
-        BuildActionContent();
+        WireActionRail();
         ShowContent(settings: false);
+        StartActivityLog();
+        StartHealthCheck();
     }
 
     /// <summary>
@@ -78,6 +85,50 @@ public partial class MainWindow : Window
         AppShell.MenuContent = menu;
     }
 
+    /// <summary>
+    /// Vult het Activity-blok: de eigen regels van deze app komen
+    /// rechtstreeks in de gedeelde opvang, en BrokerLogReader haalt die van
+    /// de AI-broker erbij. Die laatste loopt door zolang de app leeft, ook
+    /// als de broker tussendoor even weg is.
+    /// </summary>
+    private void StartActivityLog()
+    {
+        ActivityLog.Shared.Add("app", "Jabasoft gestart");
+
+        _brokerLog = new BrokerLogReader(ActivityLog.Shared);
+        _brokerLog.Start();
+    }
+
+    /// <summary>
+    /// Zet de SYSTEM HEALTH-pil aan het werk. WELKE controles er lopen is
+    /// een keuze van deze app - het bewaken zelf zit in Jabasoft.Base, zodat
+    /// elke applicatie het op dezelfde manier doet.
+    ///
+    /// De pil staat op oranje "Checking AI broker" zolang de controle loopt.
+    /// Draait de broker niet, dan START de controle hem - het is een
+    /// gedeelde voorziening waar meerdere applicaties op leunen. De pil
+    /// zegt dan "Starting AI broker" en blijft oranje: bezig is niet fout.
+    /// Pas als hij niet omhoog komt wordt het rood.
+    /// </summary>
+    private void StartHealthCheck()
+    {
+        if (AppShell.Footer is not { } footer)
+        {
+            return;
+        }
+
+        var monitor = new HealthMonitor([new AiBrokerHealthCheck()]);
+        footer.Observe(monitor);
+
+        // Elke stap van de controle ook in het Activity-blok, zodat je daar
+        // terugleest wat er bij het opstarten gebeurd is.
+        monitor.Changed += (_, status) => ActivityLog.Shared.Add("app", status.Message);
+
+        // Niet awaiten: het venster mag meteen verschijnen, de pil vult
+        // zichzelf bij terwijl de controle loopt.
+        _ = monitor.RunAsync();
+    }
+
     private void Navigate(NavigatiemenuItem item)
     {
         switch (item)
@@ -102,27 +153,22 @@ public partial class MainWindow : Window
     }
 
     /// <summary>
-    /// De instellingen-knop in de Actie-rail - zelfde reden als
-    /// BuildMenu om dit in code-behind te doen i.p.v. rechtstreeks in
-    /// XAML (MC3093, zie MainWindow.xaml). Klikken schakelt heen en weer
-    /// tussen het hoofdscherm en de instellingen; hij deelt zijn stand met
-    /// de Settings-knop in het menu.
+    /// De actierail zit ingebakken in de paginaschil, dus hij hoeft hier
+    /// niet opgebouwd te worden - alleen aangesloten. De rail meldt wat er
+    /// aangeklikt is; wat dat betekent staat hier.
+    ///
+    /// Verversen zet de splitters in de header en de footer terug op hun
+    /// standaardstand. Meer zit er niet in de rail: de instellingen gaan
+    /// via het menu.
     /// </summary>
-    private void BuildActionContent()
+    private void WireActionRail()
     {
-        var settingsButton = new Button
+        if (AppShell.Actie is not { } rail)
         {
-            Style = (Style)FindResource("IconActionButtonStyle"),
-            Content = new TextBlock
-            {
-                Text = (string)FindResource("IconSettings"),
-                FontFamily = (FontFamily)FindResource("IconFontFamily"),
-            },
-        };
-        AutomationProperties.SetName(settingsButton, "Instellingen");
-        settingsButton.Click += (_, _) => ShowContent(!_showingSettings);
+            return;
+        }
 
-        AppShell.ActionContent = settingsButton;
+        rail.RefreshRequested += (_, _) => AppShell.ResetSplitters();
     }
 
     private void StartStylebook()

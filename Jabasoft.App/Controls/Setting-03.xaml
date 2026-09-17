@@ -48,9 +48,11 @@
                        Margin="0,14,0,6" FontSize="{DynamicResource FontSizeSmall}"
                        Foreground="{DynamicResource TextMutedBrush}" />
             <Slider x:Name="IntervalSlider" Minimum="1" Maximum="60" Value="5"
+                    TickFrequency="1" IsSnapToTickEnabled="True"
+                    ValueChanged="IntervalSlider_ValueChanged"
                     Style="{DynamicResource SliderAccentStyle}" />
 
-            <Button x:Name="ResetIntervalButton" Content="Reset to default (5 sec)"
+            <Button x:Name="ResetIntervalButton" Content="Reset to default (5 sec)" Click="ResetInterval_Click"
                     Margin="0,16,0,0" Style="{DynamicResource AccentButtonStyle}" />
         </StackPanel>
     </Border>

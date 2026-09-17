@@ -48,7 +48,9 @@
     <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
         <!-- Ook deze rand loopt mee met SPACING: op 0 sluiten de kaarten aan
              tegen de rand van het inhoudsvak. -->
-        <StackPanel>
+        <!-- Ruimte rechts, zodat de kaarten niet tegen de schuifbalk aan
+             liggen. Volgt de SPACING-instelling, net als al het andere. -->
+        <StackPanel Margin="{DynamicResource RegionGapRightThickness}">
             <controls:Setting01 Width="Auto" />
             <controls:Setting02 Width="Auto" Margin="{DynamicResource RegionGapTopThickness}" />
             <controls:Setting04 Width="Auto" Margin="{DynamicResource RegionGapTopThickness}" />

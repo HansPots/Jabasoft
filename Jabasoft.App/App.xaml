@@ -1,6 +1,7 @@
 <Application x:Class="Jabasoft.App.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:sys="clr-namespace:System;assembly=mscorlib"
              xmlns:local="clr-namespace:Jabasoft.App"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
@@ -24,6 +25,90 @@
                      draait - en doet klikken op LCARS niets. -->
                 <ResourceDictionary Source="pack://application:,,,/Stylebook.Components;component/Styles/Themes/Lcars.xaml" />
             </ResourceDictionary.MergedDictionaries>
+
+            <!-- Hoe vaak de metertjes in de footer zichzelf verversen. Staat
+                 hier en niet in Stylebook.Components: dit is geen opmaak maar
+                 een instelling van DEZE app. De REFRESH TIME-kaart
+                 (Controls/Setting-03) zet er een andere waarde overheen, en
+                 Regios/Footer/Statusbalk leest 'm hier op. -->
+
+            <!--
+                Schuifbalk in de huisstijl. Staat hier en niet in de gedeelde
+                Styles/Controls.xaml: dit is een IMPLICIETE stijl, dus hij
+                geldt voor elke ScrollBar die hem ziet. In de gedeelde
+                bibliotheek zou hij ook de Stylebook-tool omzetten, en die
+                houdt zijn eigen vaste look.
+
+                De kleuren komen uit het thema, dus hij kleurt mee met LCARS
+                of VS Code. Geen pijltjesknoppen: die hebben een vaste,
+                systeemeigen tekening die je niet mooi meekrijgt, en met de
+                muis of het wiel scroll je toch.
+            -->
+            <Style TargetType="ScrollBar">
+                <Setter Property="Width" Value="10" />
+                <Setter Property="Background" Value="Transparent" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="ScrollBar">
+                            <Grid Background="{TemplateBinding Background}">
+                                <!-- Het spoor over de volle hoogte, daaroverheen
+                                     het duimpje. De twee RepeatButtons vangen
+                                     een klik naast het duimpje op; ze zijn
+                                     doorzichtig maar niet leeg, want een lege
+                                     template krijgt geen muisklikken. -->
+                                <Border CornerRadius="{DynamicResource RadiusSmall}"
+                                        Background="{DynamicResource SurfaceBrush}"
+                                        Opacity="0.6"
+                                        Margin="2,0,6,0" />
+                                <Track x:Name="PART_Track" IsDirectionReversed="True">
+                                    <Track.DecreaseRepeatButton>
+                                        <RepeatButton Command="ScrollBar.PageUpCommand" Focusable="False">
+                                            <RepeatButton.Template>
+                                                <ControlTemplate TargetType="RepeatButton">
+                                                    <Border Background="Transparent" />
+                                                </ControlTemplate>
+                                            </RepeatButton.Template>
+                                        </RepeatButton>
+                                    </Track.DecreaseRepeatButton>
+                                    <Track.IncreaseRepeatButton>
+                                        <RepeatButton Command="ScrollBar.PageDownCommand" Focusable="False">
+                                            <RepeatButton.Template>
+                                                <ControlTemplate TargetType="RepeatButton">
+                                                    <Border Background="Transparent" />
+                                                </ControlTemplate>
+                                            </RepeatButton.Template>
+                                        </RepeatButton>
+                                    </Track.IncreaseRepeatButton>
+                                    <Track.Thumb>
+                                        <Thumb>
+                                            <Thumb.Template>
+                                                <ControlTemplate TargetType="Thumb">
+                                                    <Border x:Name="Duim"
+                                                            CornerRadius="{DynamicResource RadiusSmall}"
+                                                            Background="{DynamicResource BorderBrush}"
+                                                            Margin="2,0,6,0" />
+                                                    <ControlTemplate.Triggers>
+                                                        <Trigger Property="IsMouseOver" Value="True">
+                                                            <Setter TargetName="Duim" Property="Background" Value="{DynamicResource AccentBrush}" />
+                                                        </Trigger>
+                                                    </ControlTemplate.Triggers>
+                                                </ControlTemplate>
+                                            </Thumb.Template>
+                                        </Thumb>
+                                    </Track.Thumb>
+                                </Track>
+                            </Grid>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+                <Style.Triggers>
+                    <Trigger Property="Orientation" Value="Horizontal">
+                        <Setter Property="Width" Value="Auto" />
+                        <Setter Property="Height" Value="10" />
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
+            <sys:Double x:Key="RefreshIntervalSeconds">5</sys:Double>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

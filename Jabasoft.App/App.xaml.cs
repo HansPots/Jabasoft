@@ -20,4 +20,20 @@ public partial class App : Application
         // nodig.
         _ = AiBrokerProcessLauncher.EnsureRunningAsync();
     }
+
+    /// <summary>
+    /// Ruimt de broker op als Jabasoft de laatste applicatie van de familie
+    /// was die draaide. Draait er nog een andere, dan blijft hij staan -
+    /// die heeft hem nodig.
+    ///
+    /// Synchroon en niet fire-and-forget: na deze methode wordt het proces
+    /// afgebroken, dus een taak die nog moet lopen komt er niet meer aan
+    /// toe. Het is een paar procesvragen, dat merk je niet bij het sluiten.
+    /// </summary>
+    protected override void OnExit(ExitEventArgs e)
+    {
+        AiBrokerProcessLauncher.StopIfUnused();
+
+        base.OnExit(e);
+    }
 }

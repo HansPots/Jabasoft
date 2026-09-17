@@ -1,0 +1,50 @@
+<UserControl x:Class="Jabasoft.App.Regios.Actie.Actiebalk"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="clr-namespace:Jabasoft.App.Controls"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d" Width="48"
+             d:DesignHeight="805">
+
+    <!-- Design-time-only: geeft Visual Studio/Blend's Designer een
+         thema-context (kleuren, lettertype) - deze class library heeft
+         zelf geen App.xaml die dat normaal doet. mc:Ignorable="d" zorgt
+         dat dit bij het echt compileren/draaien volledig wegvalt. -->
+    <d:UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/Stylebook.Components;component/Styles/Theme.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/Stylebook.Components;component/Styles/Themes/Lcars.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </d:UserControl.Resources>
+
+    <!--
+        De actierail: de smalle strook rechts, 48 breed net als de
+        Actie-kolom in Basis. Zit ingebakken in de paginaschil
+        (Paginas/Hoofdscherm), dus hij staat op ELKE pagina - niet per
+        scherm opnieuw opgebouwd.
+
+        Net als Navigatiemenu doet dit component zelf niets: het meldt via
+        events wat er is aangeklikt, en de app bepaalt wat er dan gebeurt.
+        Zo kan een volgende applicatie dezelfde rail gebruiken.
+
+        Nu alleen de verversknop, helemaal onderaan. De instellingen zijn
+        te bereiken via het menu; een tweede knop daarvoor in de rail was
+        dubbelop.
+    -->
+    <!-- Verversen: zet de splitters in de header en de footer terug op hun
+         standaardstand.
+
+         Onderaan in de rail, en uitgerekt over de volle breedte die de rail
+         geeft in plaats van zijn eigen vaste 48. De rail is namelijk 48 min
+         de SPACING-rand breed; bleef de knop op 48 staan, dan stak zijn
+         rechterkant eroverheen en liep de ronding daar niet meer helemaal
+         mee. -->
+    <controls:RefreshButton x:Name="RefreshAction"
+                            Width="Auto"
+                            HorizontalAlignment="Stretch"
+                            VerticalAlignment="Bottom" />
+
+</UserControl>

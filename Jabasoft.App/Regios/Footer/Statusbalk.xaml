@@ -37,7 +37,7 @@
         aan de buitenkanten niet - dat is de ruimte die de SPACING-
         instelling eventueel al geeft.
     -->
-    <Grid>
+    <Grid x:Name="PillRow">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
             <ColumnDefinition Width="*" />
@@ -46,11 +46,40 @@
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
-        <controls:Footer01 Grid.Column="0" Width="Auto" />
-        <controls:Footer02 Grid.Column="1" Width="Auto" Margin="{DynamicResource RegionGapLeftThickness}" />
-        <controls:Footer03 Grid.Column="2" Width="Auto" Margin="{DynamicResource RegionGapLeftThickness}" />
-        <controls:Footer04 Grid.Column="3" Width="Auto" Margin="{DynamicResource RegionGapLeftThickness}" />
+        <controls:Footer01 x:Name="HealthPill" Grid.Column="0" Width="Auto" />
+        <controls:Footer02 x:Name="CpuPill" Grid.Column="1" Width="Auto" Margin="{DynamicResource RegionGapLeftThickness}" />
+        <controls:Footer03 x:Name="RamPill" Grid.Column="2" Width="Auto" Margin="{DynamicResource RegionGapLeftThickness}" />
+        <controls:Footer04 x:Name="VramPill" Grid.Column="3" Width="Auto" Margin="{DynamicResource RegionGapLeftThickness}" />
         <controls:Footer05 Grid.Column="4" Width="Auto" Margin="{DynamicResource RegionGapLeftThickness}" />
+
+        <!-- Splitters tussen de pillen, in de SPACING-ruimte die de pil
+             rechts ervan toch al vrijhoudt - geen eigen kolom dus. Staat
+             SPACING op 0, dan is er niets te pakken.
+
+             BasedOnAlignment met HorizontalAlignment "Left": de splitter
+             pakt de kolom ERVOOR en zijn EIGEN kolom, dus de pil links en
+             de pil rechts van de greep. Niet "PreviousAndNext" - die telt
+             vanaf de kolom waar de splitter in zit en slaat die over. -->
+        <GridSplitter Grid.Column="1" Width="{DynamicResource RegionGapSize}"
+                      HorizontalAlignment="Left" VerticalAlignment="Stretch"
+                      Background="Transparent" ShowsPreview="False"
+                      ResizeBehavior="BasedOnAlignment" ResizeDirection="Columns"
+                      DragCompleted="Splitter_DragCompleted" />
+        <GridSplitter Grid.Column="2" Width="{DynamicResource RegionGapSize}"
+                      HorizontalAlignment="Left" VerticalAlignment="Stretch"
+                      Background="Transparent" ShowsPreview="False"
+                      ResizeBehavior="BasedOnAlignment" ResizeDirection="Columns"
+                      DragCompleted="Splitter_DragCompleted" />
+        <GridSplitter Grid.Column="3" Width="{DynamicResource RegionGapSize}"
+                      HorizontalAlignment="Left" VerticalAlignment="Stretch"
+                      Background="Transparent" ShowsPreview="False"
+                      ResizeBehavior="BasedOnAlignment" ResizeDirection="Columns"
+                      DragCompleted="Splitter_DragCompleted" />
+        <GridSplitter Grid.Column="4" Width="{DynamicResource RegionGapSize}"
+                      HorizontalAlignment="Left" VerticalAlignment="Stretch"
+                      Background="Transparent" ShowsPreview="False"
+                      ResizeBehavior="BasedOnAlignment" ResizeDirection="Columns"
+                      DragCompleted="Splitter_DragCompleted" />
     </Grid>
 
 </UserControl>

@@ -28,9 +28,14 @@
         "Content", want die inherited property is al intern in gebruik
         voor deze rij/kolom-Grid zelf.
 
-        Vaste maten: Header 210px, Footer 24px, Menu 256px, Action 48px -
-        alleen de hoofdinhoud (kolom 2) en de ruimte tussen header/footer
-        (rij 1) zijn variabel (*).
+        Vaste maten: Header 210, Footer 24, Menu 256, Actie 48. Alleen de
+        hoofdinhoud is variabel (kolom 2 en rij 1, allebei "*").
+
+        Die maten staan NIET meer als getal op de rij of de kolom; die
+        staan op Auto en volgen wat erin zit. Zo gaat de SPACING-rand er
+        niet vanaf maar komt hij erbij, en houdt het blok zelf zijn maat.
+        Het menu (256) is de uitzondering: dat is nog een vaste kolom, dus
+        daar gaat de rand wel van de 256 af.
 
         Elk van de vijf blokken geeft ruimte aan zijn LINKER- en BOVENkant,
         zo groot als de SPACING-instelling (Controls/Setting-04, via
@@ -87,7 +92,11 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="256" />
                 <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="48" />
+                <!-- Auto en geen vaste 48: de kolom voegt zich naar de
+                     actierail PLUS de SPACING-rand eromheen, in plaats van
+                     dat die rand van de 48 afgaat. De rail zelf blijft dus
+                     altijd 48 breed, wat je de spacing ook geeft. -->
+                <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
 
             <Border Grid.Column="0"

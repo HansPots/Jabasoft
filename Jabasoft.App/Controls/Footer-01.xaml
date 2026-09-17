@@ -24,9 +24,9 @@
         die alleen tekst toont. Hoogte 24 met hoekstraal 12 (= precies de
         helft), waardoor de uiteinden halve cirkels worden.
 
-        De inhoud is nu vast; het lampje (StatusLamp) en de tekst
-        (StatusText) hebben een naam zodat ze later vanuit code-behind op
-        interval bijgewerkt kunnen worden.
+        Het lampje en de tekst worden gezet met Show(), vanuit de gedeelde
+        HealthMonitor in Jabasoft.Base - zie Footer-01.xaml.cs en
+        Regios/Footer/Statusbalk.xaml.cs. Wat hier staat is de begintoestand.
         Breedte staat op het UserControl zelf en niet meer op de Border
         hieronder. Zo blijft de pil op zichzelf even breed als altijd,
         maar kan wie hem plaatst er Width="Auto" op zetten en hem laten
@@ -38,13 +38,17 @@
             Background="{DynamicResource TextMutedBrush}"
             HorizontalAlignment="Stretch" VerticalAlignment="Center">
         <StackPanel Orientation="Horizontal" Margin="12,0" VerticalAlignment="Center">
-            <Ellipse x:Name="StatusLamp" Width="8" Height="8" Opacity="0.65"
-                     Fill="{DynamicResource Text01Brush}" VerticalAlignment="Center" />
+            <!-- Kleur wordt gezet vanuit code-behind (Show): groen als alles
+                 klaarstaat, oranje tijdens het controleren, rood bij een
+                 fout. Hier de startkleur - oranje, want bij het opstarten
+                 wordt er gecontroleerd. -->
+            <Ellipse x:Name="StatusLamp" Width="8" Height="8"
+                     Fill="{DynamicResource HealthBusyBrush}" VerticalAlignment="Center" />
             <TextBlock Text="SYSTEM HEALTH" Margin="8,0,0,0"
                        FontSize="{DynamicResource FontSizeSmall}"
                        Foreground="{DynamicResource Text01Brush}"
                        Opacity="0.85" VerticalAlignment="Center" />
-            <TextBlock x:Name="StatusText" Text="Ready" Margin="10,0,0,0"
+            <TextBlock x:Name="StatusText" Text="Starting" Margin="10,0,0,0"
                        FontSize="{DynamicResource FontSizeSmall}" FontWeight="SemiBold"
                        Foreground="{DynamicResource Text01Brush}" VerticalAlignment="Center" />
         </StackPanel>
