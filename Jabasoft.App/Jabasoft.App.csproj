@@ -12,6 +12,14 @@
          snelkoppeling op het bureaublad leest het hiervandaan, dus die
          blijft kloppen zonder dat er een los .ico ergens naast staat. -->
     <ApplicationIcon>Jabasoft.ico</ApplicationIcon>
+
+    <!-- Het versienummer van deze applicatie. Elke wijziging: laatste cijfer
+         +1. Dit is de ENIGE plek waar het staat - het menu leest het uit de
+         gebouwde assembly (zie Jabasoft.Base/AppVersion), zodat het scherm
+         niet kan afwijken van wat er werkelijk draait. Het exe-bestand
+         draagt het hierdoor ook: te zien in de eigenschappen van het
+         bestand en in een foutmelding. -->
+    <Version>0.1.0.82</Version>
   </PropertyGroup>
 
   <ItemGroup>

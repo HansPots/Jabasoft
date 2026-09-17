@@ -7,6 +7,7 @@ using System.Windows.Automation;
 using System.Windows.Controls;
 using System.Windows.Media;
 using Jabasoft.App.Controls;
+using Jabasoft.Base;
 using Jabasoft.Base.AiBroker;
 using Jabasoft.Base.Health;
 using Jabasoft.Base.Logging;
@@ -110,6 +111,12 @@ public partial class MainWindow : Window
     private void BuildMenu()
     {
         _menu = new Navigatiemenu();
+
+        // Uit de gebouwde assembly en niet overgetypt in de XAML: dan kan het
+        // getal op het scherm niet afwijken van de code die draait. Ophogen
+        // gebeurt in <Version> in Jabasoft.App.csproj.
+        _menu.Version = $"V {AppVersion.Current}";
+
         AutomationProperties.SetName(_menu, "Hoofdmenu");
         _menu.ItemSelected += (_, item) => Navigate(item);
         AppShell.MenuContent = _menu;

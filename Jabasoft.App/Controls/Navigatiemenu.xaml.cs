@@ -95,7 +95,11 @@ public partial class Navigatiemenu : UserControl
         knop.BorderThickness = new Thickness(actief ? 2 : 0);
     }
 
-    /// <summary>De versietekst onderin de balk - elke app zet hier zijn eigen versienummer in.</summary>
+    /// <summary>
+    /// De versietekst onderin de balk - elke app zet hier zijn eigen
+    /// versienummer in. Het menu verzint of zoekt het niet zelf op: het weet
+    /// niet in welke applicatie het hangt.
+    /// </summary>
     public string Version
     {
         get => VersionText.Text;

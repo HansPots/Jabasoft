@@ -245,8 +245,12 @@
                         HorizontalAlignment="Stretch"
                         Height="{DynamicResource RegionGapSize}" />
 
-                <!-- Versie-indicator: wordt bij iedere wijziging aan deze app
-                     handmatig opgehoogd (laatste cijfer +1). -->
+                <!-- Versie-indicator. Het nummer staat hier NIET: de app zet
+                     het bij het opbouwen van het menu, uitgelezen uit de
+                     gebouwde assembly (zie Jabasoft.Base/AppVersion). Zo kan
+                     wat hier staat niet afwijken van wat er werkelijk draait.
+                     Ophogen doe je in het csproj van de applicatie. De
+                     d:Text hieronder is alleen voor de ontwerpweergave. -->
                 <Border x:Name="VersionBar"
                         theming:CornerRadiusParts.TopLeft="0"
                         theming:CornerRadiusParts.TopRight="0"
@@ -262,7 +266,7 @@
                                Margin="30,0,16,0"
                                VerticalAlignment="Center"
                                TextAlignment="Right"
-                               Text="V 0.1.0.81" />
+                               d:Text="V 0.0.0.0" />
                 </Border>
             </StackPanel>
         </Grid>
