@@ -14,6 +14,7 @@
     <!-- Menu -->
     <sys:String x:Key="T_MenuMain">Main</sys:String>
     <sys:String x:Key="T_MenuStylebook">Stylebook</sys:String>
+    <sys:String x:Key="T_MenuAiStudio">AI Studio</sys:String>
     <sys:String x:Key="T_MenuTokens">Tokens</sys:String>
     <sys:String x:Key="T_MenuHealth">Health</sys:String>
     <sys:String x:Key="T_MenuSettings">Settings</sys:String>
@@ -50,7 +51,7 @@
     <sys:String x:Key="T_AiTitel">AI</sys:String>
     <sys:String x:Key="T_AiServer">Server</sys:String>
     <sys:String x:Key="T_AiAdres">Server address</sys:String>
-    <sys:String x:Key="T_AiChatmodel">Chat model</sys:String>
+    <sys:String x:Key="T_AiDailychatModel">Daily chat model</sys:String>
     <sys:String x:Key="T_AiEmbeddingmodel">Embedding model</sys:String>
     <sys:String x:Key="T_AiVernieuwen">Refresh model list</sys:String>
     <sys:String x:Key="T_AiLaden">Loading…</sys:String>

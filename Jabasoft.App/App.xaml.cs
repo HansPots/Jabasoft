@@ -1,4 +1,5 @@
 using System.Windows;
+using Jabasoft.Base;
 using Jabasoft.Base.AiBroker;
 
 namespace Jabasoft.App;
@@ -37,6 +38,12 @@ public partial class App : Application
     /// </summary>
     protected override void OnExit(ExitEventArgs e)
     {
+        // Vangnet: staat er een applicatie van de familie verborgen omdat wij
+        // het scherm van haar overgenomen hebben, dan komt ze nu terug. Zonder
+        // dit zou ze onzichtbaar blijven draaien, zonder taakbalkknop en dus
+        // zonder weg terug.
+        AppHandover.RevealHidden();
+
         AiBrokerProcessLauncher.StopIfUnused();
 
         base.OnExit(e);

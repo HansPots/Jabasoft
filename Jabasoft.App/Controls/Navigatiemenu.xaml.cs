@@ -12,6 +12,9 @@ public enum NavigatiemenuItem
     /// <summary>De Stylebook-applicatie openen.</summary>
     Stylebook,
 
+    /// <summary>LocalAiStudio openen.</summary>
+    AiStudio,
+
     /// <summary>Het tokenverbruik van de AI-aanroepen.</summary>
     Tokens,
 
@@ -58,7 +61,9 @@ public partial class Navigatiemenu : UserControl
         get => _actief;
         set
         {
-            if (value == NavigatiemenuItem.Stylebook || _actief == value)
+            // Stylebook en AI Studio zijn andere applicaties: die blijven
+            // nooit als stand staan.
+            if (value is NavigatiemenuItem.Stylebook or NavigatiemenuItem.AiStudio || _actief == value)
             {
                 return;
             }
@@ -84,8 +89,10 @@ public partial class Navigatiemenu : UserControl
         Zet(HealthButton, _actief == NavigatiemenuItem.Health);
         Zet(SettingsButton, _actief == NavigatiemenuItem.Settings);
 
-        // Stylebook is een handeling, geen bestemming: nooit gemarkeerd.
+        // Stylebook en AI Studio starten een andere applicatie: dat zijn
+        // handelingen, geen bestemmingen - dus nooit gemarkeerd.
         Zet(StylebookButton, false);
+        Zet(AiStudioButton, false);
     }
 
     private static void Zet(Button knop, bool actief)
@@ -111,6 +118,7 @@ public partial class Navigatiemenu : UserControl
         var item = sender switch
         {
             _ when ReferenceEquals(sender, StylebookButton) => NavigatiemenuItem.Stylebook,
+            _ when ReferenceEquals(sender, AiStudioButton) => NavigatiemenuItem.AiStudio,
             _ when ReferenceEquals(sender, TokensButton) => NavigatiemenuItem.Tokens,
             _ when ReferenceEquals(sender, HealthButton) => NavigatiemenuItem.Health,
             _ when ReferenceEquals(sender, SettingsButton) => NavigatiemenuItem.Settings,

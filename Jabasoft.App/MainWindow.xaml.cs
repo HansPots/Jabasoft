@@ -23,6 +23,9 @@ public partial class MainWindow : Window
     /// <summary>De naam in appsettings.json van de app die de Stylebook-knop start.</summary>
     private const string StylebookAppName = "Stylebook";
 
+    /// <summary>De naam in appsettings.json van de app die de AI Studio-knop start.</summary>
+    private const string AiStudioAppName = "LocalAiStudio";
+
     /// <summary>Gestarte processen per AppEntry.Name - zie StartOrFocusApp. Geen HasExited-polling nodig buiten wat hierin al gebeurt: elke klik checkt opnieuw.</summary>
     private readonly Dictionary<string, Process> _runningApps = [];
 
@@ -187,15 +190,20 @@ public partial class MainWindow : Window
 
     private void Navigate(NavigatiemenuItem item)
     {
-        // Stylebook is geen scherm van deze app maar een eigen applicatie;
-        // de rest schakelt het inhoudsvak om.
-        if (item == NavigatiemenuItem.Stylebook)
+        // Stylebook en AI Studio zijn geen schermen van deze app maar eigen
+        // applicaties; de rest schakelt het inhoudsvak om.
+        switch (item)
         {
-            StartStylebook();
-            return;
+            case NavigatiemenuItem.Stylebook:
+                StartApp(StylebookAppName);
+                return;
+            case NavigatiemenuItem.AiStudio:
+                GaNaarApp(AiStudioAppName);
+                return;
+            default:
+                ShowContent(item);
+                return;
         }
-
-        ShowContent(item);
     }
 
     /// <summary>
@@ -241,12 +249,43 @@ public partial class MainWindow : Window
         rail.RefreshRequested += (_, _) => AppShell.ResetSplitters();
     }
 
-    private void StartStylebook()
+    /// <summary>
+    /// Geeft het scherm over aan een andere applicatie van de familie: die
+    /// komt op DEZELFDE plek en grootte te staan, en dit venster verdwijnt
+    /// van het scherm. Zo voelt het als één venster dat van inhoud wisselt.
+    ///
+    /// Lukt het overgeven niet, dan blijft alles staan zoals het stond - je
+    /// blijft dus nooit met een leeg scherm achter.
+    /// </summary>
+    private void GaNaarApp(string naam)
     {
-        if (_apps.FirstOrDefault(app => app.Name == StylebookAppName) is { Available: true } stylebook)
+        if (_apps.FirstOrDefault(app => app.Name == naam) is not { Available: true } doel)
         {
-            StartOrFocusApp(stylebook);
+            ActivityLog.Shared.Add("app", $"{naam} staat niet (of niet als beschikbaar) in appsettings.json.");
+            return;
         }
+
+        // De venstermaat nog even bewaren: de andere applicatie neemt hem
+        // over, en zo staat hij ook in onze eigen voorkeuren als we straks
+        // weer tevoorschijn komen.
+        Layout.Preferences.BewaarVenster(this);
+
+        var handvat = new System.Windows.Interop.WindowInteropHelper(this).Handle;
+        if (!AppHandover.SwitchTo(doel.ExecutablePath, handvat))
+        {
+            ActivityLog.Shared.Add("app", $"{naam} kon niet geopend worden - het venster is niet gevonden.");
+        }
+    }
+
+    private void StartApp(string naam)
+    {
+        if (_apps.FirstOrDefault(app => app.Name == naam) is { Available: true } app2)
+        {
+            StartOrFocusApp(app2);
+            return;
+        }
+
+        ActivityLog.Shared.Add("app", $"{naam} staat niet (of niet als beschikbaar) in appsettings.json.");
     }
 
     /// <summary>
@@ -267,6 +306,19 @@ public partial class MainWindow : Window
                 NativeMethods.SetForegroundWindow(existing.MainWindowHandle);
             }
 
+            return;
+        }
+
+        // Draait hij al buiten ons om - je hebt hem zelf van het bureaublad
+        // gestart? Dan dat venster naar voren halen in plaats van een tweede
+        // exemplaar erbij.
+        var procesnaam = Path.GetFileNameWithoutExtension(app.ExecutablePath);
+        var draaiend = Process.GetProcessesByName(procesnaam).FirstOrDefault(p => p.MainWindowHandle != IntPtr.Zero);
+
+        if (draaiend is not null)
+        {
+            NativeMethods.SetForegroundWindow(draaiend.MainWindowHandle);
+            _runningApps[app.Name] = draaiend;
             return;
         }
 

@@ -23,6 +23,7 @@
     <!-- Menu -->
     <sys:String x:Key="T_MenuMain">Hoofdscherm</sys:String>
     <sys:String x:Key="T_MenuStylebook">Stylebook</sys:String>
+    <sys:String x:Key="T_MenuAiStudio">AI Studio</sys:String>
     <sys:String x:Key="T_MenuTokens">Tokens</sys:String>
     <sys:String x:Key="T_MenuHealth">Gezondheid</sys:String>
     <sys:String x:Key="T_MenuSettings">Instellingen</sys:String>
@@ -59,7 +60,7 @@
     <sys:String x:Key="T_AiTitel">AI</sys:String>
     <sys:String x:Key="T_AiServer">Server</sys:String>
     <sys:String x:Key="T_AiAdres">Adres van de server</sys:String>
-    <sys:String x:Key="T_AiChatmodel">Chatmodel</sys:String>
+    <sys:String x:Key="T_AiDailychatModel">Daily chat-model</sys:String>
     <sys:String x:Key="T_AiEmbeddingmodel">Embeddingmodel</sys:String>
     <sys:String x:Key="T_AiVernieuwen">Modellijst ophalen</sys:String>
     <sys:String x:Key="T_AiLaden">Ophalen…</sys:String>
