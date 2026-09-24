@@ -33,6 +33,7 @@ public partial class Tokens : UserControl
         var weken = await _broker.GetUsageWeeksAsync(CancellationToken.None);
 
         Totaal.Show(weken);
+        await LaadVerloopAsync(weken);
         Weken.Items.Clear();
 
         if (weken.Count == 0)
@@ -63,6 +64,51 @@ public partial class Tokens : UserControl
 
             Weken.Items.Add(kaart);
         }
+    }
+
+    /// <summary>Hoeveel dagen de grafiek terugkijkt: vier volle weken.</summary>
+    private const int VerloopDagen = 28;
+
+    /// <summary>
+    /// Het verloop per model voor de grafiek: de losse aanroepen van de weken
+    /// die in de laatste <see cref="VerloopDagen"/> vallen, opgeteld per model
+    /// en per dag. Eén vraag per week, dus hooguit vijf - de weekkaarten
+    /// blijven zelf hun regels pas ophalen bij het openklappen.
+    /// </summary>
+    private async Task LaadVerloopAsync(IReadOnlyList<TokenUsageWeek> weken)
+    {
+        var tot = DateTime.Today;
+        var van = tot.AddDays(1 - VerloopDagen);
+
+        var sleutels = weken.Where(week => week.End.Date >= van).Select(week => week.Week).ToList();
+        var lijsten = await Task.WhenAll(sleutels.Select(sleutel => _broker.GetUsageEntriesAsync(sleutel, CancellationToken.None)));
+
+        var onbekend = Teksten.Van(this, "T_TokensOnbekendModel", "(onbekend)");
+        var perModel = new Dictionary<string, Dictionary<DateTime, long>>();
+
+        foreach (var regel in lijsten.SelectMany(lijst => lijst))
+        {
+            var dag = regel.Timestamp.LocalDateTime.Date;
+
+            if (dag < van || dag > tot)
+            {
+                continue;
+            }
+
+            var model = string.IsNullOrWhiteSpace(regel.Model) ? onbekend : regel.Model;
+
+            if (!perModel.TryGetValue(model, out var perDag))
+            {
+                perModel[model] = perDag = [];
+            }
+
+            perDag[dag] = perDag.GetValueOrDefault(dag) + regel.TotalTokens;
+        }
+
+        Grafiek.Show(
+            perModel.ToDictionary(model => model.Key, model => (IReadOnlyDictionary<DateTime, long>)model.Value),
+            van,
+            tot);
     }
 
     private async Task OpenklappenAsync(Tokenweek kaart, string week)

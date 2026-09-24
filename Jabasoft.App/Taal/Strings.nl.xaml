@@ -88,6 +88,10 @@
     <sys:String x:Key="T_TokensWeken">weken</sys:String>
     <sys:String x:Key="T_TokensWeekFormaat">week {0}</sys:String>
     <sys:String x:Key="T_TokensPeriodeFormaat">{0:d MMMM} t/m {1:d MMMM yyyy} · {2} {3}</sys:String>
+    <sys:String x:Key="T_TokensVerloopTitel">VERLOOP PER MODEL</sys:String>
+    <sys:String x:Key="T_TokensVerloopLeeg">Nog geen verloop om te tonen.</sys:String>
+    <sys:String x:Key="T_TokensVerloopOnderschrift">Tokens per dag, {0} tot {1}</sys:String>
+    <sys:String x:Key="T_TokensOnbekendModel">(onbekend)</sys:String>
     <sys:String x:Key="T_TokensLeeg">Nog geen AI-aanroepen vastgelegd. Zodra een applicatie de broker gebruikt, verschijnt hier een week.</sys:String>
     <sys:String x:Key="T_TokensGeenRegels">Geen regels gevonden voor deze week.</sys:String>
     <sys:String x:Key="T_TokensOphalen">Ophalen…</sys:String>

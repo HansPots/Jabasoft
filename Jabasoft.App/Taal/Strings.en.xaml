@@ -79,6 +79,10 @@
     <sys:String x:Key="T_TokensWeken">weeks</sys:String>
     <sys:String x:Key="T_TokensWeekFormaat">week {0}</sys:String>
     <sys:String x:Key="T_TokensPeriodeFormaat">{0:d MMMM} to {1:d MMMM yyyy} · {2} {3}</sys:String>
+    <sys:String x:Key="T_TokensVerloopTitel">TREND PER MODEL</sys:String>
+    <sys:String x:Key="T_TokensVerloopLeeg">No trend to show yet.</sys:String>
+    <sys:String x:Key="T_TokensVerloopOnderschrift">Tokens per day, {0} to {1}</sys:String>
+    <sys:String x:Key="T_TokensOnbekendModel">(unknown)</sys:String>
     <sys:String x:Key="T_TokensLeeg">No AI calls recorded yet. As soon as an application uses the broker, a week appears here.</sys:String>
     <sys:String x:Key="T_TokensGeenRegels">No entries found for this week.</sys:String>
     <sys:String x:Key="T_TokensOphalen">Loading…</sys:String>

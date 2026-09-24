@@ -37,6 +37,10 @@
         <StackPanel Margin="{DynamicResource RegionGapRightThickness}">
             <controls:Tokentotaal x:Name="Totaal" Width="Auto" />
 
+            <!-- Het verloop per model, over de volle breedte onder het totaal.
+                 Ruimte erboven volgt de SPACING-instelling, net als bij de kaarten. -->
+            <controls:Tokengrafiek x:Name="Grafiek" Width="Auto" Margin="{DynamicResource RegionGapTopThickness}" />
+
             <TextBlock x:Name="MeldingText" Visibility="Collapsed"
                        AutomationProperties.AutomationId="TokensMelding"
                        Margin="20,16,0,0"
