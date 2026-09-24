@@ -174,7 +174,7 @@ public partial class Setting06 : UserControl
     /// gezet: anders zou het openen van deze kaart je instelling stilletjes
     /// leegmaken, terwijl het juist de bedoeling is dat je ziet wat er mist.
     /// </summary>
-    private static void Vul(ComboBox keuzelijst, List<string> namen, string ingesteld)
+    private void Vul(ComboBox keuzelijst, List<string> namen, string ingesteld)
     {
         var items = new List<string>(namen);
 
@@ -183,9 +183,21 @@ public partial class Setting06 : UserControl
             items.Insert(0, ingesteld);
         }
 
-        keuzelijst.ItemsSource = items;
-        keuzelijst.SelectedItem = items.FirstOrDefault(item => string.Equals(item, ingesteld, StringComparison.OrdinalIgnoreCase));
+        var keuzes = items.Select(naam => Modelkeuze.Van(naam, SoortNaam)).ToList();
+
+        keuzelijst.ItemsSource = keuzes;
+        keuzelijst.SelectedItem = keuzes.FirstOrDefault(keuze => string.Equals(keuze.Naam, ingesteld, StringComparison.OrdinalIgnoreCase));
     }
+
+    /// <summary>De soort van een model in de taal van nu.</summary>
+    private string SoortNaam(Modelsoort soort) => soort switch
+    {
+        Modelsoort.Code => Teksten.Van(this, "T_AiSoortCode", "code"),
+        Modelsoort.Embedding => Teksten.Van(this, "T_AiSoortEmbedding", "embedding"),
+        _ => Teksten.Van(this, "T_AiSoortAlgemeen", "general"),
+    };
+
+    private static string Gekozen(ComboBox keuzelijst) => (keuzelijst.SelectedItem as Modelkeuze)?.Naam ?? string.Empty;
 
     /// <summary>Stuurt de huidige stand van de kaart naar de broker.</summary>
     private async Task BewaarAsync()
@@ -197,10 +209,10 @@ public partial class Setting06 : UserControl
         // wisselen niets wist - niet het adres en niet de modellen.
         var server = new AiServerSettings(
             ServerUrlBox.Text,
-            ChatModelPicker.SelectedItem as string ?? string.Empty,
-            EmbedModelPicker.SelectedItem as string ?? string.Empty,
-            CodeModelPicker.SelectedItem as string ?? string.Empty,
-            ControleModelPicker.SelectedItem as string ?? string.Empty);
+            Gekozen(ChatModelPicker),
+            Gekozen(EmbedModelPicker),
+            Gekozen(CodeModelPicker),
+            Gekozen(ControleModelPicker));
 
         await ToepassenAsync((_settings with { Provider = provider }).With(provider, server));
     }

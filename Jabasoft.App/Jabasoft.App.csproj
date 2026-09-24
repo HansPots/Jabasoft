@@ -19,7 +19,7 @@
          niet kan afwijken van wat er werkelijk draait. Het exe-bestand
          draagt het hierdoor ook: te zien in de eigenschappen van het
          bestand en in een foutmelding. -->
-    <Version>0.1.0.94</Version>
+    <Version>0.1.0.95</Version>
   </PropertyGroup>
 
   <ItemGroup>

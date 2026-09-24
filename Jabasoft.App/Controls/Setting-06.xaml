@@ -87,6 +87,19 @@
                 </Setter.Value>
             </Setter>
         </Style>
+
+        <!-- Eén regel in een modelkeuzelijst: naam, dan grootte · soort, dan de sterren. -->
+        <DataTemplate x:Key="ModelkeuzeTemplate">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="{Binding Naam}" VerticalAlignment="Center" />
+                <TextBlock Text="{Binding Info}" Margin="12,0,0,0" VerticalAlignment="Center"
+                           FontSize="{DynamicResource FontSizeSmall}"
+                           Foreground="{DynamicResource TextMutedBrush}" />
+                <TextBlock Text="{Binding SterrenTekst}" Margin="12,0,0,0" VerticalAlignment="Center"
+                           Foreground="{DynamicResource AccentBrush}"
+                           ToolTip="{DynamicResource T_AiSterrenTip}" />
+            </StackPanel>
+        </DataTemplate>
     </UserControl.Resources>
 
     <!--
@@ -144,7 +157,7 @@
                 <StackPanel Grid.Column="0">
                     <TextBlock Text="{DynamicResource T_AiDailychatModel}" Margin="0,0,0,4" FontSize="{DynamicResource FontSizeSmall}"
                                Foreground="{DynamicResource TextMutedBrush}" />
-                    <ComboBox x:Name="ChatModelPicker" Height="34"
+                    <ComboBox x:Name="ChatModelPicker" Height="34" ItemTemplate="{StaticResource ModelkeuzeTemplate}"
                               AutomationProperties.AutomationId="AiChatModel"
                               SelectionChanged="Model_SelectionChanged" />
                 </StackPanel>
@@ -152,7 +165,7 @@
                 <StackPanel Grid.Column="2">
                     <TextBlock Text="{DynamicResource T_AiEmbeddingmodel}" Margin="0,0,0,4" FontSize="{DynamicResource FontSizeSmall}"
                                Foreground="{DynamicResource TextMutedBrush}" />
-                    <ComboBox x:Name="EmbedModelPicker" Height="34"
+                    <ComboBox x:Name="EmbedModelPicker" Height="34" ItemTemplate="{StaticResource ModelkeuzeTemplate}"
                               AutomationProperties.AutomationId="AiEmbedModel"
                               SelectionChanged="Model_SelectionChanged" />
                 </StackPanel>
@@ -180,7 +193,7 @@
                     <StackPanel Grid.Column="0">
                         <TextBlock Text="{DynamicResource T_AiCodemodel}" Margin="0,0,0,4" FontSize="{DynamicResource FontSizeSmall}"
                                    Foreground="{DynamicResource TextMutedBrush}" />
-                        <ComboBox x:Name="CodeModelPicker" Height="34"
+                        <ComboBox x:Name="CodeModelPicker" Height="34" ItemTemplate="{StaticResource ModelkeuzeTemplate}"
                                   AutomationProperties.AutomationId="AiCodeModel"
                                   SelectionChanged="Model_SelectionChanged" />
                     </StackPanel>
@@ -188,7 +201,7 @@
                     <StackPanel Grid.Column="2">
                         <TextBlock Text="{DynamicResource T_AiControlemodel}" Margin="0,0,0,4" FontSize="{DynamicResource FontSizeSmall}"
                                    Foreground="{DynamicResource TextMutedBrush}" />
-                        <ComboBox x:Name="ControleModelPicker" Height="34"
+                        <ComboBox x:Name="ControleModelPicker" Height="34" ItemTemplate="{StaticResource ModelkeuzeTemplate}"
                                   AutomationProperties.AutomationId="AiControleModel"
                                   SelectionChanged="Model_SelectionChanged" />
                     </StackPanel>

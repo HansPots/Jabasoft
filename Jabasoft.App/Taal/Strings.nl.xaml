@@ -76,6 +76,10 @@
     <sys:String x:Key="T_AiContextRondesFormaat">Automatisch meer context ophalen — max {0} extra ronde(s)</sys:String>
     <sys:String x:Key="T_AiOndergrensFormaat">Ondergrens semantisch zoeken — {0}%</sys:String>
     <sys:String x:Key="T_AiNietBewaardFormaat">Niet bewaard: {0}</sys:String>
+    <sys:String x:Key="T_AiSoortCode">code</sys:String>
+    <sys:String x:Key="T_AiSoortEmbedding">embedding</sys:String>
+    <sys:String x:Key="T_AiSoortAlgemeen">algemeen</sys:String>
+    <sys:String x:Key="T_AiSterrenTip">Geschatte kwaliteit (0-5 sterren), gebaseerd op de grootte van het model</sys:String>
 
     <!-- Tokens -->
     <sys:String x:Key="T_TokensTitel">TOKENS</sys:String>

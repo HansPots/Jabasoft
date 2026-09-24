@@ -67,6 +67,10 @@
     <sys:String x:Key="T_AiContextRondesFormaat">Automatically fetch more context — max {0} extra round(s)</sys:String>
     <sys:String x:Key="T_AiOndergrensFormaat">Semantic search minimum — {0}%</sys:String>
     <sys:String x:Key="T_AiNietBewaardFormaat">Not saved: {0}</sys:String>
+    <sys:String x:Key="T_AiSoortCode">code</sys:String>
+    <sys:String x:Key="T_AiSoortEmbedding">embedding</sys:String>
+    <sys:String x:Key="T_AiSoortAlgemeen">general</sys:String>
+    <sys:String x:Key="T_AiSterrenTip">Estimated quality (0-5 stars), based on the size of the model</sys:String>
 
     <!-- Tokens -->
     <sys:String x:Key="T_TokensTitel">TOKENS</sys:String>
