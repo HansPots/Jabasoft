@@ -53,6 +53,15 @@ public partial class MainWindow : Window
 
     private BrokerLogReader? _brokerLog;
 
+    /// <summary>
+    /// Of de automatische start van de laatste applicatie al geprobeerd
+    /// is. Eén keer per opstart van Jabasoft: een latere herconrole (na
+    /// het wijzigen van de AI-instelling bijvoorbeeld) mag je niet
+    /// zomaar wegkaapt naar een andere applicatie terwijl je in de
+    /// instellingen zit.
+    /// </summary>
+    private bool _autoOpstartGeprobeerd;
+
     public MainWindow()
     {
         InitializeComponent();
@@ -181,11 +190,44 @@ public partial class MainWindow : Window
             // Elke stap van de controle ook in het Activity-blok, zodat je daar
             // terugleest wat er bij het opstarten gebeurd is.
             _monitor.Changed += (_, status) => ActivityLog.Shared.Add("app", status.Message);
+
+            // Alles goed? Dan naar de laatst geopende applicatie, maar
+            // maar één keer per opstart - zie _autoOpstartGeprobeerd. Bij
+            // rood blijf je bewust op het hoofdscherm staan: dan wil je
+            // eerst ZIEN wat er mis is, niet weggeklikt worden naar een
+            // applicatie die het toch niet gaat doen.
+            _monitor.Changed += (_, status) =>
+            {
+                if (status.State != HealthState.Healthy || _autoOpstartGeprobeerd)
+                {
+                    return;
+                }
+
+                _autoOpstartGeprobeerd = true;
+                AutoOpstartLaatsteToepassing();
+            };
         }
 
         // Niet awaiten: het venster mag meteen verschijnen, de pil vult
         // zichzelf bij terwijl de controle loopt.
         _ = _monitor.RunAsync();
+    }
+
+    /// <summary>
+    /// Opent vanzelf de applicatie waar je de vorige keer naartoe ging -
+    /// alleen als dat Stylebook of AiStudio was; de overige menu-items
+    /// zijn schermen van Jabasoft zelf en geen "applicatie" om te
+    /// heropenen.
+    /// </summary>
+    private void AutoOpstartLaatsteToepassing()
+    {
+        var naam = Layout.Preferences.LaatsteToepassing;
+
+        if (Enum.TryParse<NavigatiemenuItem>(naam, out var item) &&
+            item is NavigatiemenuItem.Stylebook or NavigatiemenuItem.AiStudio)
+        {
+            Navigate(item);
+        }
     }
 
     private void Navigate(NavigatiemenuItem item)
@@ -195,9 +237,11 @@ public partial class MainWindow : Window
         switch (item)
         {
             case NavigatiemenuItem.Stylebook:
+                Layout.Preferences.BewaarLaatsteToepassing(nameof(NavigatiemenuItem.Stylebook));
                 StartApp(StylebookAppName);
                 return;
             case NavigatiemenuItem.AiStudio:
+                Layout.Preferences.BewaarLaatsteToepassing(nameof(NavigatiemenuItem.AiStudio));
                 GaNaarApp(AiStudioAppName);
                 return;
             default:

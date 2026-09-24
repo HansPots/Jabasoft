@@ -11,6 +11,16 @@ public partial class App : Application
 {
     protected override void OnStartup(StartupEventArgs e)
     {
+        // Draait deze app al, dan komt dat venster naar voren en stopt dit
+        // tweede exemplaar meteen weer - vóór er ook maar een venster van
+        // gemaakt is. Zonder dit zou een dubbelklik op de snelkoppeling terwijl
+        // de app al open staat een tweede, verwarrende instantie opleveren.
+        if (AppHandover.ActivateExistingInstance())
+        {
+            Environment.Exit(0);
+            return;
+        }
+
         base.OnStartup(e);
 
         // Vóór het venster: taal, thema, lettertype, marges en ververstijd

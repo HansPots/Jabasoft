@@ -53,6 +53,10 @@
     <sys:String x:Key="T_AiAdres">Server address</sys:String>
     <sys:String x:Key="T_AiDailychatModel">Daily chat model</sys:String>
     <sys:String x:Key="T_AiEmbeddingmodel">Embedding model</sys:String>
+    <sys:String x:Key="T_AiCodemodel">Code model — for chat (optional)</sys:String>
+    <sys:String x:Key="T_AiCodeGroep">Code</sys:String>
+    <sys:String x:Key="T_AiControlemodel">Check model — for verification (optional)</sys:String>
+    <sys:String x:Key="T_AiChatTimeoutFormaat">Response wait time — {0} minutes</sys:String>
     <sys:String x:Key="T_AiVernieuwen">Refresh model list</sys:String>
     <sys:String x:Key="T_AiLaden">Loading…</sys:String>
     <sys:String x:Key="T_AiModellenLaden">Loading models…</sys:String>
@@ -60,6 +64,8 @@
     <sys:String x:Key="T_AiGeenLijstFormaat">No model list from {0}: {1}</sys:String>
     <sys:String x:Key="T_AiGevondenFormaat">{0} models found on {1}</sys:String>
     <sys:String x:Key="T_AiOntbreektFormaat">{0} models found — not present: {1}</sys:String>
+    <sys:String x:Key="T_AiContextRondesFormaat">Automatically fetch more context — max {0} extra round(s)</sys:String>
+    <sys:String x:Key="T_AiOndergrensFormaat">Semantic search minimum — {0}%</sys:String>
     <sys:String x:Key="T_AiNietBewaardFormaat">Not saved: {0}</sys:String>
 
     <!-- Tokens -->

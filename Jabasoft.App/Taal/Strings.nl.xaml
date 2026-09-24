@@ -62,6 +62,10 @@
     <sys:String x:Key="T_AiAdres">Adres van de server</sys:String>
     <sys:String x:Key="T_AiDailychatModel">Daily chat-model</sys:String>
     <sys:String x:Key="T_AiEmbeddingmodel">Embeddingmodel</sys:String>
+    <sys:String x:Key="T_AiCodemodel">Codemodel — voor gesprek (optioneel)</sys:String>
+    <sys:String x:Key="T_AiCodeGroep">Code</sys:String>
+    <sys:String x:Key="T_AiControlemodel">Controlemodel — voor controle (optioneel)</sys:String>
+    <sys:String x:Key="T_AiChatTimeoutFormaat">Wachttijd op een antwoord — {0} minuten</sys:String>
     <sys:String x:Key="T_AiVernieuwen">Modellijst ophalen</sys:String>
     <sys:String x:Key="T_AiLaden">Ophalen…</sys:String>
     <sys:String x:Key="T_AiModellenLaden">Modellen ophalen…</sys:String>
@@ -69,6 +73,8 @@
     <sys:String x:Key="T_AiGeenLijstFormaat">Geen modellijst van {0}: {1}</sys:String>
     <sys:String x:Key="T_AiGevondenFormaat">{0} modellen gevonden op {1}</sys:String>
     <sys:String x:Key="T_AiOntbreektFormaat">{0} modellen gevonden — niet aanwezig: {1}</sys:String>
+    <sys:String x:Key="T_AiContextRondesFormaat">Automatisch meer context ophalen — max {0} extra ronde(s)</sys:String>
+    <sys:String x:Key="T_AiOndergrensFormaat">Ondergrens semantisch zoeken — {0}%</sys:String>
     <sys:String x:Key="T_AiNietBewaardFormaat">Niet bewaard: {0}</sys:String>
 
     <!-- Tokens -->

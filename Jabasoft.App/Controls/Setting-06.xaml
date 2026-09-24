@@ -101,9 +101,13 @@
         bewaarde naam gewoon staan en zegt de regel onderaan wat er aan de
         hand is - je instelling raak je er dus niet mee kwijt.
 
-        Zelfde breedte (1568) en kaartopmaak als de andere kaarten.
+        Zelfde breedte (1568) en kaartopmaak als de andere kaarten - op de
+        randdikte na: die staat hier bewust vast op 2 (niet
+        {DynamicResource RegionBorderThickness}, zoals bij de andere
+        kaarten) zodat hij gelijk blijft aan het Code-groepje verderop, dat
+        om dezelfde reden ook vast op 2 staat.
     -->
-    <Border MinWidth="480" CornerRadius="{DynamicResource RadiusMedium}" BorderThickness="{DynamicResource RegionBorderThickness}"
+    <Border MinWidth="480" CornerRadius="{DynamicResource RadiusMedium}" BorderThickness="2"
             Background="{DynamicResource SurfaceBrush}"
             BorderBrush="{DynamicResource BorderBrush}"
             HorizontalAlignment="Stretch" VerticalAlignment="Top">
@@ -128,8 +132,8 @@
                      AutomationProperties.AutomationId="AiServerUrl"
                      LostFocus="ServerUrl_LostFocus" KeyDown="ServerUrl_KeyDown" />
 
-            <!-- De twee modellen naast elkaar: de kaart is breed genoeg, en
-                 zo staat bij elkaar wat bij elkaar hoort. -->
+            <!-- De twee algemene modellen naast elkaar: de kaart is breed
+                 genoeg, en zo staat bij elkaar wat bij elkaar hoort. -->
             <Grid Margin="0,16,0,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
@@ -153,6 +157,90 @@
                               SelectionChanged="Model_SelectionChanged" />
                 </StackPanel>
             </Grid>
+
+            <!-- Het Code-groepje: twee samenhorende modellen met een eigen
+                 taak binnen codevoorstellen (LocalAiStudio.App). Codemodel
+                 GEEFT het antwoord/voorstel; Controlemodel controleert dat
+                 antwoord achteraf tegen dezelfde broncode - een ANDER model
+                 laten narekenen wat het eerste beweerde, in plaats van een
+                 model zijn eigen werk laten nakijken. Beide optioneel: leeg
+                 valt terug op Codemodel, en die weer op het chatmodel
+                 hierboven (zie AiServerSettings). Apart omkaderd zodat
+                 duidelijk is dat deze twee bij elkaar horen. -->
+            <TextBlock Text="{DynamicResource T_AiCodeGroep}" Margin="0,16,0,4" FontSize="{DynamicResource FontSizeSmall}"
+                       FontWeight="SemiBold" Foreground="{DynamicResource TextMutedBrush}" />
+            <Border BorderBrush="{DynamicResource BorderBrush}" BorderThickness="2" CornerRadius="{DynamicResource RadiusMedium}" Padding="12">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="16" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0">
+                        <TextBlock Text="{DynamicResource T_AiCodemodel}" Margin="0,0,0,4" FontSize="{DynamicResource FontSizeSmall}"
+                                   Foreground="{DynamicResource TextMutedBrush}" />
+                        <ComboBox x:Name="CodeModelPicker" Height="34"
+                                  AutomationProperties.AutomationId="AiCodeModel"
+                                  SelectionChanged="Model_SelectionChanged" />
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="2">
+                        <TextBlock Text="{DynamicResource T_AiControlemodel}" Margin="0,0,0,4" FontSize="{DynamicResource FontSizeSmall}"
+                                   Foreground="{DynamicResource TextMutedBrush}" />
+                        <ComboBox x:Name="ControleModelPicker" Height="34"
+                                  AutomationProperties.AutomationId="AiControleModel"
+                                  SelectionChanged="Model_SelectionChanged" />
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!-- Hoeveel EXTRA ronden Projectassistent (LocalAiStudio.App)
+                 mag vragen om meer projectcontext als het model zelf zegt
+                 dat de eerste lading niet genoeg was - zie
+                 AiSettings.MaxContextRondes. 0 zet het automatisch
+                 doorvragen uit. Staat bewust bij de modellen: het gaat
+                 over hoe er met ChatModel/CodeModel gesproken wordt, niet
+                 over de ondergrens hieronder (die gaat over Zoeken). -->
+            <TextBlock x:Name="ContextRondesLabel" Text="" Margin="0,16,0,6" FontSize="{DynamicResource FontSizeSmall}"
+                       Foreground="{DynamicResource TextMutedBrush}" />
+            <Slider x:Name="ContextRondesSlider" Minimum="0" Maximum="5" Value="3"
+                    TickFrequency="1" IsSnapToTickEnabled="True"
+                    AutomationProperties.AutomationId="AiContextRondes"
+                    ValueChanged="ContextRondes_ValueChanged"
+                    PreviewMouseUp="ContextRondes_Vastgezet" KeyUp="ContextRondes_Vastgezet"
+                    Style="{DynamicResource SliderAccentStyle}" />
+
+            <!-- Hoe lang een app op een antwoord van een model wacht -
+                 geldt voor elk model dat via de broker aangeroepen wordt
+                 (chat, code, controle), dus hier en niet per applicatie
+                 apart - zie AiSettings.ChatTimeoutSeconden. Een app die
+                 zelf een broker-verbinding opzet (zoals LocalAiStudio.App)
+                 geeft deze waarde bij het opstarten mee; een wijziging hier
+                 geldt dus pas na een herstart van die apps. -->
+            <TextBlock x:Name="ChatTimeoutLabel" Text="" Margin="0,16,0,6" FontSize="{DynamicResource FontSizeSmall}"
+                       Foreground="{DynamicResource TextMutedBrush}" />
+            <Slider x:Name="ChatTimeoutSlider" Minimum="1" Maximum="60" Value="5"
+                    TickFrequency="1" IsSnapToTickEnabled="True"
+                    AutomationProperties.AutomationId="AiChatTimeout"
+                    ValueChanged="ChatTimeout_ValueChanged"
+                    PreviewMouseUp="ChatTimeout_Vastgezet" KeyUp="ChatTimeout_Vastgezet"
+                    Style="{DynamicResource SliderAccentStyle}" />
+
+            <!-- De ondergrens voor semantisch zoeken: onder dit percentage
+                 (cosinus-gelijkenis) geldt een treffer als onzeker in
+                 plaats van gevonden - zie Zoeken.xaml in LocalAiStudio.App
+                 en Jabasoft.Broker/SearchIndexStore.MinimumGelijkenis.
+                 Hoort net als de modellen hierboven bij de broker en dus
+                 bij de hele familie, niet bij deze applicatie alleen. -->
+            <TextBlock x:Name="OndergrensLabel" Text="" Margin="0,16,0,6" FontSize="{DynamicResource FontSizeSmall}"
+                       Foreground="{DynamicResource TextMutedBrush}" />
+            <Slider x:Name="OndergrensSlider" Minimum="0" Maximum="100" Value="50"
+                    TickFrequency="5"
+                    AutomationProperties.AutomationId="AiOndergrens"
+                    ValueChanged="Ondergrens_ValueChanged"
+                    PreviewMouseUp="Ondergrens_Vastgezet" KeyUp="Ondergrens_Vastgezet"
+                    Style="{DynamicResource SliderAccentStyle}" />
 
             <StackPanel Orientation="Horizontal" Margin="0,16,0,0">
                 <Button x:Name="RefreshModelsButton" Content="{DynamicResource T_AiVernieuwen}"

@@ -38,6 +38,9 @@ public static class Preferences
     private const string VensterHoogteSleutel = "venster.hoogte";
     private const string VensterMaxSleutel = "venster.gemaximaliseerd";
 
+    /// <summary>Welke applicatie je het laatst via het menu geopend hebt - Stylebook of AiStudio.</summary>
+    private const string LaatsteToepassingSleutel = "laatsteToepassing";
+
     /// <summary>Waar een verse installatie mee begint - gelijk aan waar de kaarten op staan.</summary>
     public const string StandaardLettertype = "Segoe UI";
 
@@ -64,6 +67,18 @@ public static class Preferences
     public static double Kaderrand => Store.GetDouble(KaderrandSleutel, LayoutManager.DefaultBorder);
 
     public static double Ververstijd => Store.GetDouble(VerverstijdSleutel, StandaardVerverstijd);
+
+    /// <summary>
+    /// De applicatie die je het laatst via het menu geopend hebt
+    /// (Stylebook of AiStudio, als tekst van <see cref="Controls.NavigatiemenuItem"/>),
+    /// of leeg als je nog nooit naar een andere applicatie bent geweest.
+    ///
+    /// Gebruikt om bij het opstarten - als alle controles goed zijn -
+    /// vanzelf weer bij die applicatie uit te komen. Zie MainWindow.xaml.cs.
+    /// </summary>
+    public static string LaatsteToepassing => Store.GetString(LaatsteToepassingSleutel, string.Empty);
+
+    public static void BewaarLaatsteToepassing(string naam) => Store.Set(LaatsteToepassingSleutel, naam);
 
     public static void BewaarTaal(AppLanguage taal) => Store.Set(TaalSleutel, taal.ToString());
 

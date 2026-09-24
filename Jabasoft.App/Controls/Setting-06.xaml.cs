@@ -74,11 +74,18 @@ public partial class Setting06 : UserControl
             ProviderLmStudio.IsChecked = _settings.Provider == AiProvider.LmStudio;
             ProviderOllama.IsChecked = _settings.Provider == AiProvider.Ollama;
             ServerUrlBox.Text = _settings.ActiveServerUrl;
+            ContextRondesSlider.Value = _settings.MaxContextRondes;
+            ChatTimeoutSlider.Value = _settings.ChatTimeoutSeconden / 60.0;
+            OndergrensSlider.Value = _settings.MinimumSemanticScore * 100;
         }
         finally
         {
             _laden = false;
         }
+
+        ToonContextRondes(ContextRondesSlider.Value);
+        ToonChatTimeout(ChatTimeoutSlider.Value);
+        ToonOndergrens(OndergrensSlider.Value);
 
         if (!result.Success)
         {
@@ -87,6 +94,39 @@ public partial class Setting06 : UserControl
         }
 
         await VulModellenAsync();
+    }
+
+    /// <summary>De regel boven de schuifbalk, in de taal van nu.</summary>
+    private void ToonOndergrens(double waarde)
+    {
+        if (OndergrensLabel is null)
+        {
+            return;
+        }
+
+        OndergrensLabel.Text = Teksten.Vul(this, "T_AiOndergrensFormaat", "Semantic search minimum — {0}%", (int)Math.Round(waarde));
+    }
+
+    /// <summary>De regel boven de contextronden-schuifbalk, in de taal van nu.</summary>
+    private void ToonContextRondes(double waarde)
+    {
+        if (ContextRondesLabel is null)
+        {
+            return;
+        }
+
+        ContextRondesLabel.Text = Teksten.Vul(this, "T_AiContextRondesFormaat", "Automatically fetch more context — max {0} extra round(s)", (int)Math.Round(waarde));
+    }
+
+    /// <summary>De regel boven de wachttijd-schuifbalk, in de taal van nu.</summary>
+    private void ToonChatTimeout(double waarde)
+    {
+        if (ChatTimeoutLabel is null)
+        {
+            return;
+        }
+
+        ChatTimeoutLabel.Text = Teksten.Vul(this, "T_AiChatTimeoutFormaat", "Response wait time — {0} minutes", (int)Math.Round(waarde));
     }
 
     /// <summary>
@@ -105,6 +145,8 @@ public partial class Setting06 : UserControl
         {
             Vul(ChatModelPicker, namen, _settings.Active.ChatModel);
             Vul(EmbedModelPicker, namen, _settings.Active.EmbedModel);
+            Vul(CodeModelPicker, namen, _settings.Active.CodeModel);
+            Vul(ControleModelPicker, namen, _settings.Active.ControleModel);
         }
         finally
         {
@@ -156,7 +198,9 @@ public partial class Setting06 : UserControl
         var server = new AiServerSettings(
             ServerUrlBox.Text,
             ChatModelPicker.SelectedItem as string ?? string.Empty,
-            EmbedModelPicker.SelectedItem as string ?? string.Empty);
+            EmbedModelPicker.SelectedItem as string ?? string.Empty,
+            CodeModelPicker.SelectedItem as string ?? string.Empty,
+            ControleModelPicker.SelectedItem as string ?? string.Empty);
 
         await ToepassenAsync((_settings with { Provider = provider }).With(provider, server));
     }
@@ -178,7 +222,8 @@ public partial class Setting06 : UserControl
         _settings = result.Settings;
         ActivityLog.Shared.Add(
             "app",
-            $"AI ingesteld: {_settings.Provider}, chat '{_settings.Active.ChatModel}', embedding '{_settings.Active.EmbedModel}'");
+            $"AI ingesteld: {_settings.Provider}, chat '{_settings.Active.ChatModel}', embedding '{_settings.Active.EmbedModel}', " +
+            $"code '{_settings.Active.CodeModel}', controle '{_settings.Active.ControleModel}'");
 
         SettingsSaved?.Invoke(this, EventArgs.Empty);
     }
@@ -260,4 +305,78 @@ public partial class Setting06 : UserControl
     }
 
     private async void RefreshModels_Click(object sender, RoutedEventArgs e) => await VulModellenAsync();
+
+    /// <summary>
+    /// Ververst alleen het opschrift, terwijl je sleept. Niet opslaan: dit
+    /// vuurt tientallen keren per seconde tijdens het slepen, en een
+    /// schuifbalk naar de broker schrijven bij elke tik zou de instelling
+    /// (en het activiteitenlog) onnodig laten spammen - zie
+    /// Ondergrens_Vastgezet, dat pas bewaart als je loslaat.
+    /// </summary>
+    private void Ondergrens_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) => ToonOndergrens(e.NewValue);
+
+    /// <summary>
+    /// Het slepen is klaar (muis losgelaten) of een toetsaanslag is
+    /// verwerkt (pijltjestoetsen) - nu pas opslaan. Dezelfde afweging als
+    /// bij een splitter (Layout/SplitterLayout): bewaren aan het EIND van
+    /// een beweging, niet tijdens.
+    /// </summary>
+    private async void Ondergrens_Vastgezet(object sender, RoutedEventArgs e)
+    {
+        if (_laden || !IsLoaded)
+        {
+            return;
+        }
+
+        var nieuw = OndergrensSlider.Value / 100.0;
+
+        if (Math.Abs(nieuw - _settings.MinimumSemanticScore) < 0.001)
+        {
+            return;
+        }
+
+        await ToepassenAsync(_settings with { MinimumSemanticScore = nieuw });
+    }
+
+    /// <summary>Ververst alleen het opschrift, terwijl je sleept - zelfde reden als Ondergrens_ValueChanged.</summary>
+    private void ContextRondes_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) => ToonContextRondes(e.NewValue);
+
+    /// <summary>Pas bewaren als je loslaat - zelfde afweging als Ondergrens_Vastgezet.</summary>
+    private async void ContextRondes_Vastgezet(object sender, RoutedEventArgs e)
+    {
+        if (_laden || !IsLoaded)
+        {
+            return;
+        }
+
+        var nieuw = (int)Math.Round(ContextRondesSlider.Value);
+
+        if (nieuw == _settings.MaxContextRondes)
+        {
+            return;
+        }
+
+        await ToepassenAsync(_settings with { MaxContextRondes = nieuw });
+    }
+
+    /// <summary>Ververst alleen het opschrift, terwijl je sleept - zelfde reden als Ondergrens_ValueChanged.</summary>
+    private void ChatTimeout_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) => ToonChatTimeout(e.NewValue);
+
+    /// <summary>Pas bewaren als je loslaat - zelfde afweging als Ondergrens_Vastgezet.</summary>
+    private async void ChatTimeout_Vastgezet(object sender, RoutedEventArgs e)
+    {
+        if (_laden || !IsLoaded)
+        {
+            return;
+        }
+
+        var nieuw = Math.Round(ChatTimeoutSlider.Value) * 60;
+
+        if (Math.Abs(nieuw - _settings.ChatTimeoutSeconden) < 0.001)
+        {
+            return;
+        }
+
+        await ToepassenAsync(_settings with { ChatTimeoutSeconden = nieuw });
+    }
 }
