@@ -208,6 +208,22 @@
                 </Grid>
             </Border>
 
+            <!-- Afbeeldingen: het model dat een bijgevoegd plaatje (bijvoorbeeld
+                 een screenshot) leest en beschrijft. De beschrijving gaat als
+                 tekst naar het gewone model, dat zelf geen beelden hoeft te
+                 kunnen - zie AiServerSettings.BeeldModel. Optioneel. -->
+            <TextBlock Text="{DynamicResource T_AiBeeldGroep}" Margin="0,16,0,4" FontSize="{DynamicResource FontSizeSmall}"
+                       FontWeight="SemiBold" Foreground="{DynamicResource TextMutedBrush}" />
+            <Border BorderBrush="{DynamicResource BorderBrush}" BorderThickness="2" CornerRadius="{DynamicResource RadiusMedium}" Padding="12">
+                <StackPanel>
+                    <TextBlock Text="{DynamicResource T_AiBeeldmodel}" Margin="0,0,0,4" FontSize="{DynamicResource FontSizeSmall}"
+                               Foreground="{DynamicResource TextMutedBrush}" />
+                    <ComboBox x:Name="BeeldModelPicker" Height="34" ItemTemplate="{StaticResource ModelkeuzeTemplate}"
+                              AutomationProperties.AutomationId="AiBeeldModel"
+                              SelectionChanged="Model_SelectionChanged" />
+                </StackPanel>
+            </Border>
+
             <!-- Hoeveel EXTRA ronden Projectassistent (LocalAiStudio.App)
                  mag vragen om meer projectcontext als het model zelf zegt
                  dat de eerste lading niet genoeg was - zie

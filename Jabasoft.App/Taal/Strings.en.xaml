@@ -67,6 +67,8 @@
     <sys:String x:Key="T_AiContextRondesFormaat">Automatically fetch more context — max {0} extra round(s)</sys:String>
     <sys:String x:Key="T_AiOndergrensFormaat">Semantic search minimum — {0}%</sys:String>
     <sys:String x:Key="T_AiNietBewaardFormaat">Not saved: {0}</sys:String>
+    <sys:String x:Key="T_AiBeeldGroep">Images</sys:String>
+    <sys:String x:Key="T_AiBeeldmodel">Image model — reads an attached picture (optional)</sys:String>
     <sys:String x:Key="T_AiSoortCode">code</sys:String>
     <sys:String x:Key="T_AiSoortEmbedding">embedding</sys:String>
     <sys:String x:Key="T_AiSoortAlgemeen">general</sys:String>

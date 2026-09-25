@@ -147,6 +147,7 @@ public partial class Setting06 : UserControl
             Vul(EmbedModelPicker, namen, _settings.Active.EmbedModel);
             Vul(CodeModelPicker, namen, _settings.Active.CodeModel);
             Vul(ControleModelPicker, namen, _settings.Active.ControleModel);
+            Vul(BeeldModelPicker, namen, _settings.Active.BeeldModel);
         }
         finally
         {
@@ -212,7 +213,8 @@ public partial class Setting06 : UserControl
             Gekozen(ChatModelPicker),
             Gekozen(EmbedModelPicker),
             Gekozen(CodeModelPicker),
-            Gekozen(ControleModelPicker));
+            Gekozen(ControleModelPicker),
+            Gekozen(BeeldModelPicker));
 
         await ToepassenAsync((_settings with { Provider = provider }).With(provider, server));
     }
