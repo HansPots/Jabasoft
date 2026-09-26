@@ -115,4 +115,11 @@
     <!-- Header -->
     <sys:String x:Key="T_Activiteit">Activiteit</sys:String>
 
+    <sys:String x:Key="T_OllamaTitel">OLLAMA</sys:String>
+    <sys:String x:Key="T_OllamaNietBereikbaar">Niet bereikbaar op {0}</sys:String>
+    <sys:String x:Key="T_OllamaStatusFormaat">Draait · versie {0} · {1} · {2} model(len) geladen</sys:String>
+    <sys:String x:Key="T_OllamaGeenModel">Er staat nu geen model in het geheugen.</sys:String>
+    <sys:String x:Key="T_OllamaContext">context {0}</sys:String>
+    <sys:String x:Key="T_OllamaLaatstUit">wordt uitgeladen</sys:String>
+    <sys:String x:Key="T_OllamaNogFormaat">gaat eruit over {0}</sys:String>
 </ResourceDictionary>

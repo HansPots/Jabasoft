@@ -1,0 +1,57 @@
+<UserControl x:Class="Jabasoft.App.Controls.Ollamakaart"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d">
+
+    <!-- Design-time-only: geeft Visual Studio/Blend's Designer een
+         thema-context (kleuren, lettertype) - deze class library heeft
+         zelf geen App.xaml die dat normaal doet. mc:Ignorable="d" zorgt
+         dat dit bij het echt compileren/draaien volledig wegvalt. -->
+    <d:UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/Stylebook.Components;component/Styles/Theme.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/Stylebook.Components;component/Styles/Themes/Lcars.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </d:UserControl.Resources>
+
+    <!--
+        Wat Ollama nu doet: of de server draait (en welke versie), en welke
+        modellen er op dit moment in het geheugen staan, met hoeveel geheugen
+        ze gebruiken, of ze op de GPU of CPU draaien, en hoe lang ze nog
+        blijven staan. Komt rechtstreeks van Ollama zelf (/api/version en
+        /api/ps) en ververst zolang dit scherm in beeld is.
+
+        Zelfde kaartopmaak als de gezondheidskaarten erboven.
+    -->
+    <Border MinWidth="480" CornerRadius="{DynamicResource RadiusMedium}" BorderThickness="{DynamicResource RegionBorderThickness}"
+            Background="{DynamicResource SurfaceBrush}"
+            BorderBrush="{DynamicResource BorderBrush}"
+            HorizontalAlignment="Stretch" VerticalAlignment="Top">
+        <Grid Margin="20,14">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <Ellipse x:Name="Bolletje" Grid.Column="0" Width="14" Height="14"
+                     VerticalAlignment="Top" Margin="0,6,14,0"
+                     Fill="{DynamicResource HealthBusyBrush}" />
+
+            <StackPanel Grid.Column="1">
+                <TextBlock Text="{DynamicResource T_OllamaTitel}"
+                           FontSize="{DynamicResource FontSizeTitle}" FontWeight="SemiBold"
+                           Foreground="{DynamicResource Text01Brush}" />
+                <TextBlock x:Name="StatusText" Text="" Margin="0,4,0,0" TextWrapping="Wrap"
+                           AutomationProperties.AutomationId="OllamaStatus"
+                           FontSize="{DynamicResource FontSizeSmall}"
+                           Foreground="{DynamicResource TextMutedBrush}" />
+                <StackPanel x:Name="Modellen" Margin="0,10,0,0" />
+            </StackPanel>
+        </Grid>
+    </Border>
+
+</UserControl>
