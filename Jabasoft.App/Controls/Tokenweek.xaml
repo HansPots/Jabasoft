@@ -119,6 +119,7 @@
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" SharedSizeGroup="Tijd" />
                         <ColumnDefinition Width="Auto" SharedSizeGroup="App" />
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="Onderdeel" />
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="Auto" SharedSizeGroup="Getal" />
                         <ColumnDefinition Width="Auto" SharedSizeGroup="Getal" />
@@ -126,10 +127,11 @@
                     </Grid.ColumnDefinitions>
                     <TextBlock Grid.Column="0" Text="{DynamicResource T_TokensKopTijd}" Margin="0,0,16,0" FontSize="{DynamicResource FontSizeSmall}" Foreground="{DynamicResource TextMutedBrush}" />
                     <TextBlock Grid.Column="1" Text="{DynamicResource T_TokensKopApp}" Margin="0,0,16,0" FontSize="{DynamicResource FontSizeSmall}" Foreground="{DynamicResource TextMutedBrush}" />
-                    <TextBlock Grid.Column="2" Text="{DynamicResource T_TokensKopModel}" Margin="0,0,16,0" FontSize="{DynamicResource FontSizeSmall}" Foreground="{DynamicResource TextMutedBrush}" />
-                    <TextBlock Grid.Column="3" Text="{DynamicResource T_TokensKopPrompt}" Margin="0,0,16,0" TextAlignment="Right" FontSize="{DynamicResource FontSizeSmall}" Foreground="{DynamicResource TextMutedBrush}" />
-                    <TextBlock Grid.Column="4" Text="{DynamicResource T_TokensKopAntwoord}" Margin="0,0,16,0" TextAlignment="Right" FontSize="{DynamicResource FontSizeSmall}" Foreground="{DynamicResource TextMutedBrush}" />
-                    <TextBlock Grid.Column="5" Text="{DynamicResource T_TokensKopTotaal}" TextAlignment="Right" FontSize="{DynamicResource FontSizeSmall}" Foreground="{DynamicResource TextMutedBrush}" />
+                    <TextBlock Grid.Column="2" Text="{DynamicResource T_TokensKopOnderdeel}" Margin="0,0,16,0" FontSize="{DynamicResource FontSizeSmall}" Foreground="{DynamicResource TextMutedBrush}" />
+                    <TextBlock Grid.Column="3" Text="{DynamicResource T_TokensKopModel}" Margin="0,0,16,0" FontSize="{DynamicResource FontSizeSmall}" Foreground="{DynamicResource TextMutedBrush}" />
+                    <TextBlock Grid.Column="4" Text="{DynamicResource T_TokensKopPrompt}" Margin="0,0,16,0" TextAlignment="Right" FontSize="{DynamicResource FontSizeSmall}" Foreground="{DynamicResource TextMutedBrush}" />
+                    <TextBlock Grid.Column="5" Text="{DynamicResource T_TokensKopAntwoord}" Margin="0,0,16,0" TextAlignment="Right" FontSize="{DynamicResource FontSizeSmall}" Foreground="{DynamicResource TextMutedBrush}" />
+                    <TextBlock Grid.Column="6" Text="{DynamicResource T_TokensKopTotaal}" TextAlignment="Right" FontSize="{DynamicResource FontSizeSmall}" Foreground="{DynamicResource TextMutedBrush}" />
                 </Grid>
 
                 <ItemsControl x:Name="Regels" Margin="22,0,0,0">
@@ -139,6 +141,7 @@
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="Auto" SharedSizeGroup="Tijd" />
                                     <ColumnDefinition Width="Auto" SharedSizeGroup="App" />
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="Onderdeel" />
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="Auto" SharedSizeGroup="Getal" />
                                     <ColumnDefinition Width="Auto" SharedSizeGroup="Getal" />
@@ -146,10 +149,11 @@
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Grid.Column="0" Text="{Binding Tijd}" Margin="0,0,16,0" Foreground="{DynamicResource TextPrimaryBrush}" />
                                 <TextBlock Grid.Column="1" Text="{Binding App}" Margin="0,0,16,0" Foreground="{DynamicResource TextPrimaryBrush}" />
-                                <TextBlock Grid.Column="2" Text="{Binding Model}" Margin="0,0,16,0" TextTrimming="CharacterEllipsis" Foreground="{DynamicResource TextPrimaryBrush}" />
-                                <TextBlock Grid.Column="3" Text="{Binding Prompt}" Margin="0,0,16,0" TextAlignment="Right" Foreground="{DynamicResource TextPrimaryBrush}" />
-                                <TextBlock Grid.Column="4" Text="{Binding Antwoord}" Margin="0,0,16,0" TextAlignment="Right" Foreground="{DynamicResource TextPrimaryBrush}" />
-                                <TextBlock Grid.Column="5" Text="{Binding Totaal}" TextAlignment="Right" Foreground="{DynamicResource Text01Brush}" />
+                                <TextBlock Grid.Column="2" Text="{Binding Onderdeel}" Margin="0,0,16,0" Foreground="{DynamicResource TextPrimaryBrush}" />
+                                <TextBlock Grid.Column="3" Text="{Binding Model}" Margin="0,0,16,0" TextTrimming="CharacterEllipsis" Foreground="{DynamicResource TextPrimaryBrush}" />
+                                <TextBlock Grid.Column="4" Text="{Binding Prompt}" Margin="0,0,16,0" TextAlignment="Right" Foreground="{DynamicResource TextPrimaryBrush}" />
+                                <TextBlock Grid.Column="5" Text="{Binding Antwoord}" Margin="0,0,16,0" TextAlignment="Right" Foreground="{DynamicResource TextPrimaryBrush}" />
+                                <TextBlock Grid.Column="6" Text="{Binding Totaal}" TextAlignment="Right" Foreground="{DynamicResource Text01Brush}" />
                             </Grid>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>

@@ -7,7 +7,7 @@ using Jabasoft.Base.AiBroker;
 namespace Jabasoft.App.Controls;
 
 /// <summary>Eén regel in het opengeklapte weekoverzicht, al klaar om te tonen.</summary>
-public sealed record TokenRegel(string Tijd, string App, string Model, string Prompt, string Antwoord, string Totaal);
+public sealed record TokenRegel(string Tijd, string App, string Onderdeel, string Model, string Prompt, string Antwoord, string Totaal);
 
 /// <summary>
 /// Interaction logic for Tokenweek.xaml - see that file for what it looks like.
@@ -69,6 +69,7 @@ public partial class Tokenweek : UserControl
             .Select(regel => new TokenRegel(
                 regel.Timestamp.LocalDateTime.ToString("ddd d MMM HH:mm", CultureInfo.CurrentCulture),
                 regel.Application,
+                string.IsNullOrWhiteSpace(regel.Onderdeel) ? "—" : regel.Onderdeel,
                 regel.Model ?? "-",
                 regel.PromptTokens.ToString("N0", CultureInfo.CurrentCulture),
                 regel.CompletionTokens.ToString("N0", CultureInfo.CurrentCulture),

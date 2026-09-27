@@ -72,7 +72,11 @@
     <sys:String x:Key="T_AiSoortCode">code</sys:String>
     <sys:String x:Key="T_AiSoortEmbedding">embedding</sys:String>
     <sys:String x:Key="T_AiSoortAlgemeen">general</sys:String>
-    <sys:String x:Key="T_AiSterrenTip">Estimated quality (0-5 stars), based on the size of the model</sys:String>
+    <sys:String x:Key="T_AiSterrenTip">Estimated quality (0-5 stars), based on the size of the model - settable below</sys:String>
+    <sys:String x:Key="T_AiSterrenAutomatisch">Quality: estimated</sys:String>
+    <sys:String x:Key="T_AiDenktijdStandaard">Thinking time: default</sys:String>
+    <sys:String x:Key="T_AiDenktijdFormaat">Thinking time: max {0}s</sys:String>
+    <sys:String x:Key="T_AiStandaardTitel">Default for all models (a model's own value wins over this)</sys:String>
 
     <!-- Tokens -->
     <sys:String x:Key="T_TokensTitel">TOKENS</sys:String>
@@ -113,4 +117,9 @@
     <sys:String x:Key="T_OllamaContext">context {0}</sys:String>
     <sys:String x:Key="T_OllamaLaatstUit">unloading</sys:String>
     <sys:String x:Key="T_OllamaNogFormaat">unloads in {0}</sys:String>
+    <sys:String x:Key="T_TokensKopOnderdeel">part</sys:String>
+    <sys:String x:Key="T_TokensOnderdeelTitel">USAGE PER PART</sys:String>
+    <sys:String x:Key="T_TokensOnderdeelLeeg">No usage per part to show yet.</sys:String>
+    <sys:String x:Key="T_TokensOnderdeelOnderschrift">Tokens per part, last {0} days - {1} in total</sys:String>
+    <sys:String x:Key="T_TokensOnderdeelWaardeFormaat">{0} tokens · {1} calls · {2:0}%</sys:String>
 </ResourceDictionary>

@@ -145,6 +145,27 @@
                      AutomationProperties.AutomationId="AiServerUrl"
                      LostFocus="ServerUrl_LostFocus" KeyDown="ServerUrl_KeyDown" />
 
+            <!-- Standaard voor alle modellen: kwaliteit en denktijd die
+                 gelden voor elk model HIERONDER dat zelf geen eigen waarde
+                 heeft (zie AiServerSettings.StandaardSleutel). Zo hoef je
+                 niet elk model apart in te stellen - een eigen waarde bij
+                 een model wint altijd van deze standaard. -->
+            <Border BorderBrush="{DynamicResource BorderBrush}" BorderThickness="2" CornerRadius="{DynamicResource RadiusMedium}"
+                    Padding="12" Margin="0,16,0,0">
+                <StackPanel>
+                    <TextBlock Text="{DynamicResource T_AiStandaardTitel}" FontSize="{DynamicResource FontSizeSmall}"
+                               FontWeight="SemiBold" Foreground="{DynamicResource TextMutedBrush}" />
+                    <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+                        <ComboBox x:Name="DefaultSterrenPicker" Tag="Default" Width="150" Height="34" Margin="0,0,8,0"
+                                  AutomationProperties.AutomationId="AiDefaultSterren"
+                                  SelectionChanged="Beoordeling_SelectionChanged" />
+                        <ComboBox x:Name="DefaultDenktijdPicker" Tag="Default" Width="150" Height="34"
+                                  AutomationProperties.AutomationId="AiDefaultDenktijd"
+                                  SelectionChanged="Beoordeling_SelectionChanged" />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
             <!-- De twee algemene modellen naast elkaar: de kaart is breed
                  genoeg, en zo staat bij elkaar wat bij elkaar hoort. -->
             <Grid Margin="0,16,0,0">
@@ -160,6 +181,14 @@
                     <ComboBox x:Name="ChatModelPicker" Height="34" ItemTemplate="{StaticResource ModelkeuzeTemplate}"
                               AutomationProperties.AutomationId="AiChatModel"
                               SelectionChanged="Model_SelectionChanged" />
+                    <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+                        <ComboBox x:Name="ChatSterrenPicker" Tag="Chat" Width="150" Height="34" Margin="0,0,8,0"
+                                  AutomationProperties.AutomationId="AiChatSterren"
+                                  SelectionChanged="Beoordeling_SelectionChanged" />
+                        <ComboBox x:Name="ChatDenktijdPicker" Tag="Chat" Width="150" Height="34"
+                                  AutomationProperties.AutomationId="AiChatDenktijd"
+                                  SelectionChanged="Beoordeling_SelectionChanged" />
+                    </StackPanel>
                 </StackPanel>
 
                 <StackPanel Grid.Column="2">
@@ -196,6 +225,14 @@
                         <ComboBox x:Name="CodeModelPicker" Height="34" ItemTemplate="{StaticResource ModelkeuzeTemplate}"
                                   AutomationProperties.AutomationId="AiCodeModel"
                                   SelectionChanged="Model_SelectionChanged" />
+                        <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+                            <ComboBox x:Name="CodeSterrenPicker" Tag="Code" Width="150" Height="34" Margin="0,0,8,0"
+                                      AutomationProperties.AutomationId="AiCodeSterren"
+                                      SelectionChanged="Beoordeling_SelectionChanged" />
+                            <ComboBox x:Name="CodeDenktijdPicker" Tag="Code" Width="150" Height="34"
+                                      AutomationProperties.AutomationId="AiCodeDenktijd"
+                                      SelectionChanged="Beoordeling_SelectionChanged" />
+                        </StackPanel>
                     </StackPanel>
 
                     <StackPanel Grid.Column="2">
@@ -204,6 +241,14 @@
                         <ComboBox x:Name="ControleModelPicker" Height="34" ItemTemplate="{StaticResource ModelkeuzeTemplate}"
                                   AutomationProperties.AutomationId="AiControleModel"
                                   SelectionChanged="Model_SelectionChanged" />
+                        <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+                            <ComboBox x:Name="ControleSterrenPicker" Tag="Controle" Width="150" Height="34" Margin="0,0,8,0"
+                                      AutomationProperties.AutomationId="AiControleSterren"
+                                      SelectionChanged="Beoordeling_SelectionChanged" />
+                            <ComboBox x:Name="ControleDenktijdPicker" Tag="Controle" Width="150" Height="34"
+                                      AutomationProperties.AutomationId="AiControleDenktijd"
+                                      SelectionChanged="Beoordeling_SelectionChanged" />
+                        </StackPanel>
                     </StackPanel>
                 </Grid>
             </Border>
@@ -221,6 +266,14 @@
                     <ComboBox x:Name="BeeldModelPicker" Height="34" ItemTemplate="{StaticResource ModelkeuzeTemplate}"
                               AutomationProperties.AutomationId="AiBeeldModel"
                               SelectionChanged="Model_SelectionChanged" />
+                    <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+                        <ComboBox x:Name="BeeldSterrenPicker" Tag="Beeld" Width="150" Height="34" Margin="0,0,8,0"
+                                  AutomationProperties.AutomationId="AiBeeldSterren"
+                                  SelectionChanged="Beoordeling_SelectionChanged" />
+                        <ComboBox x:Name="BeeldDenktijdPicker" Tag="Beeld" Width="150" Height="34"
+                                  AutomationProperties.AutomationId="AiBeeldDenktijd"
+                                  SelectionChanged="Beoordeling_SelectionChanged" />
+                    </StackPanel>
                 </StackPanel>
             </Border>
 

@@ -41,6 +41,9 @@
                  Ruimte erboven volgt de SPACING-instelling, net als bij de kaarten. -->
             <controls:Tokengrafiek x:Name="Grafiek" Width="Auto" Margin="{DynamicResource RegionGapTopThickness}" />
 
+            <!-- Waar de tokens heen gaan: per onderdeel van een applicatie. -->
+            <controls:Onderdeelkaart x:Name="Onderdelen" Width="Auto" Margin="{DynamicResource RegionGapTopThickness}" />
+
             <TextBlock x:Name="MeldingText" Visibility="Collapsed"
                        AutomationProperties.AutomationId="TokensMelding"
                        Margin="20,16,0,0"

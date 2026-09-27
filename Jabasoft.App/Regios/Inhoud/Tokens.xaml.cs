@@ -34,6 +34,7 @@ public partial class Tokens : UserControl
 
         Totaal.Show(weken);
         await LaadVerloopAsync(weken);
+        Onderdelen.Show(await _broker.GetUsageOnderdelenAsync(VerloopDagen, CancellationToken.None), VerloopDagen);
         Weken.Items.Clear();
 
         if (weken.Count == 0)

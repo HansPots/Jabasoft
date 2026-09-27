@@ -81,7 +81,11 @@
     <sys:String x:Key="T_AiSoortCode">code</sys:String>
     <sys:String x:Key="T_AiSoortEmbedding">embedding</sys:String>
     <sys:String x:Key="T_AiSoortAlgemeen">algemeen</sys:String>
-    <sys:String x:Key="T_AiSterrenTip">Geschatte kwaliteit (0-5 sterren), gebaseerd op de grootte van het model</sys:String>
+    <sys:String x:Key="T_AiSterrenTip">Geschatte kwaliteit (0-5 sterren), gebaseerd op de grootte van het model - hieronder zelf in te stellen</sys:String>
+    <sys:String x:Key="T_AiSterrenAutomatisch">Kwaliteit: schatting</sys:String>
+    <sys:String x:Key="T_AiDenktijdStandaard">Denktijd: standaard</sys:String>
+    <sys:String x:Key="T_AiDenktijdFormaat">Denktijd: max {0}s</sys:String>
+    <sys:String x:Key="T_AiStandaardTitel">Standaard voor alle modellen (een model met een eigen waarde wint hiervan)</sys:String>
 
     <!-- Tokens -->
     <sys:String x:Key="T_TokensTitel">TOKENS</sys:String>
@@ -122,4 +126,9 @@
     <sys:String x:Key="T_OllamaContext">context {0}</sys:String>
     <sys:String x:Key="T_OllamaLaatstUit">wordt uitgeladen</sys:String>
     <sys:String x:Key="T_OllamaNogFormaat">gaat eruit over {0}</sys:String>
+    <sys:String x:Key="T_TokensKopOnderdeel">onderdeel</sys:String>
+    <sys:String x:Key="T_TokensOnderdeelTitel">GEBRUIK PER ONDERDEEL</sys:String>
+    <sys:String x:Key="T_TokensOnderdeelLeeg">Nog geen verbruik per onderdeel om te tonen.</sys:String>
+    <sys:String x:Key="T_TokensOnderdeelOnderschrift">Tokens per onderdeel, laatste {0} dagen - {1} in totaal</sys:String>
+    <sys:String x:Key="T_TokensOnderdeelWaardeFormaat">{0} tokens · {1} aanroepen · {2:0}%</sys:String>
 </ResourceDictionary>

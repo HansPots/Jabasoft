@@ -23,13 +23,14 @@ public enum Modelsoort
 /// </summary>
 public sealed partial class Modelkeuze
 {
-    private Modelkeuze(string naam, double? miljardenParameters, string? kwantisatie, Modelsoort soort, int sterren)
+    private Modelkeuze(string naam, double? miljardenParameters, string? kwantisatie, Modelsoort soort, int sterren, bool handmatig)
     {
         Naam = naam;
         MiljardenParameters = miljardenParameters;
         Kwantisatie = kwantisatie;
         Soort = soort;
         Sterren = sterren;
+        Handmatig = handmatig;
     }
 
     public string Naam { get; }
@@ -42,8 +43,11 @@ public sealed partial class Modelkeuze
 
     public Modelsoort Soort { get; }
 
-    /// <summary>0 tot en met 5.</summary>
+    /// <summary>0 tot en met 5. Een handmatige beoordeling (zie <see cref="Handmatig"/>) telt boven de schatting.</summary>
     public int Sterren { get; }
+
+    /// <summary>Zijn de sterren door de gebruiker zelf gezet (AI-kaart), in plaats van een schatting op grootte?</summary>
+    public bool Handmatig { get; }
 
     /// <summary>De sterren als tekst, bijvoorbeeld ★★★★☆.</summary>
     public string SterrenTekst => new string('★', Sterren) + new string('☆', 5 - Sterren);
@@ -60,9 +64,11 @@ public sealed partial class Modelkeuze
 
     /// <summary>
     /// Maakt de keuze voor een naam. <paramref name="soortNaam"/> vertaalt
-    /// een soort naar tekst in de taal van nu.
+    /// een soort naar tekst in de taal van nu. <paramref name="handmatigeSterren"/>
+    /// is de door de gebruiker ingestelde beoordeling (AiServerSettings.Sterren)
+    /// - overschrijft de automatische schatting als hij er is.
     /// </summary>
-    public static Modelkeuze Van(string naam, Func<Modelsoort, string> soortNaam)
+    public static Modelkeuze Van(string naam, Func<Modelsoort, string> soortNaam, int? handmatigeSterren = null)
     {
         var laag = naam.ToLowerInvariant();
 
@@ -80,7 +86,9 @@ public sealed partial class Modelkeuze
             ? Modelsoort.Embedding
             : Code_().IsMatch(laag) ? Modelsoort.Code : Modelsoort.Algemeen;
 
-        var keuze = new Modelkeuze(naam, miljarden, kwantisatie, soort, Schat(miljarden, kwantisatie, soort));
+        var keuze = handmatigeSterren is { } gezet
+            ? new Modelkeuze(naam, miljarden, kwantisatie, soort, Math.Clamp(gezet, 0, 5), handmatig: true)
+            : new Modelkeuze(naam, miljarden, kwantisatie, soort, Schat(miljarden, kwantisatie, soort), handmatig: false);
 
         var delen = new List<string>();
 
