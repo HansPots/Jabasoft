@@ -300,12 +300,67 @@
                  rijen worden in code-behind opgebouwd (VulModellenBlok):
                  hoeveel modellen er zijn hangt af van wat de server
                  aanbiedt. -->
-            <TextBlock Text="{DynamicResource T_AiModellenTitel}" Margin="0,20,0,4" FontSize="{DynamicResource FontSizeTitle}"
-                       FontWeight="SemiBold" Foreground="{DynamicResource Text01Brush}" />
-            <TextBlock Text="{DynamicResource T_AiModellenUitleg}" Margin="0,0,0,10" TextWrapping="Wrap"
-                       FontSize="{DynamicResource FontSizeSmall}"
-                       Foreground="{DynamicResource TextMutedBrush}" />
-            <StackPanel x:Name="ModellenBlok" AutomationProperties.AutomationId="AiModellenBlok" />
+            <ToggleButton x:Name="ModellenToggle" Margin="0,20,0,0" HorizontalAlignment="Left"
+                          HorizontalContentAlignment="Left" Background="Transparent" BorderThickness="0"
+                          Cursor="Hand" Click="ModellenToggle_Click"
+                          AutomationProperties.AutomationId="AiModellenToggle">
+                <ToggleButton.Template>
+                    <ControlTemplate TargetType="ToggleButton">
+                        <DockPanel Background="{TemplateBinding Background}">
+                            <Path x:Name="Pijl" DockPanel.Dock="Left" Data="M0,0 L8,5 L0,10 Z"
+                                  Fill="{DynamicResource AccentBrush}" Width="8" Height="10" Stretch="Fill"
+                                  VerticalAlignment="Center" Margin="0,0,10,0"
+                                  RenderTransformOrigin="0.5,0.5" />
+                            <ContentPresenter VerticalAlignment="Center" />
+                        </DockPanel>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="Pijl" Property="RenderTransform">
+                                    <Setter.Value>
+                                        <RotateTransform Angle="90" />
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </ToggleButton.Template>
+                <TextBlock Text="{DynamicResource T_AiModellenTitel}" FontSize="{DynamicResource FontSizeTitle}"
+                           FontWeight="SemiBold" Foreground="{DynamicResource Text01Brush}" />
+            </ToggleButton>
+
+            <!-- Dicht bij het opstarten van deze kaart (zie Setting06 in
+                 code-behind): een lijst van soms tientallen modellen met
+                 elk een eigen notitie hoort niet standaard open te staan. -->
+            <StackPanel x:Name="ModellenSectie" Visibility="Collapsed" Margin="0,10,0,0">
+                <TextBlock Text="{DynamicResource T_AiModellenUitleg}" Margin="0,0,0,10" TextWrapping="Wrap"
+                           FontSize="{DynamicResource FontSizeSmall}"
+                           Foreground="{DynamicResource TextMutedBrush}" />
+
+                <!-- Kolomkoppen boven de tabel - ZELFDE kolomopbouw (vaste
+                     breedtes + de rekbare kolom) als elke rij in BouwModelRij
+                     (Setting-06.xaml.cs), zodat de koppen precies boven hun
+                     kolom blijven staan, ook als de kaart breder/smaller wordt. -->
+                <Grid Margin="0,0,0,6">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="260" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="170" />
+                        <ColumnDefinition Width="46" />
+                        <ColumnDefinition Width="46" />
+                        <ColumnDefinition Width="46" />
+                        <ColumnDefinition Width="46" />
+                        <ColumnDefinition Width="46" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="2" Text="{DynamicResource T_AiModellenKwaliteitKop}" FontSize="{DynamicResource FontSizeSmall}" FontWeight="SemiBold" Foreground="{DynamicResource TextMutedBrush}" />
+                    <TextBlock Grid.Column="3" Text="{DynamicResource T_AiTaakChat}" TextAlignment="Center" FontSize="{DynamicResource FontSizeSmall}" FontWeight="SemiBold" Foreground="{DynamicResource TextMutedBrush}" ToolTip="{DynamicResource T_AiTaakChatTip}" />
+                    <TextBlock Grid.Column="4" Text="{DynamicResource T_AiTaakCode}" TextAlignment="Center" FontSize="{DynamicResource FontSizeSmall}" FontWeight="SemiBold" Foreground="{DynamicResource TextMutedBrush}" ToolTip="{DynamicResource T_AiTaakCodeTip}" />
+                    <TextBlock Grid.Column="5" Text="{DynamicResource T_AiTaakControle}" TextAlignment="Center" FontSize="{DynamicResource FontSizeSmall}" FontWeight="SemiBold" Foreground="{DynamicResource TextMutedBrush}" ToolTip="{DynamicResource T_AiTaakControleTip}" />
+                    <TextBlock Grid.Column="6" Text="{DynamicResource T_AiTaakBeeld}" TextAlignment="Center" FontSize="{DynamicResource FontSizeSmall}" FontWeight="SemiBold" Foreground="{DynamicResource TextMutedBrush}" ToolTip="{DynamicResource T_AiTaakBeeldTip}" />
+                    <TextBlock Grid.Column="7" Text="{DynamicResource T_AiTaakZoeken}" TextAlignment="Center" FontSize="{DynamicResource FontSizeSmall}" FontWeight="SemiBold" Foreground="{DynamicResource TextMutedBrush}" ToolTip="{DynamicResource T_AiTaakZoekenTip}" />
+                </Grid>
+
+                <StackPanel x:Name="ModellenBlok" AutomationProperties.AutomationId="AiModellenBlok" />
+            </StackPanel>
         </StackPanel>
     </Border>
 

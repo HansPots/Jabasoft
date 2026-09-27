@@ -89,6 +89,17 @@
     <sys:String x:Key="T_AiModellenTitel">MODELLEN</sys:String>
     <sys:String x:Key="T_AiModellenUitleg">Eén plek voor elk model op deze server: een eigen notitie waar het goed in is, de kwaliteit (sterren) en hoe lang het mag nadenken. Bovenaan een standaard die geldt voor elk model hieronder zonder eigen waarde.</sys:String>
     <sys:String x:Key="T_AiOmschrijvingTip">Korte notitie waar dit model goed in is - voor jezelf, de apps doen er niets mee</sys:String>
+    <sys:String x:Key="T_AiModellenKwaliteitKop">Kwaliteit / denktijd</sys:String>
+    <sys:String x:Key="T_AiTaakChat">Chat</sys:String>
+    <sys:String x:Key="T_AiTaakChatTip">Geschatte inzetbaarheid voor Daily chat, 0-5</sys:String>
+    <sys:String x:Key="T_AiTaakCode">Code</sys:String>
+    <sys:String x:Key="T_AiTaakCodeTip">Geschatte inzetbaarheid als codemodel (codevoorstellen), 0-5</sys:String>
+    <sys:String x:Key="T_AiTaakControle">Ctrl</sys:String>
+    <sys:String x:Key="T_AiTaakControleTip">Geschatte inzetbaarheid als controlemodel, 0-5</sys:String>
+    <sys:String x:Key="T_AiTaakBeeld">Beeld</sys:String>
+    <sys:String x:Key="T_AiTaakBeeldTip">Geschatte inzetbaarheid als beeldmodel (afbeeldingen lezen), 0-5</sys:String>
+    <sys:String x:Key="T_AiTaakZoeken">Zoek</sys:String>
+    <sys:String x:Key="T_AiTaakZoekenTip">Geschatte inzetbaarheid als embeddingmodel (semantisch zoeken), 0-5</sys:String>
 
     <!-- Tokens -->
     <sys:String x:Key="T_TokensTitel">TOKENS</sys:String>

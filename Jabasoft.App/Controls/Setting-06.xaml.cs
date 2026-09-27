@@ -267,12 +267,17 @@ public partial class Setting06 : UserControl
         var rij = new Grid { Margin = new Thickness(0, 0, 0, 10) };
         rij.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(260) });
         rij.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
-        rij.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(150) });
-        rij.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(150) });
+        rij.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(170) });
+
+        for (var i = 0; i < 5; i++)
+        {
+            rij.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(46) });
+        }
 
         var tekstKleur = TryFindResource("TextPrimaryBrush") as Brush ?? Brushes.White;
         var gedempt = TryFindResource("TextMutedBrush") as Brush ?? Brushes.Gray;
         var accent = TryFindResource("AccentBrush") as Brush ?? Brushes.Orange;
+        Modelkeuze? keuze = null;
 
         if (standaard)
         {
@@ -291,7 +296,7 @@ public partial class Setting06 : UserControl
         }
         else
         {
-            var keuze = Modelkeuze.Van(model, SoortNaam, _settings.Active.SterrenVoor(model));
+            keuze = Modelkeuze.Van(model, SoortNaam, _settings.Active.SterrenVoor(model));
 
             var naamBlok = new StackPanel { VerticalAlignment = VerticalAlignment.Top, Margin = new Thickness(0, 0, 12, 0) };
             naamBlok.Children.Add(new TextBlock { Text = keuze.Naam, Foreground = tekstKleur, TextTrimming = TextTrimming.CharacterEllipsis });
@@ -350,8 +355,12 @@ public partial class Setting06 : UserControl
             rij.Children.Add(omschrijving);
         }
 
+        // Kwaliteit en denktijd onder elkaar in plaats van naast elkaar -
+        // scheelt breedte, en de twee horen toch al bij elkaar.
+        var beoordelingBlok = new StackPanel { VerticalAlignment = VerticalAlignment.Top, Margin = new Thickness(0, 0, 8, 0) };
+
         var sterrenOpties = SterrenOpties();
-        var sterren = new ComboBox { ItemsSource = sterrenOpties, DisplayMemberPath = nameof(SterrenOptie.Label), Height = 34, VerticalAlignment = VerticalAlignment.Top, Margin = new Thickness(0, 0, 8, 0) };
+        var sterren = new ComboBox { ItemsSource = sterrenOpties, DisplayMemberPath = nameof(SterrenOptie.Label), Height = 34, Margin = new Thickness(0, 0, 0, 6) };
         sterren.SelectedItem = sterrenOpties.FirstOrDefault(optie => optie.Waarde == _settings.Active.SterrenVoor(model));
         sterren.SelectionChanged += async (_, _) =>
         {
@@ -362,11 +371,10 @@ public partial class Setting06 : UserControl
 
             await WijzigSterrenAsync(model, (sterren.SelectedItem as SterrenOptie)?.Waarde);
         };
-        Grid.SetColumn(sterren, 2);
-        rij.Children.Add(sterren);
+        beoordelingBlok.Children.Add(sterren);
 
         var denktijdOpties = DenktijdOpties();
-        var denktijd = new ComboBox { ItemsSource = denktijdOpties, DisplayMemberPath = nameof(DenktijdOptie.Label), Height = 34, VerticalAlignment = VerticalAlignment.Top };
+        var denktijd = new ComboBox { ItemsSource = denktijdOpties, DisplayMemberPath = nameof(DenktijdOptie.Label), Height = 34 };
         denktijd.SelectedItem = denktijdOpties.FirstOrDefault(optie => optie.Seconden == _settings.Active.DenktijdVoor(model)) ?? denktijdOpties[0];
         denktijd.SelectionChanged += async (_, _) =>
         {
@@ -377,8 +385,34 @@ public partial class Setting06 : UserControl
 
             await WijzigDenktijdAsync(model, (denktijd.SelectedItem as DenktijdOptie)?.Seconden ?? 0);
         };
-        Grid.SetColumn(denktijd, 3);
-        rij.Children.Add(denktijd);
+        beoordelingBlok.Children.Add(denktijd);
+
+        Grid.SetColumn(beoordelingBlok, 2);
+        rij.Children.Add(beoordelingBlok);
+
+        // De STANDAARD-rij gaat over sterren/denktijd, niet over taken - een
+        // model is nooit "het" model voor een taak totdat je het kiest, dus
+        // een geschiktheidstabel zou hier niets betekenen.
+        if (!standaard && keuze is not null)
+        {
+            var taken = keuze.Taken;
+            var scores = new[] { taken.Chat, taken.Code, taken.Controle, taken.Beeld, taken.Zoeken };
+
+            for (var i = 0; i < scores.Length; i++)
+            {
+                var cel = new TextBlock
+                {
+                    Text = scores[i].ToString(System.Globalization.CultureInfo.CurrentCulture),
+                    TextAlignment = TextAlignment.Center,
+                    VerticalAlignment = VerticalAlignment.Top,
+                    Margin = new Thickness(0, 8, 0, 0),
+                    Foreground = scores[i] >= 5 ? accent : scores[i] == 0 ? gedempt : tekstKleur,
+                    FontWeight = scores[i] >= 5 ? FontWeights.SemiBold : FontWeights.Normal,
+                };
+                Grid.SetColumn(cel, 3 + i);
+                rij.Children.Add(cel);
+            }
+        }
 
         return rij;
     }
@@ -590,6 +624,15 @@ public partial class Setting06 : UserControl
     }
 
     private async void RefreshModels_Click(object sender, RoutedEventArgs e) => await VulModellenAsync();
+
+    /// <summary>
+    /// Klapt het MODELLEN-blok open of dicht. Staat standaard dicht (zie
+    /// Setting-06.xaml, ModellenSectie.Visibility="Collapsed") - een lijst
+    /// met soms tientallen modellen en hun notities hoeft niet altijd in
+    /// beeld te staan.
+    /// </summary>
+    private void ModellenToggle_Click(object sender, RoutedEventArgs e) =>
+        ModellenSectie.Visibility = ModellenToggle.IsChecked == true ? Visibility.Visible : Visibility.Collapsed;
 
     /// <summary>
     /// Ververst alleen het opschrift, terwijl je sleept. Niet opslaan: dit

@@ -60,6 +60,9 @@ public sealed partial class Modelkeuze
     /// <summary>De regel achter de naam: grootte, soort en eventueel kwantisatie.</summary>
     public string Info { get; private set; } = string.Empty;
 
+    /// <summary>Geschatte inzetbaarheid per JabaSoft-taak (0-6) - zie <see cref="SchatGeschiktheid"/>.</summary>
+    public Geschiktheid Taken { get; private set; } = new(0, 0, 0, 0, 0);
+
     public override string ToString() => Naam;
 
     /// <summary>
@@ -105,6 +108,7 @@ public sealed partial class Modelkeuze
         }
 
         keuze.Info = string.Join(" · ", delen);
+        keuze.Taken = SchatGeschiktheid(laag, miljarden, soort);
         return keuze;
     }
 
@@ -222,5 +226,63 @@ public sealed partial class Modelkeuze
         var laag = naam.ToLowerInvariant();
         var gevonden = BekendeFamilies.FirstOrDefault(paar => laag.Contains(paar.Deel, StringComparison.Ordinal));
         return gevonden.Omschrijving ?? string.Empty;
+    }
+
+    /// <summary>
+    /// Hoe inzetbaar dit model is voor elk van de vijf taken binnen de
+    /// JabaSoft-familie (dezelfde vijf als de rolkeuzelijsten op deze kaart),
+    /// op een schaal van 0 (niet geschikt) tot en met 6 (uitstekend).
+    /// </summary>
+    public sealed record Geschiktheid(int Chat, int Code, int Controle, int Beeld, int Zoeken);
+
+    [GeneratedRegex(@"(?<![a-z0-9])(llava|bakllava|moondream|pixtral|qwen2?\.?5?-?vl|minicpm-v|vision|cogvlm|internvl)(?![a-z0-9])")]
+    private static partial Regex Beeldherkenning_();
+
+    [GeneratedRegex(@"(?<![a-z0-9])(deepseek-r1|qwen3|qwq|o1|o3)(?![a-z0-9])")]
+    private static partial Regex Redeneermodel_();
+
+    /// <summary>
+    /// Schat de geschiktheid per taak op basis van de grootte en de
+    /// herkende soort/familie - net als <see cref="Schat"/> een indicatie,
+    /// geen benchmark. Gemma3 wordt apart herkend als beeldmodel (geen
+    /// algemene "vision"-term in de naam, maar wel bekend beeldherkenning).
+    /// Schaal 0-5, zoals de sterren.
+    /// </summary>
+    private static Geschiktheid SchatGeschiktheid(string laag, double? miljarden, Modelsoort soort)
+    {
+        var basis = miljarden switch
+        {
+            null => 3,
+            < 2 => 1,
+            < 5 => 2,
+            < 13 => 3,
+            < 25 => 4,
+            _ => 5,
+        };
+
+        var beeld = laag.Contains("gemma3", StringComparison.Ordinal) || Beeldherkenning_().IsMatch(laag) ? 5 : 0;
+        var redeneert = Redeneermodel_().IsMatch(laag);
+
+        if (soort == Modelsoort.Embedding)
+        {
+            return new Geschiktheid(Chat: 1, Code: 0, Controle: 0, Beeld: 0, Zoeken: 5);
+        }
+
+        if (soort == Modelsoort.Code)
+        {
+            return new Geschiktheid(
+                Chat: Math.Max(1, basis - 2),
+                Code: basis,
+                Controle: redeneert ? Math.Min(5, basis + 1) : basis,
+                Beeld: beeld,
+                Zoeken: 0);
+        }
+
+        return new Geschiktheid(
+            Chat: basis,
+            Code: Math.Max(1, basis - 2),
+            Controle: redeneert ? Math.Min(5, basis + 1) : Math.Max(1, basis - 1),
+            Beeld: beeld,
+            Zoeken: 0);
     }
 }

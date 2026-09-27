@@ -80,6 +80,17 @@
     <sys:String x:Key="T_AiModellenTitel">MODELS</sys:String>
     <sys:String x:Key="T_AiModellenUitleg">One place for every model on this server: a note on what it's good at, its quality (stars) and how long it may think. The top row is a default for any model below that has no value of its own.</sys:String>
     <sys:String x:Key="T_AiOmschrijvingTip">Short note on what this model is good at - for yourself, not used by the apps</sys:String>
+    <sys:String x:Key="T_AiModellenKwaliteitKop">Quality / thinking time</sys:String>
+    <sys:String x:Key="T_AiTaakChat">Chat</sys:String>
+    <sys:String x:Key="T_AiTaakChatTip">Estimated fit for Daily chat, 0-5</sys:String>
+    <sys:String x:Key="T_AiTaakCode">Code</sys:String>
+    <sys:String x:Key="T_AiTaakCodeTip">Estimated fit as the code model (code proposals), 0-5</sys:String>
+    <sys:String x:Key="T_AiTaakControle">Ctrl</sys:String>
+    <sys:String x:Key="T_AiTaakControleTip">Estimated fit as the check model, 0-5</sys:String>
+    <sys:String x:Key="T_AiTaakBeeld">Image</sys:String>
+    <sys:String x:Key="T_AiTaakBeeldTip">Estimated fit as the image model (reading pictures), 0-5</sys:String>
+    <sys:String x:Key="T_AiTaakZoeken">Search</sys:String>
+    <sys:String x:Key="T_AiTaakZoekenTip">Estimated fit as the embedding model (semantic search), 0-5</sys:String>
 
     <!-- Tokens -->
     <sys:String x:Key="T_TokensTitel">TOKENS</sys:String>
