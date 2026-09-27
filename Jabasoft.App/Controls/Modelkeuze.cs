@@ -147,4 +147,80 @@ public sealed partial class Modelkeuze
 
     [GeneratedRegex(@"(?<![a-z0-9])(coder|code)(?![a-z0-9])")]
     private static partial Regex Code_();
+
+    /// <summary>
+    /// Bekende modelfamilies, herkend aan een stukje van de naam (op zijn
+    /// LM Studio- én Ollama-vorm), met een korte Nederlandse notitie over
+    /// waar zo'n model goed in is. Eerste treffer wint, dus specifiekere
+    /// namen (zoals "qwen2.5-coder") staan boven de algemenere ("qwen2.5").
+    /// Puur ter oriëntatie - geen benchmark, en wordt alleen gebruikt als
+    /// het model nog geen eigen, zelf getypte notitie heeft (zie
+    /// Setting-06.xaml.cs).
+    /// </summary>
+    private static readonly (string Deel, string Omschrijving)[] BekendeFamilies =
+    [
+        ("deepseek-r1",
+            "Redeneermodel (reasoning), gebouwd om te concurreren met OpenAI's o1/o3. Denkt eerst uitgebreid in zichzelf na " +
+            "(chain of thought, via reinforcement learning aangeleerd) voordat het met een antwoord komt - waar een gewoon " +
+            "model meteen begint te typen.\n" +
+            "Sterk in wiskunde, logica en meerstaps-redeneren; ook goed in code. Nadeel: merkbaar trager door dat nadenken, " +
+            "en dat gedachtespoor kost tokens (zie de instelling Denktijd hiernaast om dat te begrenzen)."),
+        ("deepseek", "Sterk in code en wiskunde; over het algemeen goed voor zijn grootte."),
+        ("qwen2.5-coder",
+            "Toegespitst op programmeren: sterk in code schrijven, uitleggen, verbeteren en refactoren, over veel talen " +
+            "heen (C#, Python, JavaScript, XAML, enzovoort).\n" +
+            "Compact (bijvoorbeeld 14B) geldt het als een van de sterkste lokaal te draaien codeermodellen in zijn " +
+            "gewichtsklasse - een goede standaardkeuze voor het codemodel in deze familie apps."),
+        ("qwen2.5coder",
+            "Toegespitst op programmeren: sterk in code schrijven, uitleggen, verbeteren en refactoren, over veel talen " +
+            "heen. Compact en efficiënt voor zijn grootte."),
+        ("qwen3-coder",
+            "Nieuwere codeervariant van Qwen3: sterk in programmeren, met optioneel hardop nadenken (reasoning-modus) " +
+            "voor lastige vraagstukken - dat kost dan wel extra tijd."),
+        ("qwen3",
+            "Kan desgewenst hardop nadenken (een aan/uit-schakelbare reasoning-modus) voor lastige vragen, en anders " +
+            "meteen antwoorden zoals een gewoon model.\n" +
+            "Sterk in wiskunde, logica en meertalige taken; recentere en over het algemeen krachtigere lichting dan " +
+            "Qwen2.5."),
+        ("qwen2.5",
+            "Algemeen Qwen-model (geen aparte coder- of reasoning-variant): sterk in meertalige taken, wiskunde en " +
+            "logisch redeneren. Compact en snel voor zijn grootte, en geldt binnen de AI-community als een van de " +
+            "betere lokale modellen in zijn gewichtsklasse."),
+        ("qwen", "Algemeen Qwen-model: doorgaans sterk in meertalige taken en redeneren voor zijn grootte."),
+        ("gemma3",
+            "Google's compacte model - kan ook afbeeldingen lezen en beschrijven (beeldherkenning), vandaar geschikt als " +
+            "beeldmodel voor bijgevoegde plaatjes. Goed algemeen taalgebruik, minder gespecialiseerd in code dan een " +
+            "coder-variant."),
+        ("gemma", "Google's compacte, algemene model - snel en breed inzetbaar."),
+        ("nomic-embed",
+            "Embeddingmodel: zet tekst om in getallenreeksen (vectoren) voor semantisch zoeken - vindt bestanden op " +
+            "betekenis, niet op exacte woorden. Niet bedoeld om zelf een gesprek mee te voeren of vragen aan te stellen."),
+        ("embed", "Embeddingmodel: zet tekst om in vectoren voor zoeken - niet bedoeld voor een gewoon gesprek."),
+        ("llama3", "Meta's algemene model: breed inzetbaar, prima startpunt voor gewone chat- en schrijftaken."),
+        ("llama", "Meta's algemene model: breed inzetbaar voor gewone chat- en schrijftaken."),
+        ("mixtral",
+            "Meerdere kleinere modellen die samenwerken en per vraag de best passende erbij kiezen (mixture of " +
+            "experts) - vaak sneller dan zijn totale grootte doet vermoeden, met een kwaliteit die in de buurt komt " +
+            "van een groter, aaneengesloten model."),
+        ("mistral", "Compact en snel algemeen model, sterk voor zijn grootte."),
+        ("phi",
+            "Microsoft's kleine model, getraind op zorgvuldig gekozen ('textbook-quality') data. Verrassend sterk in " +
+            "redeneren en wiskunde voor zijn formaat, maar met minder brede wereldkennis dan een groter model."),
+        ("starcoder", "Toegespitst op programmeren, getraind op veel broncode uit open-sourceprojecten."),
+        ("codellama", "Meta's codeervariant van Llama: gericht op programmeren, met varianten voor Python en instructies."),
+    ];
+
+    /// <summary>
+    /// Een korte, automatische notitie over waar dit model goed in is, op
+    /// basis van bekende modelfamilies - of leeg als de naam niets herkends
+    /// bevat. Alleen een SCHATTING op de naam, geen eigen mening; de
+    /// gebruiker kan dit in het MODELLEN-blok altijd overschrijven met een
+    /// eigen tekst.
+    /// </summary>
+    public static string AutomatischeOmschrijving(string naam)
+    {
+        var laag = naam.ToLowerInvariant();
+        var gevonden = BekendeFamilies.FirstOrDefault(paar => laag.Contains(paar.Deel, StringComparison.Ordinal));
+        return gevonden.Omschrijving ?? string.Empty;
+    }
 }

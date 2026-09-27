@@ -77,6 +77,9 @@
     <sys:String x:Key="T_AiDenktijdStandaard">Thinking time: default</sys:String>
     <sys:String x:Key="T_AiDenktijdFormaat">Thinking time: max {0}s</sys:String>
     <sys:String x:Key="T_AiStandaardTitel">Default for all models (a model's own value wins over this)</sys:String>
+    <sys:String x:Key="T_AiModellenTitel">MODELS</sys:String>
+    <sys:String x:Key="T_AiModellenUitleg">One place for every model on this server: a note on what it's good at, its quality (stars) and how long it may think. The top row is a default for any model below that has no value of its own.</sys:String>
+    <sys:String x:Key="T_AiOmschrijvingTip">Short note on what this model is good at - for yourself, not used by the apps</sys:String>
 
     <!-- Tokens -->
     <sys:String x:Key="T_TokensTitel">TOKENS</sys:String>

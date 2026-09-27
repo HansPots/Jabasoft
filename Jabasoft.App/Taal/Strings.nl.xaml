@@ -86,6 +86,9 @@
     <sys:String x:Key="T_AiDenktijdStandaard">Denktijd: standaard</sys:String>
     <sys:String x:Key="T_AiDenktijdFormaat">Denktijd: max {0}s</sys:String>
     <sys:String x:Key="T_AiStandaardTitel">Standaard voor alle modellen (een model met een eigen waarde wint hiervan)</sys:String>
+    <sys:String x:Key="T_AiModellenTitel">MODELLEN</sys:String>
+    <sys:String x:Key="T_AiModellenUitleg">Eén plek voor elk model op deze server: een eigen notitie waar het goed in is, de kwaliteit (sterren) en hoe lang het mag nadenken. Bovenaan een standaard die geldt voor elk model hieronder zonder eigen waarde.</sys:String>
+    <sys:String x:Key="T_AiOmschrijvingTip">Korte notitie waar dit model goed in is - voor jezelf, de apps doen er niets mee</sys:String>
 
     <!-- Tokens -->
     <sys:String x:Key="T_TokensTitel">TOKENS</sys:String>

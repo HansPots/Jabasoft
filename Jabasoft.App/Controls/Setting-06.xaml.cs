@@ -1,6 +1,7 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 using Jabasoft.Base.AiBroker;
 using Jabasoft.App.Taal;
 using Jabasoft.Base.Logging;
@@ -139,7 +140,7 @@ public partial class Setting06 : UserControl
 
     /// <summary>
     /// Vraagt de broker welke modellen er op de ingestelde server AANWEZIG
-    /// zijn en zet die in de twee keuzelijsten.
+    /// zijn en zet die in de keuzelijsten en het MODELLEN-blok.
     /// </summary>
     private async Task VulModellenAsync()
     {
@@ -155,11 +156,9 @@ public partial class Setting06 : UserControl
             Vul(EmbedModelPicker, namen, _settings.Active.EmbedModel);
             Vul(CodeModelPicker, namen, _settings.Active.CodeModel);
             Vul(ControleModelPicker, namen, _settings.Active.ControleModel);
-            VulBeoordeling(DefaultSterrenPicker, DefaultDenktijdPicker, AiServerSettings.StandaardSleutel);
-            VulBeoordeling(ChatSterrenPicker, ChatDenktijdPicker, _settings.Active.ChatModel);
-            VulBeoordeling(CodeSterrenPicker, CodeDenktijdPicker, _settings.Active.CodeModel);
-            VulBeoordeling(ControleSterrenPicker, ControleDenktijdPicker, _settings.Active.ControleModel);
-            VulBeoordeling(BeeldSterrenPicker, BeeldDenktijdPicker, _settings.Active.BeeldModel);
+            Vul(BeeldModelPicker, namen, _settings.Active.BeeldModel);
+
+            VulModellenBlok(namen);
         }
         finally
         {
@@ -202,56 +201,18 @@ public partial class Setting06 : UserControl
         keuzelijst.SelectedItem = keuzes.FirstOrDefault(keuze => string.Equals(keuze.Naam, ingesteld, StringComparison.OrdinalIgnoreCase));
     }
 
-    /// <summary>
-    /// Vult de sterren- en denktijdcombo voor ÉÉN modelrol, met wat er voor
-    /// <paramref name="model"/> nu ingesteld staat (of "automatisch"/"standaard"
-    /// als er niets handmatigs is). Een lege modelnaam (rol niet ingevuld)
-    /// verbergt beide combo's - er valt dan niets te beoordelen.
-    /// </summary>
-    private void VulBeoordeling(ComboBox sterren, ComboBox denktijd, string model)
+    /// <summary>Bouwt de items van een modelkeuzelijst opnieuw op (na een sterrenwijziging elders) en houdt de keuze vast.</summary>
+    private void HerbouwKeuzelijst(ComboBox keuzelijst, string ingesteld)
     {
-        var zichtbaar = !string.IsNullOrWhiteSpace(model);
-        sterren.Visibility = zichtbaar ? Visibility.Visible : Visibility.Collapsed;
-        denktijd.Visibility = zichtbaar ? Visibility.Visible : Visibility.Collapsed;
-
-        if (!zichtbaar)
+        if (keuzelijst.ItemsSource is not IEnumerable<Modelkeuze> huidige)
         {
             return;
         }
 
-        var sterrenOpties = new List<SterrenOptie> { new(Teksten.Van(this, "T_AiSterrenAutomatisch", "Quality: estimated"), null) };
-        sterrenOpties.AddRange(Enumerable.Range(0, 6).Select(n => new SterrenOptie(new string('★', n) + new string('☆', 5 - n), n)));
-
-        sterren.ItemsSource = sterrenOpties;
-        sterren.DisplayMemberPath = nameof(SterrenOptie.Label);
-        sterren.SelectedItem = sterrenOpties.FirstOrDefault(optie => optie.Waarde == _settings.Active.SterrenVoor(model));
-
-        var denktijdOpties = DenktijdWaarden
-            .Select(seconden => new DenktijdOptie(
-                seconden == 0
-                    ? Teksten.Van(this, "T_AiDenktijdStandaard", "Thinking time: default")
-                    : Teksten.Vul(this, "T_AiDenktijdFormaat", "Thinking time: max {0}s", seconden),
-                seconden))
-            .ToList();
-
-        denktijd.ItemsSource = denktijdOpties;
-        denktijd.DisplayMemberPath = nameof(DenktijdOptie.Label);
-        denktijd.SelectedItem = denktijdOpties.FirstOrDefault(optie => optie.Seconden == _settings.Active.DenktijdVoor(model)) ?? denktijdOpties[0];
+        var keuzes = huidige.Select(keuze => Modelkeuze.Van(keuze.Naam, SoortNaam, _settings.Active.SterrenVoor(keuze.Naam))).ToList();
+        keuzelijst.ItemsSource = keuzes;
+        keuzelijst.SelectedItem = keuzes.FirstOrDefault(keuze => string.Equals(keuze.Naam, ingesteld, StringComparison.OrdinalIgnoreCase));
     }
-
-    /// <summary>
-    /// Welke sterren/denktijd-combo en welke modelnaam bij een Tag horen - voor
-    /// Beoordeling_SelectionChanged. "Default" heeft geen eigen modelkeuzelijst:
-    /// de naam ligt vast op AiServerSettings.StandaardSleutel.
-    /// </summary>
-    private (Func<string?> Model, ComboBox Sterren, ComboBox Denktijd) RolPickers(string rol) => rol switch
-    {
-        "Code" => (() => (CodeModelPicker.SelectedItem as Modelkeuze)?.Naam, CodeSterrenPicker, CodeDenktijdPicker),
-        "Controle" => (() => (ControleModelPicker.SelectedItem as Modelkeuze)?.Naam, ControleSterrenPicker, ControleDenktijdPicker),
-        "Beeld" => (() => (BeeldModelPicker.SelectedItem as Modelkeuze)?.Naam, BeeldSterrenPicker, BeeldDenktijdPicker),
-        "Default" => (() => AiServerSettings.StandaardSleutel, DefaultSterrenPicker, DefaultDenktijdPicker),
-        _ => (() => (ChatModelPicker.SelectedItem as Modelkeuze)?.Naam, ChatSterrenPicker, ChatDenktijdPicker),
-    };
 
     /// <summary>De soort van een model in de taal van nu.</summary>
     private string SoortNaam(Modelsoort soort) => soort switch
@@ -263,21 +224,268 @@ public partial class Setting06 : UserControl
 
     private static string Gekozen(ComboBox keuzelijst) => (keuzelijst.SelectedItem as Modelkeuze)?.Naam ?? string.Empty;
 
+    // ------------------------------------------------------------------
+    // MODELLEN-blok: één rij per model op de server (plus een STANDAARD-
+    // rij bovenaan), met een eigen notitie, kwaliteit en denktijd - zie de
+    // toelichting in Setting-06.xaml. Vervangt de losse sterren/denktijd-
+    // combo's die eerder onder elke van de vijf rolkeuzelijsten stonden:
+    // die lieten bij een gedeeld model (bijvoorbeeld hetzelfde model voor
+    // Daily chat EN Afbeeldingen) twee kopietjes van dezelfde instelling
+    // zien die niet synchroon bleven.
+    // ------------------------------------------------------------------
+
+    private List<SterrenOptie> SterrenOpties()
+    {
+        var opties = new List<SterrenOptie> { new(Teksten.Van(this, "T_AiSterrenAutomatisch", "Quality: estimated"), null) };
+        opties.AddRange(Enumerable.Range(0, 6).Select(n => new SterrenOptie(new string('★', n) + new string('☆', 5 - n), n)));
+        return opties;
+    }
+
+    private List<DenktijdOptie> DenktijdOpties() => DenktijdWaarden
+        .Select(seconden => new DenktijdOptie(
+            seconden == 0
+                ? Teksten.Van(this, "T_AiDenktijdStandaard", "Thinking time: default")
+                : Teksten.Vul(this, "T_AiDenktijdFormaat", "Thinking time: max {0}s", seconden),
+            seconden))
+        .ToList();
+
+    /// <summary>Bouwt het hele MODELLEN-blok opnieuw op: de STANDAARD-rij, dan één rij per model uit <paramref name="namen"/>.</summary>
+    private void VulModellenBlok(List<string> namen)
+    {
+        ModellenBlok.Children.Clear();
+        ModellenBlok.Children.Add(BouwModelRij(AiServerSettings.StandaardSleutel, standaard: true));
+
+        foreach (var naam in namen)
+        {
+            ModellenBlok.Children.Add(BouwModelRij(naam, standaard: false));
+        }
+    }
+
+    /// <summary>Eén rij: modelnaam (+ grootte/soort), een notitie, kwaliteit en denktijd.</summary>
+    private UIElement BouwModelRij(string model, bool standaard)
+    {
+        var rij = new Grid { Margin = new Thickness(0, 0, 0, 10) };
+        rij.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(260) });
+        rij.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+        rij.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(150) });
+        rij.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(150) });
+
+        var tekstKleur = TryFindResource("TextPrimaryBrush") as Brush ?? Brushes.White;
+        var gedempt = TryFindResource("TextMutedBrush") as Brush ?? Brushes.Gray;
+        var accent = TryFindResource("AccentBrush") as Brush ?? Brushes.Orange;
+
+        if (standaard)
+        {
+            var label = new TextBlock
+            {
+                Text = Teksten.Van(this, "T_AiStandaardTitel", "Default for all models (a model's own value wins over this)"),
+                FontWeight = FontWeights.SemiBold,
+                TextWrapping = TextWrapping.Wrap,
+                VerticalAlignment = VerticalAlignment.Center,
+                Foreground = accent,
+                Margin = new Thickness(0, 0, 12, 0),
+            };
+            Grid.SetColumn(label, 0);
+            Grid.SetColumnSpan(label, 2);
+            rij.Children.Add(label);
+        }
+        else
+        {
+            var keuze = Modelkeuze.Van(model, SoortNaam, _settings.Active.SterrenVoor(model));
+
+            var naamBlok = new StackPanel { VerticalAlignment = VerticalAlignment.Top, Margin = new Thickness(0, 0, 12, 0) };
+            naamBlok.Children.Add(new TextBlock { Text = keuze.Naam, Foreground = tekstKleur, TextTrimming = TextTrimming.CharacterEllipsis });
+            naamBlok.Children.Add(new TextBlock
+            {
+                Text = keuze.Info,
+                Foreground = gedempt,
+                FontSize = TryFindResource("FontSizeSmall") is double klein ? klein : 12,
+            });
+            Grid.SetColumn(naamBlok, 0);
+            rij.Children.Add(naamBlok);
+
+            // Eigen notitie als die er is; anders alvast de automatische
+            // inschatting op de modelnaam (zie Modelkeuze.AutomatischeOmschrijving)
+            // - bewust bewerkbaar en niet als grijze plaatshoudertekst, zodat
+            // je hem meteen kunt bijschaven. Onaangeraakt laten bewaart 'm
+            // niet: pas typen en wegklikken zet 'm vast (zie WijzigOmschrijvingAsync).
+            var eigenOmschrijving = _settings.Active.OmschrijvingVoor(model);
+            var omschrijving = new TextBox
+            {
+                Text = eigenOmschrijving.Length > 0 ? eigenOmschrijving : Modelkeuze.AutomatischeOmschrijving(model),
+                Style = TryFindResource("InputBoxStyle") as Style,
+                // InputBoxStyle zet zelf Height="34" (voor de gewone, ééncijferige
+                // velden) - dat wint altijd van MinHeight/MaxHeight, dus hier expliciet
+                // terug naar automatisch zodat dit veld echt met de tekst meegroeit.
+                Height = double.NaN,
+                MinHeight = 34,
+                MaxHeight = 160,
+                Padding = new Thickness(10, 6, 10, 6),
+                AcceptsReturn = true,
+                TextWrapping = TextWrapping.Wrap,
+                VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
+                VerticalAlignment = VerticalAlignment.Top,
+                Margin = new Thickness(0, 0, 12, 0),
+            };
+            ToolTipService.SetToolTip(
+                omschrijving,
+                Teksten.Van(this, "T_AiOmschrijvingTip", "Note on what this model is good at - for yourself, not used by the apps. Grows with more lines if needed."));
+
+            // Alleen ECHT bewaren als de tekst is veranderd sinds het veld
+            // zijn waarde kreeg - anders zou je door er even in te klikken en
+            // weer weg te klikken (zonder iets te wijzigen) de automatische
+            // suggestie alsnog vastzetten als jouw eigen notitie.
+            var basisTekst = omschrijving.Text;
+            omschrijving.LostFocus += async (_, _) =>
+            {
+                if (omschrijving.Text.Trim() == basisTekst.Trim())
+                {
+                    return;
+                }
+
+                basisTekst = omschrijving.Text;
+                await WijzigOmschrijvingAsync(model, omschrijving.Text);
+            };
+            Grid.SetColumn(omschrijving, 1);
+            rij.Children.Add(omschrijving);
+        }
+
+        var sterrenOpties = SterrenOpties();
+        var sterren = new ComboBox { ItemsSource = sterrenOpties, DisplayMemberPath = nameof(SterrenOptie.Label), Height = 34, VerticalAlignment = VerticalAlignment.Top, Margin = new Thickness(0, 0, 8, 0) };
+        sterren.SelectedItem = sterrenOpties.FirstOrDefault(optie => optie.Waarde == _settings.Active.SterrenVoor(model));
+        sterren.SelectionChanged += async (_, _) =>
+        {
+            if (_laden || !IsLoaded)
+            {
+                return;
+            }
+
+            await WijzigSterrenAsync(model, (sterren.SelectedItem as SterrenOptie)?.Waarde);
+        };
+        Grid.SetColumn(sterren, 2);
+        rij.Children.Add(sterren);
+
+        var denktijdOpties = DenktijdOpties();
+        var denktijd = new ComboBox { ItemsSource = denktijdOpties, DisplayMemberPath = nameof(DenktijdOptie.Label), Height = 34, VerticalAlignment = VerticalAlignment.Top };
+        denktijd.SelectedItem = denktijdOpties.FirstOrDefault(optie => optie.Seconden == _settings.Active.DenktijdVoor(model)) ?? denktijdOpties[0];
+        denktijd.SelectionChanged += async (_, _) =>
+        {
+            if (_laden || !IsLoaded)
+            {
+                return;
+            }
+
+            await WijzigDenktijdAsync(model, (denktijd.SelectedItem as DenktijdOptie)?.Seconden ?? 0);
+        };
+        Grid.SetColumn(denktijd, 3);
+        rij.Children.Add(denktijd);
+
+        return rij;
+    }
+
+    private async Task WijzigSterrenAsync(string model, int? waarde)
+    {
+        var huidig = _settings.Active;
+        var sterren = new Dictionary<string, int>(huidig.Sterren ?? new Dictionary<string, int>(), StringComparer.OrdinalIgnoreCase);
+
+        if (waarde is { } gezet)
+        {
+            sterren[model] = gezet;
+        }
+        else
+        {
+            sterren.Remove(model);
+        }
+
+        await ToepassenAsync(_settings.With(HuidigeProvider(), huidig with { Sterren = sterren }));
+        VerversModelkeuzelijsten();
+    }
+
+    private async Task WijzigDenktijdAsync(string model, int seconden)
+    {
+        var huidig = _settings.Active;
+        var denktijden = new Dictionary<string, int>(huidig.MaxDenktijdSeconden ?? new Dictionary<string, int>(), StringComparer.OrdinalIgnoreCase);
+
+        if (seconden > 0)
+        {
+            denktijden[model] = seconden;
+        }
+        else
+        {
+            denktijden.Remove(model);
+        }
+
+        await ToepassenAsync(_settings.With(HuidigeProvider(), huidig with { MaxDenktijdSeconden = denktijden }));
+    }
+
+    private async Task WijzigOmschrijvingAsync(string model, string tekst)
+    {
+        var huidig = _settings.Active;
+
+        if (string.Equals(huidig.OmschrijvingVoor(model), tekst.Trim(), StringComparison.Ordinal))
+        {
+            return;
+        }
+
+        var omschrijvingen = new Dictionary<string, string>(huidig.Omschrijvingen ?? new Dictionary<string, string>(), StringComparer.OrdinalIgnoreCase);
+
+        if (string.IsNullOrWhiteSpace(tekst))
+        {
+            omschrijvingen.Remove(model);
+        }
+        else
+        {
+            omschrijvingen[model] = tekst.Trim();
+        }
+
+        await ToepassenAsync(_settings.With(HuidigeProvider(), huidig with { Omschrijvingen = omschrijvingen }));
+    }
+
+    private AiProvider HuidigeProvider() => ProviderOllama.IsChecked == true ? AiProvider.Ollama : AiProvider.LmStudio;
+
+    /// <summary>
+    /// De sterren bij een modelnaam in de vijf rolkeuzelijsten (zie
+    /// ModelkeuzeTemplate) opnieuw laten kloppen na een wijziging in het
+    /// MODELLEN-blok - zonder dat blok zelf opnieuw op te bouwen, want dat
+    /// zou elke openstaande notitie zijn focus/cursor laten verliezen.
+    /// </summary>
+    private void VerversModelkeuzelijsten()
+    {
+        _laden = true;
+        try
+        {
+            HerbouwKeuzelijst(ChatModelPicker, _settings.Active.ChatModel);
+            HerbouwKeuzelijst(EmbedModelPicker, _settings.Active.EmbedModel);
+            HerbouwKeuzelijst(CodeModelPicker, _settings.Active.CodeModel);
+            HerbouwKeuzelijst(ControleModelPicker, _settings.Active.ControleModel);
+            HerbouwKeuzelijst(BeeldModelPicker, _settings.Active.BeeldModel);
+        }
+        finally
+        {
+            _laden = false;
+        }
+    }
+
     /// <summary>Stuurt de huidige stand van de kaart naar de broker.</summary>
     private async Task BewaarAsync()
     {
-        var provider = ProviderOllama.IsChecked == true ? AiProvider.Ollama : AiProvider.LmStudio;
+        var provider = HuidigeProvider();
 
         // Wat er op de kaart staat hoort bij de soort die NU gekozen is; de
         // andere soort blijft staan zoals hij stond, zodat heen en weer
-        // wisselen niets wist - niet het adres en niet de modellen.
-        var server = new AiServerSettings(
-            ServerUrlBox.Text,
-            Gekozen(ChatModelPicker),
-            Gekozen(EmbedModelPicker),
-            Gekozen(CodeModelPicker),
-            Gekozen(ControleModelPicker),
-            Gekozen(BeeldModelPicker));
+        // wisselen niets wist - niet het adres en niet de modellen. Sterren,
+        // denktijd en omschrijvingen staan al in _settings.Active en blijven
+        // dus ook automatisch staan - die komen hier niet aan bod.
+        var huidig = _settings.Active;
+        var server = huidig with
+        {
+            Url = ServerUrlBox.Text,
+            ChatModel = Gekozen(ChatModelPicker),
+            EmbedModel = Gekozen(EmbedModelPicker),
+            CodeModel = Gekozen(CodeModelPicker),
+            ControleModel = Gekozen(ControleModelPicker),
+            BeeldModel = Gekozen(BeeldModelPicker),
+        };
 
         await ToepassenAsync((_settings with { Provider = provider }).With(provider, server));
     }
@@ -379,128 +587,6 @@ public partial class Setting06 : UserControl
         }
 
         await BewaarAsync();
-
-        // Het net gekozen model kan een andere (of geen) handmatige
-        // beoordeling hebben dan het vorige - de combo's ernaast volgen mee.
-        _laden = true;
-        try
-        {
-            if (ReferenceEquals(sender, ChatModelPicker))
-            {
-                VulBeoordeling(ChatSterrenPicker, ChatDenktijdPicker, _settings.Active.ChatModel);
-            }
-            else if (ReferenceEquals(sender, CodeModelPicker))
-            {
-                VulBeoordeling(CodeSterrenPicker, CodeDenktijdPicker, _settings.Active.CodeModel);
-            }
-            else if (ReferenceEquals(sender, ControleModelPicker))
-            {
-                VulBeoordeling(ControleSterrenPicker, ControleDenktijdPicker, _settings.Active.ControleModel);
-            }
-            else if (ReferenceEquals(sender, BeeldModelPicker))
-            {
-                VulBeoordeling(BeeldSterrenPicker, BeeldDenktijdPicker, _settings.Active.BeeldModel);
-            }
-        }
-        finally
-        {
-            _laden = false;
-        }
-    }
-
-    /// <summary>
-    /// Sterren of denktijd van één model gewijzigd. Bouwt de bijgewerkte
-    /// dictionary voor de HUIDIGE serversoort (de andere modelrollen blijven
-    /// erin staan) en bewaart die.
-    /// </summary>
-    private async void Beoordeling_SelectionChanged(object sender, SelectionChangedEventArgs e)
-    {
-        if (_laden || !IsLoaded || sender is not ComboBox { Tag: string rol } combo)
-        {
-            return;
-        }
-
-        var (modelVan, sterrenPicker, denktijdPicker) = RolPickers(rol);
-        var model = modelVan();
-
-        if (string.IsNullOrWhiteSpace(model))
-        {
-            return;
-        }
-
-        var huidig = _settings.Active;
-        var sterren = new Dictionary<string, int>(huidig.Sterren ?? new Dictionary<string, int>(), StringComparer.OrdinalIgnoreCase);
-        var denktijden = new Dictionary<string, int>(huidig.MaxDenktijdSeconden ?? new Dictionary<string, int>(), StringComparer.OrdinalIgnoreCase);
-
-        if (ReferenceEquals(combo, sterrenPicker))
-        {
-            if ((combo.SelectedItem as SterrenOptie)?.Waarde is { } waarde)
-            {
-                sterren[model] = waarde;
-            }
-            else
-            {
-                sterren.Remove(model);
-            }
-        }
-        else if (ReferenceEquals(combo, denktijdPicker))
-        {
-            var seconden = (combo.SelectedItem as DenktijdOptie)?.Seconden ?? 0;
-
-            if (seconden > 0)
-            {
-                denktijden[model] = seconden;
-            }
-            else
-            {
-                denktijden.Remove(model);
-            }
-        }
-
-        var provider = ProviderOllama.IsChecked == true ? AiProvider.Ollama : AiProvider.LmStudio;
-        var server = huidig with { Sterren = sterren, MaxDenktijdSeconden = denktijden };
-
-        await ToepassenAsync(_settings.With(provider, server));
-
-        _laden = true;
-        try
-        {
-            // Twee rollen kunnen naar HETZELFDE model wijzen (bijvoorbeeld
-            // Daily chat en Afbeeldingen allebei op gemma3:12b) - sterren en
-            // denktijd horen bij de MODELNAAM, niet bij de rol, dus zo'n
-            // wijziging raakt dan ook de andere rol. Daarom hier altijd alle
-            // vijf keuzelijsten en alle vier sterren/denktijd-combo's
-            // verversen, niet alleen die van de rol waar je net in klikte -
-            // anders bleef een andere rol de oude waarde tonen totdat je het
-            // scherm opnieuw opende (leek dan alsof opslaan niet werkte).
-            HerbouwKeuzelijst(ChatModelPicker, _settings.Active.ChatModel);
-            HerbouwKeuzelijst(EmbedModelPicker, _settings.Active.EmbedModel);
-            HerbouwKeuzelijst(CodeModelPicker, _settings.Active.CodeModel);
-            HerbouwKeuzelijst(ControleModelPicker, _settings.Active.ControleModel);
-            HerbouwKeuzelijst(BeeldModelPicker, _settings.Active.BeeldModel);
-
-            VulBeoordeling(ChatSterrenPicker, ChatDenktijdPicker, _settings.Active.ChatModel);
-            VulBeoordeling(CodeSterrenPicker, CodeDenktijdPicker, _settings.Active.CodeModel);
-            VulBeoordeling(ControleSterrenPicker, ControleDenktijdPicker, _settings.Active.ControleModel);
-            VulBeoordeling(BeeldSterrenPicker, BeeldDenktijdPicker, _settings.Active.BeeldModel);
-        }
-        finally
-        {
-            _laden = false;
-        }
-    }
-
-    /// <summary>Bouwt de items van een modelkeuzelijst opnieuw op (na een sterrenwijziging) en houdt de keuze vast.</summary>
-    private void HerbouwKeuzelijst(ComboBox keuzelijst, string ingesteld)
-    {
-        if (keuzelijst.ItemsSource is not IEnumerable<Modelkeuze> huidige)
-        {
-            return;
-        }
-
-        var keuzes = huidige.Select(keuze => Modelkeuze.Van(keuze.Naam, SoortNaam, _settings.Active.SterrenVoor(keuze.Naam))).ToList();
-        keuzelijst.ItemsSource = keuzes;
-        keuzelijst.SelectedItem = keuzes.FirstOrDefault(keuze => string.Equals(keuze.Naam, ingesteld, StringComparison.OrdinalIgnoreCase));
     }
 
     private async void RefreshModels_Click(object sender, RoutedEventArgs e) => await VulModellenAsync();
