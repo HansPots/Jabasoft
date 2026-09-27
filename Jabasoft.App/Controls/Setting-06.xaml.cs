@@ -465,35 +465,24 @@ public partial class Setting06 : UserControl
         _laden = true;
         try
         {
-            if (string.Equals(rol, "Default", StringComparison.Ordinal))
-            {
-                // De standaard geldt voor ELK model dat zelf niets eigen
-                // heeft - dus alle vijf keuzelijsten en alle vier andere
-                // sterren/denktijd-combo's kunnen er nu anders uitzien.
-                HerbouwKeuzelijst(ChatModelPicker, _settings.Active.ChatModel);
-                HerbouwKeuzelijst(EmbedModelPicker, _settings.Active.EmbedModel);
-                HerbouwKeuzelijst(CodeModelPicker, _settings.Active.CodeModel);
-                HerbouwKeuzelijst(ControleModelPicker, _settings.Active.ControleModel);
-                HerbouwKeuzelijst(BeeldModelPicker, _settings.Active.BeeldModel);
+            // Twee rollen kunnen naar HETZELFDE model wijzen (bijvoorbeeld
+            // Daily chat en Afbeeldingen allebei op gemma3:12b) - sterren en
+            // denktijd horen bij de MODELNAAM, niet bij de rol, dus zo'n
+            // wijziging raakt dan ook de andere rol. Daarom hier altijd alle
+            // vijf keuzelijsten en alle vier sterren/denktijd-combo's
+            // verversen, niet alleen die van de rol waar je net in klikte -
+            // anders bleef een andere rol de oude waarde tonen totdat je het
+            // scherm opnieuw opende (leek dan alsof opslaan niet werkte).
+            HerbouwKeuzelijst(ChatModelPicker, _settings.Active.ChatModel);
+            HerbouwKeuzelijst(EmbedModelPicker, _settings.Active.EmbedModel);
+            HerbouwKeuzelijst(CodeModelPicker, _settings.Active.CodeModel);
+            HerbouwKeuzelijst(ControleModelPicker, _settings.Active.ControleModel);
+            HerbouwKeuzelijst(BeeldModelPicker, _settings.Active.BeeldModel);
 
-                VulBeoordeling(ChatSterrenPicker, ChatDenktijdPicker, _settings.Active.ChatModel);
-                VulBeoordeling(CodeSterrenPicker, CodeDenktijdPicker, _settings.Active.CodeModel);
-                VulBeoordeling(ControleSterrenPicker, ControleDenktijdPicker, _settings.Active.ControleModel);
-                VulBeoordeling(BeeldSterrenPicker, BeeldDenktijdPicker, _settings.Active.BeeldModel);
-            }
-            else
-            {
-                // De naam in de keuzelijst zelf toont de sterren (zie
-                // ModelkeuzeTemplate) - die lijst opnieuw opbouwen met de
-                // nieuwe stand, zonder alles te herladen.
-                HerbouwKeuzelijst(rol switch
-                {
-                    "Code" => CodeModelPicker,
-                    "Controle" => ControleModelPicker,
-                    "Beeld" => BeeldModelPicker,
-                    _ => ChatModelPicker,
-                }, model);
-            }
+            VulBeoordeling(ChatSterrenPicker, ChatDenktijdPicker, _settings.Active.ChatModel);
+            VulBeoordeling(CodeSterrenPicker, CodeDenktijdPicker, _settings.Active.CodeModel);
+            VulBeoordeling(ControleSterrenPicker, ControleDenktijdPicker, _settings.Active.ControleModel);
+            VulBeoordeling(BeeldSterrenPicker, BeeldDenktijdPicker, _settings.Active.BeeldModel);
         }
         finally
         {
