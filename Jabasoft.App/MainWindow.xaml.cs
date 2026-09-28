@@ -26,6 +26,9 @@ public partial class MainWindow : Window
     /// <summary>De naam in appsettings.json van de app die de AI Studio-knop start.</summary>
     private const string AiStudioAppName = "LocalAiStudio";
 
+    /// <summary>De naam in appsettings.json van de app die de Tab Studio-knop start.</summary>
+    private const string TabStudioAppName = "TabStudio";
+
     /// <summary>Gestarte processen per AppEntry.Name - zie StartOrFocusApp. Geen HasExited-polling nodig buiten wat hierin al gebeurt: elke klik checkt opnieuw.</summary>
     private readonly Dictionary<string, Process> _runningApps = [];
 
@@ -191,8 +194,8 @@ public partial class MainWindow : Window
 
     private void Navigate(NavigatiemenuItem item)
     {
-        // Stylebook en AI Studio zijn geen schermen van deze app maar eigen
-        // applicaties; de rest schakelt het inhoudsvak om. Jabasoft start
+        // Stylebook, AI Studio en Tab Studio zijn geen schermen van deze app
+        // maar eigen applicaties; de rest schakelt het inhoudsvak om. Jabasoft start
         // altijd op zijn eigen hoofdscherm (zie ShowContent(NavigatiemenuItem.Main)
         // in de constructor) en gaat nooit vanzelf door naar een applicatie -
         // dat gebeurt alleen als je er zelf op klikt.
@@ -203,6 +206,9 @@ public partial class MainWindow : Window
                 return;
             case NavigatiemenuItem.AiStudio:
                 GaNaarApp(AiStudioAppName);
+                return;
+            case NavigatiemenuItem.TabStudio:
+                GaNaarApp(TabStudioAppName);
                 return;
             default:
                 ShowContent(item);

@@ -15,6 +15,9 @@ public enum NavigatiemenuItem
     /// <summary>LocalAiStudio openen.</summary>
     AiStudio,
 
+    /// <summary>JabaSoft.TabStudio openen.</summary>
+    TabStudio,
+
     /// <summary>Het tokenverbruik van de AI-aanroepen.</summary>
     Tokens,
 
@@ -61,9 +64,9 @@ public partial class Navigatiemenu : UserControl
         get => _actief;
         set
         {
-            // Stylebook en AI Studio zijn andere applicaties: die blijven
-            // nooit als stand staan.
-            if (value is NavigatiemenuItem.Stylebook or NavigatiemenuItem.AiStudio || _actief == value)
+            // Stylebook, AI Studio en Tab Studio zijn andere applicaties: die
+            // blijven nooit als stand staan.
+            if (value is NavigatiemenuItem.Stylebook or NavigatiemenuItem.AiStudio or NavigatiemenuItem.TabStudio || _actief == value)
             {
                 return;
             }
@@ -89,10 +92,11 @@ public partial class Navigatiemenu : UserControl
         Zet(HealthButton, _actief == NavigatiemenuItem.Health);
         Zet(SettingsButton, _actief == NavigatiemenuItem.Settings);
 
-        // Stylebook en AI Studio starten een andere applicatie: dat zijn
-        // handelingen, geen bestemmingen - dus nooit gemarkeerd.
+        // Stylebook, AI Studio en Tab Studio starten een andere applicatie:
+        // dat zijn handelingen, geen bestemmingen - dus nooit gemarkeerd.
         Zet(StylebookButton, false);
         Zet(AiStudioButton, false);
+        Zet(TabStudioButton, false);
     }
 
     private static void Zet(Button knop, bool actief)
@@ -119,6 +123,7 @@ public partial class Navigatiemenu : UserControl
         {
             _ when ReferenceEquals(sender, StylebookButton) => NavigatiemenuItem.Stylebook,
             _ when ReferenceEquals(sender, AiStudioButton) => NavigatiemenuItem.AiStudio,
+            _ when ReferenceEquals(sender, TabStudioButton) => NavigatiemenuItem.TabStudio,
             _ when ReferenceEquals(sender, TokensButton) => NavigatiemenuItem.Tokens,
             _ when ReferenceEquals(sender, HealthButton) => NavigatiemenuItem.Health,
             _ when ReferenceEquals(sender, SettingsButton) => NavigatiemenuItem.Settings,
