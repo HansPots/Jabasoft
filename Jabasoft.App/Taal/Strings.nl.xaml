@@ -25,6 +25,7 @@
     <sys:String x:Key="T_MenuStylebook">Stylebook</sys:String>
     <sys:String x:Key="T_MenuAiStudio">AI Studio</sys:String>
     <sys:String x:Key="T_MenuTabStudio">Tab Studio</sys:String>
+    <sys:String x:Key="T_MenuImageFunn">ImageFunn</sys:String>
     <sys:String x:Key="T_MenuTokens">Tokens</sys:String>
     <sys:String x:Key="T_MenuHealth">Gezondheid</sys:String>
     <sys:String x:Key="T_MenuSettings">Instellingen</sys:String>

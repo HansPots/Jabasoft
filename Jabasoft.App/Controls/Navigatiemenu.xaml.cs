@@ -18,6 +18,9 @@ public enum NavigatiemenuItem
     /// <summary>JabaSoft.TabStudio openen.</summary>
     TabStudio,
 
+    /// <summary>JabaSoft.ImageFunn openen.</summary>
+    ImageFunn,
+
     /// <summary>Het tokenverbruik van de AI-aanroepen.</summary>
     Tokens,
 
@@ -64,9 +67,9 @@ public partial class Navigatiemenu : UserControl
         get => _actief;
         set
         {
-            // Stylebook, AI Studio en Tab Studio zijn andere applicaties: die
+            // Stylebook, AI Studio, Tab Studio en ImageFunn zijn andere applicaties: die
             // blijven nooit als stand staan.
-            if (value is NavigatiemenuItem.Stylebook or NavigatiemenuItem.AiStudio or NavigatiemenuItem.TabStudio || _actief == value)
+            if (value is NavigatiemenuItem.Stylebook or NavigatiemenuItem.AiStudio or NavigatiemenuItem.TabStudio or NavigatiemenuItem.ImageFunn || _actief == value)
             {
                 return;
             }
@@ -92,11 +95,12 @@ public partial class Navigatiemenu : UserControl
         Zet(HealthButton, _actief == NavigatiemenuItem.Health);
         Zet(SettingsButton, _actief == NavigatiemenuItem.Settings);
 
-        // Stylebook, AI Studio en Tab Studio starten een andere applicatie:
+        // Stylebook, AI Studio, Tab Studio en ImageFunn starten een andere applicatie:
         // dat zijn handelingen, geen bestemmingen - dus nooit gemarkeerd.
         Zet(StylebookButton, false);
         Zet(AiStudioButton, false);
         Zet(TabStudioButton, false);
+        Zet(ImageFunnButton, false);
     }
 
     private static void Zet(Button knop, bool actief)
@@ -124,6 +128,7 @@ public partial class Navigatiemenu : UserControl
             _ when ReferenceEquals(sender, StylebookButton) => NavigatiemenuItem.Stylebook,
             _ when ReferenceEquals(sender, AiStudioButton) => NavigatiemenuItem.AiStudio,
             _ when ReferenceEquals(sender, TabStudioButton) => NavigatiemenuItem.TabStudio,
+            _ when ReferenceEquals(sender, ImageFunnButton) => NavigatiemenuItem.ImageFunn,
             _ when ReferenceEquals(sender, TokensButton) => NavigatiemenuItem.Tokens,
             _ when ReferenceEquals(sender, HealthButton) => NavigatiemenuItem.Health,
             _ when ReferenceEquals(sender, SettingsButton) => NavigatiemenuItem.Settings,
