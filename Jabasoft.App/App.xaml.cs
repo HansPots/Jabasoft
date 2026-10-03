@@ -23,6 +23,15 @@ public partial class App : Application
 
         base.OnStartup(e);
 
+        // Diensten uit een eerdere sessie opruimen (de broker, de beeldservice, de audioservice), maar alleen
+        // als er geen andere app van de familie draait. De broker die hieronder vers start is dan ook echt
+        // nieuw, en een dienst met oude code blijft niet in gebruik.
+        var gestopt = Jabasoft.Base.FamilieServices.StopOudeDiensten();
+        if (gestopt.Count > 0)
+        {
+            Jabasoft.Base.Logging.ActivityLog.Shared.Add("app", $"Oude diensten gestopt: {string.Join(", ", gestopt)}");
+        }
+
         // Vóór het venster: taal, thema, lettertype, marges en ververstijd
         // staan dan meteen goed in plaats van dat je het scherm ziet
         // omklappen. Zie Layout/Preferences.
