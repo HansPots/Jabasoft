@@ -11,11 +11,10 @@ public partial class App : Application
 {
     protected override void OnStartup(StartupEventArgs e)
     {
-        // Draait deze app al, dan komt dat venster naar voren en stopt dit
-        // tweede exemplaar meteen weer - vóór er ook maar een venster van
-        // gemaakt is. Zonder dit zou een dubbelklik op de snelkoppeling terwijl
-        // de app al open staat een tweede, verwarrende instantie opleveren.
-        if (AppHandover.ActivateExistingInstance())
+        // Draait deze app al (of is hij net aan het opstarten), dan komt dat
+        // venster naar voren en stopt dit tweede exemplaar meteen weer - vóór
+        // er ook maar een venster van gemaakt is. Zie AppHandover.ClaimSingleInstance.
+        if (!AppHandover.ClaimSingleInstance("Jabasoft.App"))
         {
             Environment.Exit(0);
             return;
@@ -57,6 +56,10 @@ public partial class App : Application
     /// </summary>
     protected override void OnExit(ExitEventArgs e)
     {
+        // Als eerste: wie Jabasoft nu opnieuw start, krijgt meteen een nieuw
+        // exemplaar in plaats van te wachten tot het opruimen hieronder klaar is.
+        AppHandover.ReleaseSingleInstance();
+
         // Vangnet: staat er een applicatie van de familie verborgen omdat wij
         // het scherm van haar overgenomen hebben, dan komt ze nu terug. Zonder
         // dit zou ze onzichtbaar blijven draaien, zonder taakbalkknop en dus
