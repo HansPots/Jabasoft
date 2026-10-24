@@ -19,6 +19,11 @@
     </d:UserControl.Resources>
 
     <!--
+        AI-WACHTRIJ: wat er aan vragen bij de AI-broker loopt en wacht, uit
+        alle onderdelen samen. De tekst telt ze, het balkje toont de lopende
+        vraag; klik voor het lijstje met Annuleren (zie Footer-05.xaml.cs).
+    -->
+    <!--
         Footerpil 5 van 5: EMBEDDING QUEUE. Laatste pil, in het accentkleur en breder dan de andere: hij staat rechts en loopt tot de rand van de footer. De vulling staat op 0 (lege wachtrij) - de balk is dan alleen spoor.
 
         De vulling is GEEN vaste breedte maar een sterverhouding
@@ -32,7 +37,8 @@
         Jabasoft (Regions/Footer/Statusbalk), waar de vijf pillen samen de
         breedte verdelen. De HOOGTE blijft altijd 24.
     -->
-    <Border Height="24" CornerRadius="{DynamicResource RadiusLarge}"
+    <Border x:Name="Pil" Height="24" CornerRadius="{DynamicResource RadiusLarge}"
+            Cursor="Hand" MouseLeftButtonUp="Pil_Klik" ToolTip="Klik voor de wachtrij van de AI-broker"
             Background="{DynamicResource AccentBrush}"
             HorizontalAlignment="Stretch" VerticalAlignment="Center">
         <Grid Margin="12,0">
@@ -42,10 +48,10 @@
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
-            <TextBlock Grid.Column="0" Text="EMBEDDING QUEUE"
+            <TextBlock Grid.Column="0" Text="AI-WACHTRIJ"
                        FontSize="{DynamicResource FontSizeSmall}"
                        Foreground="{DynamicResource BackgroundBrush}" VerticalAlignment="Center" />
-            <TextBlock Grid.Column="1" x:Name="ValueText" Text="0 / 0" Margin="8,0,0,0"
+            <TextBlock Grid.Column="1" x:Name="ValueText" Text="" Margin="8,0,0,0"
                        FontSize="{DynamicResource FontSizeSmall}" FontWeight="SemiBold"
                        Foreground="{DynamicResource BackgroundBrush}" VerticalAlignment="Center" />
 
@@ -62,6 +68,22 @@
                 <Border Grid.Column="0" CornerRadius="{DynamicResource RadiusSmall}"
                         Background="{DynamicResource BackgroundBrush}" />
             </Grid>
+
+            <!-- Het lijstje met elke vraag apart en een knop om hem te
+                 annuleren - opent boven de pil als je erop klikt, en gaat
+                 dicht als je ergens anders klikt. Gevuld in code-behind. -->
+            <Popup x:Name="Lijstje" PlacementTarget="{Binding ElementName=Pil}" Placement="Top"
+                   StaysOpen="False" AllowsTransparency="True" VerticalOffset="-6">
+                <Border MinWidth="380" MaxWidth="560" Padding="16,12"
+                        CornerRadius="{DynamicResource RadiusMedium}" BorderThickness="2"
+                        Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource AccentBrush}">
+                    <StackPanel>
+                        <TextBlock Text="AI-WACHTRIJ" FontWeight="SemiBold"
+                                   FontSize="{DynamicResource FontSizeSmall}" Foreground="{DynamicResource AccentBrush}" />
+                        <StackPanel x:Name="Regels" Margin="0,4,0,0" />
+                    </StackPanel>
+                </Border>
+            </Popup>
         </Grid>
     </Border>
 
