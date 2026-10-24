@@ -2,6 +2,8 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:controls="clr-namespace:Jabasoft.App.Controls"
+             xmlns:aistudio="clr-namespace:LocalAiStudio.App.Controls;assembly=LocalAiStudio.App"
+             xmlns:imagefunn="clr-namespace:ImageFunn.App.Controls;assembly=ImageFunn.App"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              mc:Ignorable="d">
@@ -18,6 +20,18 @@
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </d:UserControl.Resources>
+
+    <UserControl.Resources>
+        <!-- Het kopje boven elk onderdeel. Groter dan de titel van een kaart
+             en in de accentkleur, zodat je bij het scrollen ziet waar het
+             volgende onderdeel begint. -->
+        <Style x:Key="SectiekopStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="24" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Foreground" Value="{DynamicResource AccentBrush}" />
+            <Setter Property="Margin" Value="4,24,0,8" />
+        </Style>
+    </UserControl.Resources>
 
     <!--
         Inhoud-regio component: Jabasoft.App's instellingenscherm - waar de
@@ -45,26 +59,43 @@
         verschijnen. Verticaal blijft hij op Auto, want meer kaarten dan er
         passen kan gewoon.
     -->
-    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-        <!-- Ook deze rand loopt mee met SPACING: op 0 sluiten de kaarten aan
-             tegen de rand van het inhoudsvak. -->
+    <!--
+        Het ENE instellingenscherm van de applicatie: alles staat hier, met
+        een kopje per onderdeel. AI Studio, TabStudio en ImageFunn hebben
+        geen eigen instellingenpagina meer; hun kaarten komen uit hun eigen
+        bibliotheek (ze bewaren in hun eigen voorkeuren) maar staan hier.
+        De Instellingen-knop in het menu van AI Studio komt hier uit, bij
+        het kopje AI Studio (zie ToonSectie).
+    -->
+    <ScrollViewer x:Name="Scroller" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
         <!-- Ruimte rechts, zodat de kaarten niet tegen de schuifbalk aan
              liggen. Volgt de SPACING-instelling, net als al het andere. -->
-        <StackPanel Margin="{DynamicResource RegionGapRightThickness}">
-            <!-- AI staat bovenaan: dit is de enige kaart die iets doet in
-                 plaats van iets toont, en de enige die voor alle
-                 applicaties tegelijk geldt. De rest eronder is opmaak van
-                 deze app. -->
-            <!-- Taal bovenaan: die bepaalt hoe de rest van dit scherm
-                 te lezen is. -->
+        <StackPanel x:Name="Kaarten" Margin="{DynamicResource RegionGapRightThickness}">
+
+            <!-- Algemeen: geldt voor de hele applicatie. Taal bovenaan: die
+                 bepaalt hoe de rest van dit scherm te lezen is. -->
+            <TextBlock x:Name="KopAlgemeen" Text="{DynamicResource T_SectieAlgemeen}" Style="{StaticResource SectiekopStyle}" Margin="4,0,0,8" />
             <controls:Setting07 Width="Auto" />
-            <controls:Setting06 x:Name="AiKaart" Width="Auto" Margin="{DynamicResource RegionGapTopThickness}" />
             <controls:Setting01 Width="Auto" Margin="{DynamicResource RegionGapTopThickness}" />
             <controls:Setting02 Width="Auto" Margin="{DynamicResource RegionGapTopThickness}" />
             <controls:Setting04 Width="Auto" Margin="{DynamicResource RegionGapTopThickness}" />
             <controls:Setting05 Width="Auto" Margin="{DynamicResource RegionGapTopThickness}" />
             <controls:Setting03 Width="Auto" Margin="{DynamicResource RegionGapTopThickness}" />
+
+            <!-- AI: server en modellen, gedeeld door AI Studio, ImageFunn en
+                 de broker. -->
+            <TextBlock x:Name="KopAi" Text="{DynamicResource T_SectieAi}" Style="{StaticResource SectiekopStyle}" />
+            <controls:Setting06 x:Name="AiKaart" Width="Auto" />
+
+            <TextBlock x:Name="KopAiStudio" Text="{DynamicResource T_SectieAiStudio}" Style="{StaticResource SectiekopStyle}" />
+            <aistudio:Settings />
+
+            <TextBlock x:Name="KopTabStudio" Text="{DynamicResource T_SectieTabStudio}" Style="{StaticResource SectiekopStyle}" />
+            <TextBlock Text="{DynamicResource T_SectieGeenInstellingen}" Margin="4,0,0,0"
+                       Foreground="{DynamicResource TextMutedBrush}" FontSize="{DynamicResource FontSizeBody}" />
+
+            <TextBlock x:Name="KopImageFunn" Text="{DynamicResource T_SectieImageFunn}" Style="{StaticResource SectiekopStyle}" />
+            <imagefunn:Beeldserviceinstellingen Margin="0,0,0,6" />
         </StackPanel>
     </ScrollViewer>
-
 </UserControl>

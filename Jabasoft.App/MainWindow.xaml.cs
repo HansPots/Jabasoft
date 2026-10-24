@@ -222,6 +222,7 @@ public partial class MainWindow : Window
                 {
                     var view = new LocalAiStudioView();
                     view.HomeRequested += (_, _) => ToonJabasoft();
+                    view.InstellingenRequested += (_, _) => ToonInstellingen(Regios.Inhoud.InstellingenSectie.AiStudio);
                     return view;
                 });
                 return;
@@ -318,6 +319,18 @@ public partial class MainWindow : Window
 
         Content = view;
         Title = $"Jabasoft - {naam}";
+    }
+
+    /// <summary>
+    /// Het ene instellingenscherm, open bij het kopje van <paramref name="sectie"/>.
+    /// Een onderdeel heeft geen eigen instellingenpagina: zijn
+    /// Instellingen-knop komt hier uit.
+    /// </summary>
+    private void ToonInstellingen(Regios.Inhoud.InstellingenSectie sectie)
+    {
+        ToonJabasoft();
+        ShowContent(NavigatiemenuItem.Settings);
+        _settingsView.Instellingen.ToonSectie(sectie);
     }
 
     /// <summary>Terug naar het eigen scherm van Jabasoft - de Home-knop van een onderdeel komt hier uit.</summary>

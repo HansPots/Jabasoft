@@ -138,4 +138,12 @@
     <sys:String x:Key="T_TokensOnderdeelLeeg">No usage per part to show yet.</sys:String>
     <sys:String x:Key="T_TokensOnderdeelOnderschrift">Tokens per part, last {0} days - {1} in total</sys:String>
     <sys:String x:Key="T_TokensOnderdeelWaardeFormaat">{0} tokens · {1} calls · {2:0}%</sys:String>
+
+    <!-- Kopjes op het instellingenscherm, een per onderdeel. -->
+    <sys:String x:Key="T_SectieAlgemeen">General</sys:String>
+    <sys:String x:Key="T_SectieAi">AI</sys:String>
+    <sys:String x:Key="T_SectieAiStudio">AI Studio</sys:String>
+    <sys:String x:Key="T_SectieTabStudio">TabStudio</sys:String>
+    <sys:String x:Key="T_SectieImageFunn">ImageFunn</sys:String>
+    <sys:String x:Key="T_SectieGeenInstellingen">No settings of its own yet.</sys:String>
 </ResourceDictionary>
