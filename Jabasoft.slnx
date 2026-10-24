@@ -1,3 +1,26 @@
 <Solution>
-  <Project Path="Jabasoft.App/Jabasoft.App.csproj" />
+  <Folder Name="/Jabasoft/">
+    <Project Path="Jabasoft.App/Jabasoft.App.csproj" />
+  </Folder>
+  <Folder Name="/LocalAiStudio/">
+    <Project Path="../JabaSoft.LocalAiStudio/LocalAiStudio.App/LocalAiStudio.App.csproj" />
+  </Folder>
+  <Folder Name="/TabStudio/">
+    <Project Path="../JabaSoft.TabStudio/TabStudio.App/TabStudio.App.csproj" />
+  </Folder>
+  <Folder Name="/ImageFunn/">
+    <Project Path="../JabaSoft.ImageFunn/ImageFunn.App/ImageFunn.App.csproj" />
+  </Folder>
+  <Folder Name="/Jabasoft.Base/">
+    <Project Path="../Jabasoft.Base/Jabasoft.Base.csproj" />
+    <Project Path="../Jabasoft.Base/Jabasoft.Ai.Data/Jabasoft.Ai.Data.csproj" />
+  </Folder>
+  <Folder Name="/Jabasoft.Broker/">
+    <Project Path="../Jabasoft.Broker/Jabasoft.Broker.csproj" />
+  </Folder>
+  <Folder Name="/Jabasoft.Stylebook/">
+    <Project Path="../Jabasoft.Stylebook/Stylebook.Components/Stylebook.Components.csproj" />
+    <Project Path="../Jabasoft.Stylebook/Stylebook.Data/Stylebook.Data.csproj" />
+    <Project Path="../Jabasoft.Stylebook/Stylebook.Playground/Stylebook.Playground.csproj" />
+  </Folder>
 </Solution>
