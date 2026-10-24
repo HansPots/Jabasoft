@@ -142,6 +142,9 @@
     <sys:String x:Key="T_OllamaContext">context {0}</sys:String>
     <sys:String x:Key="T_OllamaLaatstUit">wordt uitgeladen</sys:String>
     <sys:String x:Key="T_OllamaNogFormaat">gaat eruit over {0}</sys:String>
+    <sys:String x:Key="T_LmStudioTitel">LM STUDIO</sys:String>
+    <sys:String x:Key="T_LmStudioStatusFormaat">Draait · {0} · {1} model(len) beschikbaar · {2} geladen</sys:String>
+    <sys:String x:Key="T_LmStudioContextFormaat">context {0} / {1}</sys:String>
     <sys:String x:Key="T_TokensKopOnderdeel">onderdeel</sys:String>
     <sys:String x:Key="T_TokensOnderdeelTitel">GEBRUIK PER ONDERDEEL</sys:String>
     <sys:String x:Key="T_TokensOnderdeelLeeg">Nog geen verbruik per onderdeel om te tonen.</sys:String>

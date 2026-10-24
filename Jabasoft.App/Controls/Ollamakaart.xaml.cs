@@ -13,11 +13,16 @@ namespace Jabasoft.App.Controls;
 /// <summary>
 /// Interaction logic for Ollamakaart.xaml - see that file for what it looks like.
 ///
-/// Vraagt Ollama zelf (niet de broker) wat het nu doet: /api/version voor de
-/// versie, /api/ps voor de modellen die in het geheugen staan. Het adres komt
-/// uit de AI-instelling bij de broker. Ververst elke paar seconden zolang de
-/// kaart in beeld is; een server die niet antwoordt is geen fout van dit
-/// scherm, alleen een melding op de kaart.
+/// Vraagt de AI-server zelf (niet de broker) wat hij nu doet. WELKE server
+/// volgt de AI-instelling bij de broker: staat die op LM Studio, dan gaat het
+/// over LM Studio, anders over Ollama. Omdat de instelling bij elke ronde
+/// opnieuw opgehaald wordt, schakelt de kaart vanzelf mee.
+///
+/// Ollama: /api/version voor de versie, /api/ps voor de modellen in het
+/// geheugen. LM Studio: /api/v0/models, waarin elk model zegt of het geladen
+/// is. Ververst elke paar seconden zolang de kaart in beeld is; een server
+/// die niet antwoordt is geen fout van dit scherm, alleen een melding op de
+/// kaart.
 /// </summary>
 public partial class Ollamakaart : UserControl
 {
@@ -63,6 +68,15 @@ public partial class Ollamakaart : UserControl
         try
         {
             var instelling = await _broker.GetSettingsAsync(CancellationToken.None);
+
+            if (instelling.Settings.Provider == AiProvider.LmStudio)
+            {
+                Titel.SetResourceReference(TextBlock.TextProperty, "T_LmStudioTitel");
+                await VernieuwLmStudioAsync(instelling.Settings.LmStudio.Url.TrimEnd('/'));
+                return;
+            }
+
+            Titel.SetResourceReference(TextBlock.TextProperty, "T_OllamaTitel");
             var url = instelling.Settings.Ollama.Url.TrimEnd('/');
 
             string versie;
@@ -113,6 +127,74 @@ public partial class Ollamakaart : UserControl
         finally
         {
             _bezig = false;
+        }
+    }
+
+    /// <summary>
+    /// LM Studio: één aanroep, /api/v0/models. Daarin staat elk model dat op
+    /// schijf staat, met "state": "loaded" voor wat er nu in het geheugen zit.
+    /// Een versie en het geheugengebruik geeft LM Studio daar niet - die
+    /// staan er dus ook niet op.
+    /// </summary>
+    private async Task VernieuwLmStudioAsync(string url)
+    {
+        List<JsonElement> modellen;
+
+        try
+        {
+            using var doc = JsonDocument.Parse(await Http.GetStringAsync($"{url}/api/v0/models"));
+            modellen = doc.RootElement.TryGetProperty("data", out var lijst)
+                ? lijst.EnumerateArray().Select(model => model.Clone()).ToList()
+                : [];
+        }
+        catch (Exception fout) when (fout is HttpRequestException or TaskCanceledException or JsonException)
+        {
+            Bolletje.Fill = Kleur("HealthErrorBrush", Brushes.Red);
+            StatusText.Text = Teksten.Vul(this, "T_OllamaNietBereikbaar", "Not reachable at {0}", url);
+            Modellen.Children.Clear();
+            return;
+        }
+
+        string Tekst(JsonElement model, string naam) =>
+            model.TryGetProperty(naam, out var e) && e.ValueKind == JsonValueKind.String ? e.GetString() ?? string.Empty : string.Empty;
+        long Getal(JsonElement model, string naam) =>
+            model.TryGetProperty(naam, out var e) && e.ValueKind == JsonValueKind.Number ? e.GetInt64() : 0;
+
+        var geladen = modellen.Where(model => Tekst(model, "state") == "loaded").ToList();
+
+        Bolletje.Fill = Kleur("HealthOkBrush", Brushes.LimeGreen);
+        StatusText.Text = Teksten.Vul(
+            this,
+            "T_LmStudioStatusFormaat",
+            "Running · {0} · {1} model(s) available · {2} loaded",
+            url,
+            modellen.Count,
+            geladen.Count);
+
+        Modellen.Children.Clear();
+
+        if (geladen.Count == 0)
+        {
+            Modellen.Children.Add(Regel(Teksten.Van(this, "T_OllamaGeenModel", "No model in memory right now."), gedempt: true));
+            return;
+        }
+
+        foreach (var model in geladen)
+        {
+            // Bijvoorbeeld: text-embedding-bge-m3 — embeddings · Q8_0 · context 2048 / 8192
+            var delen = new List<string> { Tekst(model, "type"), Tekst(model, "quantization") };
+
+            var context = Getal(model, "loaded_context_length");
+            var maximaal = Getal(model, "max_context_length");
+            if (context > 0)
+            {
+                delen.Add(maximaal > context
+                    ? Teksten.Vul(this, "T_LmStudioContextFormaat", "context {0} / {1}", context, maximaal)
+                    : Teksten.Vul(this, "T_OllamaContext", "context {0}", context));
+            }
+
+            var beschrijving = string.Join(" · ", delen.Where(deel => deel.Length > 0));
+            Modellen.Children.Add(Regel($"{Tekst(model, "id")} — {beschrijving}", gedempt: false));
         }
     }
 

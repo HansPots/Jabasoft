@@ -19,11 +19,14 @@
     </d:UserControl.Resources>
 
     <!--
-        Wat Ollama nu doet: of de server draait (en welke versie), en welke
-        modellen er op dit moment in het geheugen staan, met hoeveel geheugen
-        ze gebruiken, of ze op de GPU of CPU draaien, en hoe lang ze nog
-        blijven staan. Komt rechtstreeks van Ollama zelf (/api/version en
-        /api/ps) en ververst zolang dit scherm in beeld is.
+        Wat de AI-server nu doet - Ollama of LM Studio, wat er in de
+        AI-instellingen gekozen is. Of de server draait, en welke modellen er
+        op dit moment in het geheugen staan. Bij Ollama ook de versie, hoeveel
+        geheugen elk model gebruikt, GPU of CPU en hoe lang het nog blijft
+        staan (/api/version en /api/ps); LM Studio geeft per geladen model
+        het soort, de quantisatie en de context (/api/v0/models). Ververst
+        zolang dit scherm in beeld is, en schakelt dus vanzelf mee als je een
+        andere server kiest.
 
         Zelfde kaartopmaak als de gezondheidskaarten erboven.
     -->
@@ -42,7 +45,7 @@
                      Fill="{DynamicResource HealthBusyBrush}" />
 
             <StackPanel Grid.Column="1">
-                <TextBlock Text="{DynamicResource T_OllamaTitel}"
+                <TextBlock x:Name="Titel" Text="{DynamicResource T_OllamaTitel}"
                            FontSize="{DynamicResource FontSizeTitle}" FontWeight="SemiBold"
                            Foreground="{DynamicResource Text01Brush}" />
                 <TextBlock x:Name="StatusText" Text="" Margin="0,4,0,0" TextWrapping="Wrap"

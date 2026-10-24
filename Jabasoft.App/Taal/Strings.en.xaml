@@ -133,6 +133,9 @@
     <sys:String x:Key="T_OllamaContext">context {0}</sys:String>
     <sys:String x:Key="T_OllamaLaatstUit">unloading</sys:String>
     <sys:String x:Key="T_OllamaNogFormaat">unloads in {0}</sys:String>
+    <sys:String x:Key="T_LmStudioTitel">LM STUDIO</sys:String>
+    <sys:String x:Key="T_LmStudioStatusFormaat">Running · {0} · {1} model(s) available · {2} loaded</sys:String>
+    <sys:String x:Key="T_LmStudioContextFormaat">context {0} / {1}</sys:String>
     <sys:String x:Key="T_TokensKopOnderdeel">part</sys:String>
     <sys:String x:Key="T_TokensOnderdeelTitel">USAGE PER PART</sys:String>
     <sys:String x:Key="T_TokensOnderdeelLeeg">No usage per part to show yet.</sys:String>
