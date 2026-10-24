@@ -36,9 +36,15 @@ public partial class App : Application
         // omklappen. Zie Layout/Preferences.
         Layout.Preferences.Apply(this);
 
-        // Fire-and-forget, niet afgewacht: Jabasoft roept zelf nooit de AI
-        // aan, alleen de apps die je er straks vanuit start doen dat - de
-        // launcher-lijst hoeft niet te wachten tot de broker (die tot 45s
+        // AI Studio heeft zijn eigen schermteksten (een eigen Taal/-map in
+        // zijn bibliotheek). Die staan naast de onze in Application.Resources
+        // en volgen dezelfde taalkeuze: er is één TAAL-kaart voor de hele
+        // applicatie.
+        LocalAiStudio.App.LocalAiStudioModule.ZetTaal(Taal.LanguageManager.Current == Taal.AppLanguage.English, Resources);
+        Taal.LanguageManager.Changed += (_, _) =>
+            LocalAiStudio.App.LocalAiStudioModule.ZetTaal(Taal.LanguageManager.Current == Taal.AppLanguage.English, Resources);
+
+        // Fire-and-forget, niet afgewacht: het venster hoeft niet te wachten tot de broker (die tot 45s
         // kan duren als 'm nog moet opstarten) bereikbaar is. Elke methode
         // hierin vangt zijn eigen fouten al af, dus hier is geen try/catch
         // nodig.
@@ -65,6 +71,12 @@ public partial class App : Application
         // dit zou ze onzichtbaar blijven draaien, zonder taakbalkknop en dus
         // zonder weg terug.
         AppHandover.RevealHidden();
+
+        // De onderdelen die in dit venster draaien (zie MainWindow) ruimen
+        // hun eigen diensten op - alleen wat ze zelf gestart hebben.
+        LocalAiStudio.App.LocalAiStudioModule.Stop();
+        TabStudio.App.TabStudioModule.Stop();
+        ImageFunn.App.ImageFunnModule.Stop();
 
         AiBrokerProcessLauncher.StopIfUnused();
 

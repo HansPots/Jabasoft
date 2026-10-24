@@ -12,13 +12,13 @@ public enum NavigatiemenuItem
     /// <summary>De Stylebook-applicatie openen.</summary>
     Stylebook,
 
-    /// <summary>LocalAiStudio openen.</summary>
+    /// <summary>LocalAiStudio openen - in hetzelfde venster, met zijn eigen menu.</summary>
     AiStudio,
 
-    /// <summary>JabaSoft.TabStudio openen.</summary>
+    /// <summary>JabaSoft.TabStudio openen - in hetzelfde venster, met zijn eigen menu.</summary>
     TabStudio,
 
-    /// <summary>JabaSoft.ImageFunn openen.</summary>
+    /// <summary>JabaSoft.ImageFunn openen - in hetzelfde venster, met zijn eigen menu.</summary>
     ImageFunn,
 
     /// <summary>Het tokenverbruik van de AI-aanroepen.</summary>
@@ -67,7 +67,8 @@ public partial class Navigatiemenu : UserControl
         get => _actief;
         set
         {
-            // Stylebook, AI Studio, Tab Studio en ImageFunn zijn andere applicaties: die
+            // Stylebook is een andere applicatie, en AI Studio, Tab Studio en
+            // ImageFunn vervangen het hele scherm door hun eigen menu: die
             // blijven nooit als stand staan.
             if (value is NavigatiemenuItem.Stylebook or NavigatiemenuItem.AiStudio or NavigatiemenuItem.TabStudio or NavigatiemenuItem.ImageFunn || _actief == value)
             {
@@ -95,8 +96,9 @@ public partial class Navigatiemenu : UserControl
         Zet(HealthButton, _actief == NavigatiemenuItem.Health);
         Zet(SettingsButton, _actief == NavigatiemenuItem.Settings);
 
-        // Stylebook, AI Studio, Tab Studio en ImageFunn starten een andere applicatie:
-        // dat zijn handelingen, geen bestemmingen - dus nooit gemarkeerd.
+        // Stylebook start een andere applicatie, en AI Studio, Tab Studio en
+        // ImageFunn nemen het hele scherm over met hun eigen menu: dat zijn
+        // handelingen, geen bestemmingen van dit menu - dus nooit gemarkeerd.
         Zet(StylebookButton, false);
         Zet(AiStudioButton, false);
         Zet(TabStudioButton, false);

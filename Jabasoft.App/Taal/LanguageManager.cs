@@ -42,6 +42,13 @@ public static class LanguageManager
     /// </summary>
     public static event EventHandler? Changed;
 
+    /// <summary>
+    /// De taal die nu op het scherm staat. Voor wie bij <see cref="Changed"/>
+    /// wil weten WELKE taal het geworden is - zoals de teksten van AI Studio,
+    /// die in dezelfde applicatie meeschakelen (zie App.xaml.cs).
+    /// </summary>
+    public static AppLanguage Current { get; private set; } = AppLanguage.Nederlands;
+
     /// <summary>De bestandsnaam per taal - kort, zoals het in settings.json terechtkomt.</summary>
     private static string Bestandsdeel(AppLanguage taal) => taal == AppLanguage.English ? "en" : "nl";
 
@@ -54,10 +61,12 @@ public static class LanguageManager
             Source = new Uri($"{TaalPackPrefix}Strings.{Bestandsdeel(taal)}.xaml", UriKind.Absolute),
         };
 
+        Current = taal;
+
         var merged = target.MergedDictionaries;
         for (var i = 0; i < merged.Count; i++)
         {
-            if (merged[i].Source?.OriginalString.Contains(TaalMapPath, StringComparison.OrdinalIgnoreCase) == true)
+            if (IsEigenWoordenboek(merged[i]))
             {
                 merged[i] = vervanger;
                 Changed?.Invoke(null, EventArgs.Empty);
@@ -70,5 +79,18 @@ public static class LanguageManager
         // ontwerpweergave) ook aan zijn teksten komen.
         merged.Add(vervanger);
         Changed?.Invoke(null, EventArgs.Empty);
+    }
+
+    /// <summary>
+    /// Is dit het taalwoordenboek van Jabasoft zelf? Naast het onze staat dat
+    /// van AI Studio ("pack://application:,,,/LocalAiStudio.App;component/Taal/...")
+    /// - ook een map Taal/, maar uit een andere bibliotheek. Dat laten we staan.
+    /// </summary>
+    private static bool IsEigenWoordenboek(ResourceDictionary woordenboek)
+    {
+        var bron = woordenboek.Source?.OriginalString;
+        return bron is not null
+            && bron.Contains(TaalMapPath, StringComparison.OrdinalIgnoreCase)
+            && !bron.Contains(";component/", StringComparison.OrdinalIgnoreCase);
     }
 }

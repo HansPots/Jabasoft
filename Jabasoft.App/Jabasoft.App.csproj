@@ -19,7 +19,7 @@
          niet kan afwijken van wat er werkelijk draait. Het exe-bestand
          draagt het hierdoor ook: te zien in de eigenschappen van het
          bestand en in een foutmelding. -->
-    <Version>0.1.0.114</Version>
+    <Version>0.1.0.115</Version>
   </PropertyGroup>
 
   <ItemGroup>
@@ -35,6 +35,15 @@
          zodat Stylebook (en straks TabStudio/LocalAiStudio) 'm al
          draaiend aantreffen. -->
     <ProjectReference Include="..\..\Jabasoft.Base\Jabasoft.Base.csproj" />
+
+    <!-- De onderdelen die in het venster van Jabasoft draaien: elk levert
+         zijn complete scherm (header, eigen menu, inhoud, footer) als
+         UserControl, en MainWindow wisselt daartussen. Eén applicatie, één
+         proces, één venster - in plaats van losse exe's die elkaars venster
+         overnamen. -->
+    <ProjectReference Include="..\..\JabaSoft.LocalAiStudio\LocalAiStudio.App\LocalAiStudio.App.csproj" />
+    <ProjectReference Include="..\..\JabaSoft.TabStudio\TabStudio.App\TabStudio.App.csproj" />
+    <ProjectReference Include="..\..\JabaSoft.ImageFunn\ImageFunn.App\ImageFunn.App.csproj" />
   </ItemGroup>
 
   <ItemGroup>

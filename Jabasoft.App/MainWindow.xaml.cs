@@ -11,6 +11,9 @@ using Jabasoft.Base;
 using Jabasoft.Base.AiBroker;
 using Jabasoft.Base.Health;
 using Jabasoft.Base.Logging;
+using ImageFunn.App;
+using LocalAiStudio.App;
+using TabStudio.App;
 using InhoudSchermen = Jabasoft.App.Regios.Inhoud;
 
 namespace Jabasoft.App;
@@ -22,13 +25,6 @@ public partial class MainWindow : Window
 {
     /// <summary>De naam in appsettings.json van de app die de Stylebook-knop start.</summary>
     private const string StylebookAppName = "Stylebook";
-
-    /// <summary>De naam in appsettings.json van de app die de AI Studio-knop start.</summary>
-    private const string AiStudioAppName = "LocalAiStudio";
-
-    /// <summary>De naam in appsettings.json van de app die de Tab Studio-knop start.</summary>
-    private const string TabStudioAppName = "TabStudio";
-    private const string ImageFunnAppName = "ImageFunn";
 
     /// <summary>Gestarte processen per AppEntry.Name - zie StartOrFocusApp. Geen HasExited-polling nodig buiten wat hierin al gebeurt: elke klik checkt opnieuw.</summary>
     private readonly Dictionary<string, Process> _runningApps = [];
@@ -45,6 +41,19 @@ public partial class MainWindow : Window
 
     /// <summary>Het gezondheidsoverzicht. Kijkt mee met dezelfde monitor als de pil in de footer.</summary>
     private readonly InhoudSchermen.Health _health = new();
+
+    /// <summary>
+    /// De onderdelen die in DIT venster draaien: elk is een complete
+    /// paginaschil met zijn eigen header, menu en footer. Pas gemaakt als je
+    /// er voor het eerst op klikt (dan starten ook hun diensten, zie
+    /// OpenOnderdeel), en daarna hergebruikt - net als de schermen hierboven
+    /// blijft wat je erin deed staan als je even terug naar Jabasoft gaat.
+    /// </summary>
+    private LocalAiStudioView? _aiStudio;
+
+    private TabStudioView? _tabStudio;
+
+    private ImageFunnView? _imageFunn;
 
     /// <summary>De bewaking van deze app. Eén per applicatie: de pil en het gezondheidsscherm kijken allebei hiernaar.</summary>
     private HealthMonitor? _monitor;
@@ -195,24 +204,42 @@ public partial class MainWindow : Window
 
     private void Navigate(NavigatiemenuItem item)
     {
-        // Stylebook, AI Studio, Tab Studio en ImageFunn zijn geen schermen van deze app
-        // maar eigen applicaties; de rest schakelt het inhoudsvak om. Jabasoft start
-        // altijd op zijn eigen hoofdscherm (zie ShowContent(NavigatiemenuItem.Main)
-        // in de constructor) en gaat nooit vanzelf door naar een applicatie -
-        // dat gebeurt alleen als je er zelf op klikt.
+        // AI Studio, Tab Studio en ImageFunn vervangen het HELE scherm (met hun
+        // eigen menu) door dat van het onderdeel - in dit zelfde venster. Hun
+        // Home-knop brengt je hier terug. Stylebook is het ontwerpgereedschap
+        // en blijft een eigen applicatie. De rest schakelt het inhoudsvak om.
+        // Jabasoft start altijd op zijn eigen hoofdscherm (zie
+        // ShowContent(NavigatiemenuItem.Main) in de constructor) en gaat nooit
+        // vanzelf door naar een onderdeel - dat gebeurt alleen als je er zelf
+        // op klikt.
         switch (item)
         {
             case NavigatiemenuItem.Stylebook:
                 StartApp(StylebookAppName);
                 return;
             case NavigatiemenuItem.AiStudio:
-                GaNaarApp(AiStudioAppName);
+                OpenOnderdeel(ref _aiStudio, "AI Studio", LocalAiStudioModule.Start, () =>
+                {
+                    var view = new LocalAiStudioView();
+                    view.HomeRequested += (_, _) => ToonJabasoft();
+                    return view;
+                });
                 return;
             case NavigatiemenuItem.TabStudio:
-                GaNaarApp(TabStudioAppName);
+                OpenOnderdeel(ref _tabStudio, "TabStudio", TabStudioModule.Start, () =>
+                {
+                    var view = new TabStudioView();
+                    view.HomeRequested += (_, _) => ToonJabasoft();
+                    return view;
+                });
                 return;
             case NavigatiemenuItem.ImageFunn:
-                GaNaarApp(ImageFunnAppName);
+                OpenOnderdeel(ref _imageFunn, "ImageFunn", ImageFunnModule.Start, () =>
+                {
+                    var view = new ImageFunnView();
+                    view.HomeRequested += (_, _) => ToonJabasoft();
+                    return view;
+                });
                 return;
             default:
                 ShowContent(item);
@@ -264,31 +291,40 @@ public partial class MainWindow : Window
     }
 
     /// <summary>
-    /// Geeft het scherm over aan een andere applicatie van de familie: die
-    /// komt op DEZELFDE plek en grootte te staan, en dit venster verdwijnt
-    /// van het scherm. Zo voelt het als één venster dat van inhoud wisselt.
+    /// Zet een onderdeel in dit venster: zijn complete paginaschil komt in
+    /// de plaats van die van Jabasoft. De eerste keer wordt het onderdeel
+    /// gemaakt en starten zijn diensten (<paramref name="start"/>); daarna
+    /// komt hetzelfde exemplaar terug, met alles erin zoals je het liet.
     ///
-    /// Lukt het overgeven niet, dan blijft alles staan zoals het stond - je
+    /// Lukt het maken niet, dan blijft Jabasoft staan zoals het stond - je
     /// blijft dus nooit met een leeg scherm achter.
     /// </summary>
-    private void GaNaarApp(string naam)
+    private void OpenOnderdeel<T>(ref T? view, string naam, Action start, Func<T> maak)
+        where T : UserControl
     {
-        if (_apps.FirstOrDefault(app => app.Name == naam) is not { Available: true } doel)
+        if (view is null)
         {
-            ActivityLog.Shared.Add("app", $"{naam} staat niet (of niet als beschikbaar) in appsettings.json.");
-            return;
+            try
+            {
+                start();
+                view = maak();
+            }
+            catch (Exception fout)
+            {
+                ActivityLog.Shared.Add("app", $"{naam} kon niet geopend worden: {fout.Message}");
+                return;
+            }
         }
 
-        // De venstermaat nog even bewaren: de andere applicatie neemt hem
-        // over, en zo staat hij ook in onze eigen voorkeuren als we straks
-        // weer tevoorschijn komen.
-        Layout.Preferences.BewaarVenster(this);
+        Content = view;
+        Title = $"Jabasoft - {naam}";
+    }
 
-        var handvat = new System.Windows.Interop.WindowInteropHelper(this).Handle;
-        if (!AppHandover.SwitchTo(doel.ExecutablePath, handvat))
-        {
-            ActivityLog.Shared.Add("app", $"{naam} kon niet geopend worden - het venster is niet gevonden.");
-        }
+    /// <summary>Terug naar het eigen scherm van Jabasoft - de Home-knop van een onderdeel komt hier uit.</summary>
+    private void ToonJabasoft()
+    {
+        Content = AppShell;
+        Title = "Jabasoft";
     }
 
     private void StartApp(string naam)

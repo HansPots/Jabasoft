@@ -6,16 +6,16 @@ vanwaaruit je de andere JabaSoft-apps start.
 ## Architectuur
 
 Herbouwd op de uniforme WPF-stack (zie `Jabasoft.Stylebook`'s
-geschiedenis voor waarom). `Jabasoft.App` is een losse WPF-executable,
-geen webhost, geen embedding: een klik op een geregistreerde app start
-die app's eigen `.exe` als apart proces/venster. Draait die al, dan
-komt het bestaande venster naar voren in plaats van een tweede
-exemplaar te starten.
+geschiedenis voor waarom). `Jabasoft.App` is één WPF-applicatie met één
+venster. AI Studio (`JabaSoft.LocalAiStudio`), TabStudio en ImageFunn zijn
+bibliotheken waar Jabasoft naar verwijst: een klik in het menu zet de
+complete paginaschil van dat onderdeel (eigen header, eigen menu, eigen
+footer) in hetzelfde venster, en de Home-knop van het onderdeel zet het
+scherm van Jabasoft terug. Een onderdeel wordt bij de eerste klik gemaakt
+(en start dan zijn Python-service) en daarna hergebruikt.
 
-De lijst met apps staat in `appsettings.json` (`Apps[]`: `Name`,
-`DisplayName`, `ExecutablePath`, `Available`). Een app met
-`Available: false` staat zichtbaar maar niet-klikbaar in het menu -
-"nog niet herbouwd" op de nieuwe stack.
+Alleen Stylebook (het ontwerpgereedschap) is nog een eigen programma; het
+pad staat in `appsettings.json` (`Apps[]`).
 
 Styling komt van `Jabasoft.Stylebook/Stylebook.Components` (gedeelde
 `{DynamicResource}`-tokens/`Theme.xaml`), zodat Jabasoft er visueel
