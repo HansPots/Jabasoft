@@ -84,7 +84,8 @@ public partial class MainWindow : Window
 
         BuildMenu();
         WireActionRail();
-        ShowContent(NavigatiemenuItem.Main);
+        // Opstarten op Gezondheid: dat is altijd de eerste controle.
+        ShowContent(NavigatiemenuItem.Health);
         StartActivityLog();
         StartHealthCheck();
 
