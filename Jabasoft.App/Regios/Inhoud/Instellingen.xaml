@@ -87,6 +87,11 @@
             <TextBlock x:Name="KopAi" Text="{DynamicResource T_SectieAi}" Style="{StaticResource SectiekopStyle}" />
             <controls:Setting06 x:Name="AiKaart" Width="Auto" />
 
+            <!-- Hermes Agent: de instellingen die Jabasoft in Hermes beheert
+                 (via de broker, in Hermes' eigen config.yaml). -->
+            <TextBlock x:Name="KopHermes" Text="{DynamicResource T_SectieHermes}" Style="{StaticResource SectiekopStyle}" />
+            <controls:Setting08 Width="Auto" />
+
             <TextBlock x:Name="KopAiStudio" Text="{DynamicResource T_SectieAiStudio}" Style="{StaticResource SectiekopStyle}" />
             <aistudio:Settings />
 

@@ -149,4 +149,33 @@
     <sys:String x:Key="T_SectieTabStudio">TabStudio</sys:String>
     <sys:String x:Key="T_SectieImageFunn">ImageFunn</sys:String>
     <sys:String x:Key="T_SectieGeenInstellingen">No settings of its own yet.</sys:String>
+    <sys:String x:Key="T_SectieHermes">Hermes</sys:String>
+
+    <!-- Kaart Hermes (Setting-08). -->
+    <sys:String x:Key="T_HermesTitel">Hermes Agent</sys:String>
+    <sys:String x:Key="T_HermesProvider">Main model via</sys:String>
+    <sys:String x:Key="T_HermesModel">Model</sys:String>
+    <sys:String x:Key="T_HermesSleutel">API key</sys:String>
+    <sys:String x:Key="T_HermesLokaalGroep">Local</sys:String>
+    <sys:String x:Key="T_HermesLokaalModel">Model for side tasks and as fallback</sys:String>
+    <sys:String x:Key="T_HermesMcp">Jabasoft tools (MCP)</sys:String>
+    <sys:String x:Key="T_HermesAan">On</sys:String>
+    <sys:String x:Key="T_HermesUit">Off</sys:String>
+    <sys:String x:Key="T_HermesOpen">Open Hermes</sys:String>
+    <sys:String x:Key="T_HermesNietGeinstalleerd">Hermes Agent is not installed on this machine.</sys:String>
+    <sys:String x:Key="T_HermesStatusFormaat">Installed · gateway {0} · {1}</sys:String>
+    <sys:String x:Key="T_HermesDraait">running</sys:String>
+    <sys:String x:Key="T_HermesDraaitNiet">not running</sys:String>
+    <sys:String x:Key="T_HermesSleutelIngesteld">Set (in Hermes)</sys:String>
+    <sys:String x:Key="T_HermesSleutelOntbreekt">Missing - enter it in Hermes itself</sys:String>
+    <sys:String x:Key="T_HermesSleutelNietNodig">Not needed (local)</sys:String>
+    <sys:String x:Key="T_HermesSleutelOnbekend">Unknown</sys:String>
+    <sys:String x:Key="T_HermesLokaalGeen">None - Hermes uses its main model for everything</sys:String>
+    <sys:String x:Key="T_HermesContextFormaat">{0:N0} tokens context</sys:String>
+    <sys:String x:Key="T_HermesContextTeKleinFormaat">{0:N0} tokens context - too small for Hermes (min. 64,000)</sys:String>
+    <sys:String x:Key="T_HermesNietOpServer">not on LM Studio</sys:String>
+    <sys:String x:Key="T_HermesLokaalUitlegFormaat">For summarising, images (if the model can read them) and as a fallback when the main model is unavailable. Via {0} - load the model there with at least 64,000 tokens context.</sys:String>
+    <sys:String x:Key="T_HermesGeenModel">Choose or type a model first.</sys:String>
+    <sys:String x:Key="T_HermesBewaard">Saved - restart Hermes to use it.</sys:String>
+    <sys:String x:Key="T_HermesOpenFoutFormaat">Could not open Hermes: {0}</sys:String>
 </ResourceDictionary>

@@ -1,0 +1,182 @@
+<UserControl x:Class="Jabasoft.App.Controls.Setting08"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d" Width="1568">
+
+    <!-- Design-time-only: thema-context voor de Designer (zie Setting-06.xaml). -->
+    <d:UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/Stylebook.Components;component/Styles/Theme.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/Stylebook.Components;component/Styles/Themes/Lcars.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </d:UserControl.Resources>
+
+    <UserControl.Resources>
+        <!-- Pilknop voor een keuze uit een paar: dezelfde als de serverkeuze op
+             de AI-kaart (Setting-06.xaml). Een eigen kopie om dezelfde reden
+             als daar: het Stylebook levert deze (nog) niet. -->
+        <Style x:Key="KeuzeStyle" TargetType="RadioButton">
+            <Setter Property="Height" Value="34" />
+            <Setter Property="FontSize" Value="{DynamicResource FontSizeSmall}" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Foreground" Value="{DynamicResource Text01Brush}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="RadioButton">
+                        <Border x:Name="Bd" CornerRadius="{DynamicResource RadiusMedium}" BorderThickness="2" Padding="14,0"
+                                Background="{DynamicResource BackgroundBrush}"
+                                BorderBrush="{DynamicResource BorderBrush}">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <Ellipse x:Name="Dot" Width="9" Height="9"
+                                         Fill="{DynamicResource Text01Brush}" VerticalAlignment="Center" />
+                                <ContentPresenter Margin="9,0,0,0" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+                                <Setter TargetName="Dot" Property="Fill" Value="{DynamicResource AccentBrush}" />
+                                <Setter Property="Foreground" Value="{DynamicResource AccentBrush}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Eén regel in de keuzelijst met lokale modellen: naam, dan de
+             context. Te weinig context (onder 64.000) in de gedempte kleur
+             met een waarschuwing - Hermes weigert zo'n model. -->
+        <DataTemplate x:Key="LokaalModelTemplate">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="{Binding Naam}" VerticalAlignment="Center" />
+                <TextBlock Text="{Binding Info}" Margin="12,0,0,0" VerticalAlignment="Center"
+                           FontSize="{DynamicResource FontSizeSmall}"
+                           Foreground="{DynamicResource TextMutedBrush}" />
+            </StackPanel>
+        </DataTemplate>
+    </UserControl.Resources>
+
+    <!--
+        Instellingenkaart Hermes: de instellingen van Hermes Agent die
+        Jabasoft beheert. Net als de AI-kaart staat de waarde NIET in deze
+        applicatie: de broker schrijft hem in Hermes' eigen config.yaml (zie
+        Jabasoft.Broker/HermesConfigStore.cs). Alleen het hoofdmodel, het
+        lokale model voor bijtaken en reserve, en de Jabasoft-tools (MCP) -
+        de rest (chatkanalen, persoonlijkheid, skills) blijft in Hermes zelf,
+        en de API-sleutel ook: hier zie je alleen OF hij er is.
+
+        Hermes leest zijn config bij het opstarten: een wijziging hier geldt
+        pas na een herstart van Hermes - dat staat ook onderaan de kaart.
+
+        Zelfde breedte (1568) en kaartopmaak als de AI-kaart.
+    -->
+    <Border MinWidth="480" CornerRadius="{DynamicResource RadiusMedium}" BorderThickness="2"
+            Background="{DynamicResource SurfaceBrush}"
+            BorderBrush="{DynamicResource BorderBrush}"
+            HorizontalAlignment="Stretch" VerticalAlignment="Top">
+        <StackPanel Margin="20,16">
+            <TextBlock Text="{DynamicResource T_HermesTitel}" FontSize="{DynamicResource FontSizeTitle}" FontWeight="SemiBold"
+                       Foreground="{DynamicResource Text01Brush}" />
+
+            <!-- Status: geïnstalleerd, gateway, map - één regel. -->
+            <TextBlock x:Name="StatusRegel" Margin="0,8,0,0" TextWrapping="Wrap"
+                       AutomationProperties.AutomationId="HermesStatusRegel"
+                       FontSize="{DynamicResource FontSizeSmall}"
+                       Foreground="{DynamicResource TextMutedBrush}" />
+
+            <!-- Hoofdmodel: provider en model naast elkaar. -->
+            <TextBlock Text="{DynamicResource T_HermesProvider}" Margin="0,16,0,4" FontSize="{DynamicResource FontSizeSmall}"
+                       Foreground="{DynamicResource TextMutedBrush}" />
+            <StackPanel Orientation="Horizontal">
+                <RadioButton x:Name="ProviderAnthropic" Content="Anthropic" Tag="anthropic" GroupName="HermesProvider"
+                             AutomationProperties.AutomationId="HermesProviderAnthropic"
+                             Checked="Provider_Checked" Style="{DynamicResource KeuzeStyle}" />
+                <RadioButton x:Name="ProviderOpenRouter" Content="OpenRouter" Tag="openrouter" GroupName="HermesProvider" Margin="8,0,0,0"
+                             AutomationProperties.AutomationId="HermesProviderOpenRouter"
+                             Checked="Provider_Checked" Style="{DynamicResource KeuzeStyle}" />
+                <RadioButton x:Name="ProviderNous" Content="Nous Portal" Tag="nous" GroupName="HermesProvider" Margin="8,0,0,0"
+                             AutomationProperties.AutomationId="HermesProviderNous"
+                             Checked="Provider_Checked" Style="{DynamicResource KeuzeStyle}" />
+                <RadioButton x:Name="ProviderLmStudio" Content="LM Studio" Tag="lmstudio" GroupName="HermesProvider" Margin="8,0,0,0"
+                             AutomationProperties.AutomationId="HermesProviderLmStudio"
+                             Checked="Provider_Checked" Style="{DynamicResource KeuzeStyle}" />
+            </StackPanel>
+
+            <Grid Margin="0,16,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="16" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <!-- Bewerkbaar: een cloudprovider heeft honderden modellen,
+                     de lijst geeft alleen suggesties - een eigen naam typen
+                     mag. Bewaren bij wegklikken of Enter. -->
+                <StackPanel Grid.Column="0">
+                    <TextBlock Text="{DynamicResource T_HermesModel}" Margin="0,0,0,4" FontSize="{DynamicResource FontSizeSmall}"
+                               Foreground="{DynamicResource TextMutedBrush}" />
+                    <ComboBox x:Name="ModelPicker" Height="34" IsEditable="True"
+                              AutomationProperties.AutomationId="HermesModel"
+                              SelectionChanged="Model_SelectionChanged"
+                              LostKeyboardFocus="Model_LostKeyboardFocus" KeyDown="Model_KeyDown" />
+                </StackPanel>
+
+                <StackPanel Grid.Column="2">
+                    <TextBlock Text="{DynamicResource T_HermesSleutel}" Margin="0,0,0,4" FontSize="{DynamicResource FontSizeSmall}"
+                               Foreground="{DynamicResource TextMutedBrush}" />
+                    <TextBlock x:Name="SleutelTekst" Height="34" Padding="0,8,0,0"
+                               AutomationProperties.AutomationId="HermesSleutel"
+                               Foreground="{DynamicResource TextPrimaryBrush}" />
+                </StackPanel>
+            </Grid>
+
+            <!-- Lokaal model: bijtaken (samenvatten, beelden) en reserve als
+                 het hoofdmodel niet bereikbaar is. Leeg = uit. -->
+            <TextBlock Text="{DynamicResource T_HermesLokaalGroep}" Margin="0,16,0,4" FontSize="{DynamicResource FontSizeSmall}"
+                       FontWeight="SemiBold" Foreground="{DynamicResource TextMutedBrush}" />
+            <Border BorderBrush="{DynamicResource BorderBrush}" BorderThickness="2" CornerRadius="{DynamicResource RadiusMedium}" Padding="12">
+                <StackPanel>
+                    <TextBlock Text="{DynamicResource T_HermesLokaalModel}" Margin="0,0,0,4" FontSize="{DynamicResource FontSizeSmall}"
+                               Foreground="{DynamicResource TextMutedBrush}" />
+                    <ComboBox x:Name="LokaalModelPicker" Height="34" ItemTemplate="{StaticResource LokaalModelTemplate}"
+                              AutomationProperties.AutomationId="HermesLokaalModel"
+                              SelectionChanged="LokaalModel_SelectionChanged" />
+                    <TextBlock x:Name="LokaalUitleg" Margin="0,6,0,0" TextWrapping="Wrap"
+                               FontSize="{DynamicResource FontSizeSmall}"
+                               Foreground="{DynamicResource TextMutedBrush}" />
+                </StackPanel>
+            </Border>
+
+            <!-- Jabasoft-tools: de MCP-server van de broker aan of uit. -->
+            <TextBlock Text="{DynamicResource T_HermesMcp}" Margin="0,16,0,4" FontSize="{DynamicResource FontSizeSmall}"
+                       Foreground="{DynamicResource TextMutedBrush}" />
+            <StackPanel Orientation="Horizontal">
+                <RadioButton x:Name="McpAan" Content="{DynamicResource T_HermesAan}" GroupName="HermesMcp"
+                             AutomationProperties.AutomationId="HermesMcpAan"
+                             Checked="Mcp_Checked" Style="{DynamicResource KeuzeStyle}" />
+                <RadioButton x:Name="McpUit" Content="{DynamicResource T_HermesUit}" GroupName="HermesMcp" Margin="8,0,0,0"
+                             AutomationProperties.AutomationId="HermesMcpUit"
+                             Checked="Mcp_Checked" Style="{DynamicResource KeuzeStyle}" />
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" Margin="0,16,0,0">
+                <Button x:Name="OpenHermesButton" Content="{DynamicResource T_HermesOpen}"
+                        AutomationProperties.AutomationId="HermesOpen"
+                        Click="OpenHermes_Click" Style="{DynamicResource AccentButtonStyle}" />
+                <Button x:Name="VernieuwButton" Content="{DynamicResource T_AiVernieuwen}" Margin="8,0,0,0"
+                        AutomationProperties.AutomationId="HermesVernieuwen"
+                        Click="Vernieuw_Click" Style="{DynamicResource AccentButtonStyle}" />
+                <TextBlock x:Name="MeldingTekst" Margin="14,0,0,0" VerticalAlignment="Center" TextWrapping="Wrap"
+                           AutomationProperties.AutomationId="HermesMelding"
+                           FontSize="{DynamicResource FontSizeSmall}"
+                           Foreground="{DynamicResource TextMutedBrush}" />
+            </StackPanel>
+        </StackPanel>
+    </Border>
+
+</UserControl>
