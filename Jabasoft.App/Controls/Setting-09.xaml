@@ -18,12 +18,25 @@
     <UserControl.Resources>
         <!-- Eén regel in de keuzelijst: naam, dan context en waar het model
              voor bedoeld is - net als het lokale model op de Hermes-kaart. -->
+        <!-- De tekst neemt de kleur van de keuzelijst over, zodat hij op de
+             oranje balk leesbaar is; het groen/geel-blokje (groen = samen
+             vastgesteld, geel = eigen favoriet, voor Goose) heeft een eigen
+             donkere achtergrond. -->
+        <BooleanToVisibilityConverter x:Key="ZichtbaarAls" />
         <DataTemplate x:Key="GooseModelTemplate">
             <StackPanel Orientation="Horizontal">
+                <Border Background="#E6141414" CornerRadius="3" Padding="3,0" Margin="0,0,8,0" VerticalAlignment="Center"
+                        Visibility="{Binding HeeftSter, Converter={StaticResource ZichtbaarAls}}">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="★" Foreground="#3FB950" Visibility="{Binding Groen, Converter={StaticResource ZichtbaarAls}}" />
+                        <TextBlock Text="★" Foreground="#E3B341" Visibility="{Binding Geel, Converter={StaticResource ZichtbaarAls}}" />
+                    </StackPanel>
+                </Border>
                 <TextBlock Text="{Binding Naam}" VerticalAlignment="Center" />
-                <TextBlock Text="{Binding Info}" Margin="12,0,0,0" VerticalAlignment="Center"
-                           FontSize="{DynamicResource FontSizeSmall}"
-                           Foreground="{DynamicResource TextMutedBrush}" />
+                <TextBlock Text="{Binding Kwaliteit}" Margin="12,0,0,0" VerticalAlignment="Center"
+                           ToolTip="{DynamicResource T_AiSterrenTip}" />
+                <TextBlock Text="{Binding Info}" Margin="12,0,0,0" VerticalAlignment="Center" Opacity="0.75"
+                           FontSize="{DynamicResource FontSizeSmall}" />
             </StackPanel>
         </DataTemplate>
     </UserControl.Resources>

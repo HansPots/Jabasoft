@@ -37,9 +37,6 @@ public partial class Setting08 : UserControl
     /// <summary>Aan terwijl de kaart zichzelf invult - dan mag niets een opslag uitlokken (zie Setting06._laden).</summary>
     private bool _laden;
 
-    /// <summary>Eén keuze in de lijst met lokale modellen. Leeg <see cref="Naam"/> = geen lokaal model.</summary>
-    private sealed record LokaalKeuze(string Naam, string Info);
-
     public Setting08()
     {
         InitializeComponent();
@@ -139,19 +136,19 @@ public partial class Setting08 : UserControl
     /// <summary>De suggesties in de modellijst, per provider. Typen mag altijd - dit zijn alleen de voor de hand liggende.</summary>
     private void VulModelSuggesties(string provider)
     {
-        string[] suggesties = provider switch
+        List<ModelRegel> suggesties = provider switch
         {
-            "anthropic" => ["claude-sonnet-5-5", "claude-opus-5-5", "claude-haiku-5-5", "claude-fable-5-1"],
-            "openrouter" => ["anthropic/claude-sonnet-5-5", "anthropic/claude-opus-5-5", "anthropic/claude-haiku-5-5"],
+            "anthropic" => [.. new[] { "claude-sonnet-5-5", "claude-opus-5-5", "claude-haiku-5-5", "claude-fable-5-1" }.Select(naam => new ModelRegel(naam, string.Empty))],
+            "openrouter" => [.. new[] { "anthropic/claude-sonnet-5-5", "anthropic/claude-opus-5-5", "anthropic/claude-haiku-5-5" }.Select(naam => new ModelRegel(naam, string.Empty))],
             // Alleen wat Hermes als hoofdmodel kan gebruiken: genoeg context en geschikt als agent (zie
-            // Modelkeuze.Taken.Agent) - beste eerst. Een eigen naam typen mag nog steeds.
+            // Modelkeuze.Taken.Agent) - onze keuze voor Hermes eerst, dan de beste. Een eigen naam typen mag nog steeds.
             "lmstudio" => [.. _status.LokaleModellen
                 .Where(model => model.MaxContext >= HermesStatus.MinimaleContext && Keuze(model).Taken.Agent >= 3)
                 .Where(model => Tonen(model.Naam, _status.Model))
-                .OrderByDescending(model => Aanbevelingen.Voor(model.Naam).Count > 0)
+                .OrderByDescending(model => Aanbevelingen.Voor(model.Naam, Onderdelen.Hermes).Count > 0)
                 .ThenByDescending(model => Keuze(model).Taken.Agent)
                 .ThenBy(model => model.Naam, StringComparer.OrdinalIgnoreCase)
-                .Select(model => model.Naam)],
+                .Select(model => Regel(model, Teksten.Vul(this, "T_HermesContextFormaat", "{0:N0} tokens context", model.MaxContext)))],
             _ => [],
         };
 
@@ -165,15 +162,15 @@ public partial class Setting08 : UserControl
     /// </summary>
     private void VulLokaleModellen(bool alleenBeelden)
     {
-        var keuzes = new List<LokaalKeuze>
+        var keuzes = new List<ModelRegel>
         {
             new(string.Empty, alleenBeelden
                 ? Teksten.Van(this, "T_HermesVisionGeen", "None — the main model reads images itself (if it can)")
                 : Teksten.Van(this, "T_HermesLokaalGeen", "None — Hermes uses its main model for everything")),
         };
 
-        keuzes.AddRange(_status.LokaleModellen.Where(model => (!alleenBeelden || model.KanBeelden) && Tonen(model.Naam, _status.LokaalModel)).Select(model => new LokaalKeuze(
-            model.Naam,
+        keuzes.AddRange(_status.LokaleModellen.Where(model => (!alleenBeelden || model.KanBeelden) && Tonen(model.Naam, _status.LokaalModel)).Select(model => Regel(
+            model,
             MetDoel(model, model.MaxContext >= HermesStatus.MinimaleContext
                 ? Teksten.Vul(this, "T_HermesContextFormaat", "{0:N0} tokens context", model.MaxContext)
                 : Teksten.Vul(this, "T_HermesContextTeKleinFormaat", "{0:N0} tokens context — too small for Hermes (min. 64,000)", model.MaxContext)))));
@@ -186,7 +183,7 @@ public partial class Setting08 : UserControl
             keuzes.All(keuze => !string.Equals(keuze.Naam, _status.LokaalModel, StringComparison.OrdinalIgnoreCase)) &&
             _status.LokaleModellen.All(model => !string.Equals(model.Naam, _status.LokaalModel, StringComparison.OrdinalIgnoreCase)))
         {
-            keuzes.Insert(1, new LokaalKeuze(_status.LokaalModel, Teksten.Van(this, "T_HermesNietOpServer", "not on LM Studio")));
+            keuzes.Insert(1, new ModelRegel(_status.LokaalModel, Teksten.Van(this, "T_HermesNietOpServer", "not on LM Studio")));
         }
 
         LokaalModelPicker.ItemsSource = keuzes;
@@ -199,6 +196,14 @@ public partial class Setting08 : UserControl
                 "T_HermesLokaalUitlegFormaat",
                 "For summarising, images (if the model can read them) and as a fallback when the main model is unavailable. Via {0} — load the model there with at least 64,000 tokens context.",
                 _status.LokaalServerUrl);
+    }
+
+    /// <summary>Een regel in een keuzelijst: met kwaliteitssterren en de groene/gele ster voor Hermes.</summary>
+    private ModelRegel Regel(HermesLokaalModel model, string info)
+    {
+        var (groen, geel) = Onderdeelsterren.Voor(model.Naam, _lmStudio, Onderdelen.Hermes);
+        var kwaliteit = Modelteksten.Keuze(this, model.Naam, _lmStudio?.SterrenVoor(model.Naam), model.KanBeelden, model.MaxContext).SterrenTekst;
+        return new ModelRegel(model.Naam, info, kwaliteit, groen, geel);
     }
 
     /// <summary>De inschatting van een LM Studio-model, met wat LM Studio zelf weet (context, beelden).</summary>
@@ -303,7 +308,7 @@ public partial class Setting08 : UserControl
         var instelling = new HermesInstelling(
             GekozenProvider(),
             ModelPicker.Text.Trim(),
-            (LokaalModelPicker.SelectedItem as LokaalKeuze)?.Naam ?? string.Empty,
+            (LokaalModelPicker.SelectedItem as ModelRegel)?.Naam ?? string.Empty,
             McpAan.IsChecked == true,
             GekozenGrens());
 
@@ -347,7 +352,7 @@ public partial class Setting08 : UserControl
         try
         {
             VulModelSuggesties(provider);
-            var suggesties = ModelPicker.ItemsSource as IEnumerable<string> ?? [];
+            var suggesties = (ModelPicker.ItemsSource as IEnumerable<ModelRegel> ?? []).Select(regel => regel.Naam).ToList();
             if (!suggesties.Contains(ModelPicker.Text, StringComparer.OrdinalIgnoreCase))
             {
                 ModelPicker.Text = suggesties.FirstOrDefault() ?? string.Empty;
@@ -365,7 +370,7 @@ public partial class Setting08 : UserControl
 
     private async void Model_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        if (_laden || !IsLoaded || ModelPicker.SelectedItem is not string gekozen)
+        if (_laden || !IsLoaded || ModelPicker.SelectedItem is not ModelRegel { Naam: var gekozen })
         {
             return;
         }

@@ -65,6 +65,23 @@ public sealed partial class Modelkeuze
     /// <summary>De sterren als tekst, bijvoorbeeld ★★★★☆.</summary>
     public string SterrenTekst => new string('★', Sterren) + new string('☆', 5 - Sterren);
 
+    /// <summary>Groene ster in een keuzelijst: samen vastgesteld voor het onderdeel van die lijst (zie Onderdeelsterren).</summary>
+    public bool Groen { get; private set; }
+
+    /// <summary>Gele ster in een keuzelijst: eigen favoriet voor het onderdeel van die lijst.</summary>
+    public bool Geel { get; private set; }
+
+    /// <summary>Is er een groene of gele ster? Dan toont de keuzelijst het sterrenblokje.</summary>
+    public bool HeeftSter => Groen || Geel;
+
+    /// <summary>Zet de groene en gele ster (per keuzelijst anders, dus niet in <see cref="Van"/>).</summary>
+    public Modelkeuze MetOnderdeelSterren((bool Groen, bool Geel) sterren)
+    {
+        Groen = sterren.Groen;
+        Geel = sterren.Geel;
+        return this;
+    }
+
     /// <summary>De grootte als tekst ("14B"), of leeg als de naam er niets over zegt.</summary>
     public string Grootte => MiljardenParameters is { } miljarden
         ? miljarden.ToString("0.#", CultureInfo.InvariantCulture) + "B"

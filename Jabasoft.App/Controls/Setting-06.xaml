@@ -91,19 +91,30 @@
         <!-- Eén regel in een modelkeuzelijst: naam, dan grootte · soort, dan de sterren.
              De sterren/denktijd zelf stel je niet hier in, maar onderaan de kaart in het
              blok MODELLEN (zie Setting-06.xaml.cs) - dit is alleen de weergave. -->
+        <!-- De tekst neemt de kleur van de keuzelijst over (geen eigen
+             Foreground): zo is hij leesbaar op de oranje balk én in de
+             uitgeklapte lijst. Het groen/geel-blokje heeft een eigen donkere
+             achtergrond, anders verdwijnt geel op oranje. Groen = samen
+             vastgesteld, geel = eigen favoriet (voor LocalAiStudio/ImageFunn,
+             zie Onderdeelsterren). -->
+        <BooleanToVisibilityConverter x:Key="ZichtbaarAls" />
         <DataTemplate x:Key="ModelkeuzeTemplate">
             <StackPanel Orientation="Horizontal">
+                <Border Background="#E6141414" CornerRadius="3" Padding="3,0" Margin="0,0,8,0" VerticalAlignment="Center"
+                        Visibility="{Binding HeeftSter, Converter={StaticResource ZichtbaarAls}}">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="★" Foreground="#3FB950" Visibility="{Binding Groen, Converter={StaticResource ZichtbaarAls}}" />
+                        <TextBlock Text="★" Foreground="#E3B341" Visibility="{Binding Geel, Converter={StaticResource ZichtbaarAls}}" />
+                    </StackPanel>
+                </Border>
                 <TextBlock Text="{Binding Naam}" VerticalAlignment="Center" />
-                <TextBlock Text="{Binding Info}" Margin="12,0,0,0" VerticalAlignment="Center"
-                           FontSize="{DynamicResource FontSizeSmall}"
-                           Foreground="{DynamicResource TextMutedBrush}" />
+                <TextBlock Text="{Binding Info}" Margin="12,0,0,0" VerticalAlignment="Center" Opacity="0.75"
+                           FontSize="{DynamicResource FontSizeSmall}" />
                 <TextBlock Text="{Binding SterrenTekst}" Margin="12,0,0,0" VerticalAlignment="Center"
-                           Foreground="{DynamicResource AccentBrush}"
                            ToolTip="{DynamicResource T_AiSterrenTip}" />
                 <!-- Waar het model voor bedoeld is (zie Modelkeuze.BedoeldVoor). -->
-                <TextBlock Text="{Binding DoelTekst}" Margin="12,0,0,0" VerticalAlignment="Center"
+                <TextBlock Text="{Binding DoelTekst}" Margin="12,0,0,0" VerticalAlignment="Center" Opacity="0.75"
                            FontSize="{DynamicResource FontSizeSmall}"
-                           Foreground="{DynamicResource TextPrimaryBrush}"
                            ToolTip="{DynamicResource T_AiDoelTip}" />
             </StackPanel>
         </DataTemplate>

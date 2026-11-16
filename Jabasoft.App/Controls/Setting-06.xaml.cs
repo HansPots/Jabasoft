@@ -202,11 +202,19 @@ public partial class Setting06 : UserControl
             items.Insert(0, ingesteld);
         }
 
-        var keuzes = items.Select(naam => Modelteksten.Keuze(this, naam, _settings.Active.SterrenVoor(naam))).ToList();
+        var keuzes = items.Select(naam => Keuze(naam)).ToList();
 
         keuzelijst.ItemsSource = keuzes;
         keuzelijst.SelectedItem = keuzes.FirstOrDefault(keuze => string.Equals(keuze.Naam, ingesteld, StringComparison.OrdinalIgnoreCase));
     }
+
+    /// <summary>
+    /// Eén regel in een rolkeuzelijst: kwaliteitssterren, en de groene/gele ster voor de apps die deze rollen
+    /// gebruiken (LocalAiStudio en ImageFunn).
+    /// </summary>
+    private Modelkeuze Keuze(string naam) =>
+        Modelteksten.Keuze(this, naam, _settings.Active.SterrenVoor(naam))
+            .MetOnderdeelSterren(Onderdeelsterren.Voor(naam, _settings.Active, Onderdelen.LocalAiStudio, Onderdelen.ImageFunn));
 
     /// <summary>Bouwt de items van een modelkeuzelijst opnieuw op (na een sterrenwijziging elders) en houdt de keuze vast.</summary>
     private void HerbouwKeuzelijst(ComboBox keuzelijst, string ingesteld)
@@ -216,7 +224,7 @@ public partial class Setting06 : UserControl
             return;
         }
 
-        var keuzes = huidige.Select(keuze => Modelteksten.Keuze(this, keuze.Naam, _settings.Active.SterrenVoor(keuze.Naam))).ToList();
+        var keuzes = huidige.Select(keuze => Keuze(keuze.Naam)).ToList();
         keuzelijst.ItemsSource = keuzes;
         keuzelijst.SelectedItem = keuzes.FirstOrDefault(keuze => string.Equals(keuze.Naam, ingesteld, StringComparison.OrdinalIgnoreCase));
     }

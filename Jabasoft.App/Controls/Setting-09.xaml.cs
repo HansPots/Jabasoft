@@ -29,9 +29,6 @@ public partial class Setting09 : UserControl
     /// <summary>Aan terwijl de kaart zichzelf invult - dan mag niets een opslag uitlokken (zie Setting06._laden).</summary>
     private bool _laden;
 
-    /// <summary>Eén keuze in de modellijst.</summary>
-    private sealed record GooseKeuze(string Naam, string Info);
-
     public Setting09()
     {
         InitializeComponent();
@@ -115,23 +112,31 @@ public partial class Setting09 : UserControl
             .Where(model => model.MaxContext >= HermesStatus.MinimaleContext && Keuze(model).Taken.Agent >= 3)
             // Op "niet tonen" in de modeltabel: weg, behalve het model dat Goose nu gebruikt (dat komt hieronder terug).
             .Where(model => _lmStudio?.IsVerborgen(model.Naam) != true || string.Equals(model.Naam, _status.Model, StringComparison.OrdinalIgnoreCase))
-            .OrderByDescending(model => Aanbevelingen.Voor(model.Naam).Count > 0)
+            .OrderByDescending(model => Aanbevelingen.Voor(model.Naam, Onderdelen.Goose).Count > 0)
             .ThenByDescending(model => Keuze(model).Taken.Agent)
             .ThenBy(model => model.Naam, StringComparer.OrdinalIgnoreCase)
-            .Select(model => new GooseKeuze(model.Naam, Info(model)))
+            .Select(model => Regel(model))
             .ToList();
 
         var actiefJabasoft = string.Equals(_status.Provider, "jabasoft", StringComparison.OrdinalIgnoreCase);
         if (actiefJabasoft && _status.Model.Length > 0 &&
             keuzes.All(keuze => !string.Equals(keuze.Naam, _status.Model, StringComparison.OrdinalIgnoreCase)))
         {
-            keuzes.Insert(0, new GooseKeuze(_status.Model, Teksten.Van(this, "T_HermesNietOpServer", "not on LM Studio")));
+            keuzes.Insert(0, new ModelRegel(_status.Model, Teksten.Van(this, "T_HermesNietOpServer", "not on LM Studio")));
         }
 
         ModelPicker.ItemsSource = keuzes;
         ModelPicker.SelectedItem = actiefJabasoft
             ? keuzes.FirstOrDefault(keuze => string.Equals(keuze.Naam, _status.Model, StringComparison.OrdinalIgnoreCase))
             : null;
+    }
+
+    /// <summary>Een regel in de keuzelijst: met kwaliteitssterren en de groene/gele ster voor Goose.</summary>
+    private ModelRegel Regel(HermesLokaalModel model)
+    {
+        var (groen, geel) = Onderdeelsterren.Voor(model.Naam, _lmStudio, Onderdelen.Goose);
+        var kwaliteit = Modelteksten.Keuze(this, model.Naam, _lmStudio?.SterrenVoor(model.Naam), model.KanBeelden, model.MaxContext).SterrenTekst;
+        return new ModelRegel(model.Naam, Info(model), kwaliteit, groen, geel);
     }
 
     private Modelkeuze Keuze(HermesLokaalModel model) =>
@@ -148,7 +153,7 @@ public partial class Setting09 : UserControl
 
     private void ToonModelDoel()
     {
-        var naam = (ModelPicker.SelectedItem as GooseKeuze)?.Naam;
+        var naam = (ModelPicker.SelectedItem as ModelRegel)?.Naam;
         var gekozen = _status.LokaleModellen.FirstOrDefault(model => string.Equals(model.Naam, naam, StringComparison.OrdinalIgnoreCase));
         ToonGrensUitleg(gekozen);
         if (gekozen is null)
@@ -227,7 +232,7 @@ public partial class Setting09 : UserControl
     /// <summary>Stuurt model en grens naar de broker. Alles wat opslaat komt hierlangs.</summary>
     private async Task BewaarAsync()
     {
-        if (ModelPicker.SelectedItem is not GooseKeuze gekozen)
+        if (ModelPicker.SelectedItem is not ModelRegel gekozen)
         {
             return;
         }
