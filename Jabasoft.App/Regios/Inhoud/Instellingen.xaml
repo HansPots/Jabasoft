@@ -92,6 +92,16 @@
             <TextBlock x:Name="KopHermes" Text="{DynamicResource T_SectieHermes}" Style="{StaticResource SectiekopStyle}" />
             <controls:Setting08 Width="Auto" />
 
+            <!-- Goose (Block): het lokale model dat Jabasoft in Goose instelt
+                 (via de broker, in Goose' eigen config). -->
+            <TextBlock x:Name="KopGoose" Text="{DynamicResource T_SectieGoose}" Style="{StaticResource SectiekopStyle}" />
+            <controls:Setting09 Width="Auto" />
+
+            <!-- Alle modellen op een rij: wat ze kunnen, waar ze voor bedoeld
+                 zijn, onze vastgestelde keuze en de eigen favorieten. -->
+            <TextBlock x:Name="KopModellen" Text="{DynamicResource T_SectieModellen}" Style="{StaticResource SectiekopStyle}" />
+            <controls:Setting10 Width="Auto" />
+
             <TextBlock x:Name="KopAiStudio" Text="{DynamicResource T_SectieAiStudio}" Style="{StaticResource SectiekopStyle}" />
             <aistudio:Settings />
 

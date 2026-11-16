@@ -152,13 +152,17 @@ public partial class Setting06 : UserControl
         _laden = true;
         try
         {
-            Vul(ChatModelPicker, namen, _settings.Active.ChatModel);
-            Vul(EmbedModelPicker, namen, _settings.Active.EmbedModel);
-            Vul(CodeModelPicker, namen, _settings.Active.CodeModel);
-            Vul(ControleModelPicker, namen, _settings.Active.ControleModel);
+            // Elke keuzelijst alleen de modellen die voor die taak zinvol zijn: een embeddingmodel kan niet
+            // chatten en een chatmodel niet zoeken, en alleen een model met beeldherkenning kan afbeeldingen
+            // lezen. Wat al gekozen is blijft altijd zichtbaar (zie Vul), ook als het niet in het rijtje past.
+            var keuzes = namen.Select(naam => Modelteksten.Keuze(this, naam)).ToList();
+            List<string> Met(Func<Modelkeuze, bool> zinvol) => [.. keuzes.Where(zinvol).Select(keuze => keuze.Naam)];
 
-            // Een embeddingmodel kan geen afbeeldingen lezen; alleen als het al gekozen is blijft het zichtbaar.
-            Vul(BeeldModelPicker, namen.Where(naam => !naam.Contains("embed", StringComparison.OrdinalIgnoreCase)).ToList(), _settings.Active.BeeldModel);
+            Vul(ChatModelPicker, Met(keuze => keuze.Soort != Modelsoort.Embedding), _settings.Active.ChatModel);
+            Vul(EmbedModelPicker, Met(keuze => keuze.Soort == Modelsoort.Embedding), _settings.Active.EmbedModel);
+            Vul(CodeModelPicker, Met(keuze => keuze.Soort != Modelsoort.Embedding), _settings.Active.CodeModel);
+            Vul(ControleModelPicker, Met(keuze => keuze.Soort != Modelsoort.Embedding), _settings.Active.ControleModel);
+            Vul(BeeldModelPicker, Met(keuze => keuze.KanBeelden), _settings.Active.BeeldModel);
 
             VulModellenBlok(namen);
         }
@@ -190,14 +194,15 @@ public partial class Setting06 : UserControl
     /// </summary>
     private void Vul(ComboBox keuzelijst, List<string> namen, string ingesteld)
     {
-        var items = new List<string>(namen);
+        // Wat in de modeltabel op "niet tonen" staat valt weg; het ingestelde model komt hieronder alsnog terug.
+        var items = namen.Where(naam => !_settings.Active.IsVerborgen(naam)).ToList();
 
         if (!string.IsNullOrWhiteSpace(ingesteld) && !items.Contains(ingesteld, StringComparer.OrdinalIgnoreCase))
         {
             items.Insert(0, ingesteld);
         }
 
-        var keuzes = items.Select(naam => Modelkeuze.Van(naam, SoortNaam, _settings.Active.SterrenVoor(naam))).ToList();
+        var keuzes = items.Select(naam => Modelteksten.Keuze(this, naam, _settings.Active.SterrenVoor(naam))).ToList();
 
         keuzelijst.ItemsSource = keuzes;
         keuzelijst.SelectedItem = keuzes.FirstOrDefault(keuze => string.Equals(keuze.Naam, ingesteld, StringComparison.OrdinalIgnoreCase));
@@ -211,7 +216,7 @@ public partial class Setting06 : UserControl
             return;
         }
 
-        var keuzes = huidige.Select(keuze => Modelkeuze.Van(keuze.Naam, SoortNaam, _settings.Active.SterrenVoor(keuze.Naam))).ToList();
+        var keuzes = huidige.Select(keuze => Modelteksten.Keuze(this, keuze.Naam, _settings.Active.SterrenVoor(keuze.Naam))).ToList();
         keuzelijst.ItemsSource = keuzes;
         keuzelijst.SelectedItem = keuzes.FirstOrDefault(keuze => string.Equals(keuze.Naam, ingesteld, StringComparison.OrdinalIgnoreCase));
     }

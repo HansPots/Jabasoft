@@ -135,13 +135,55 @@
                 </StackPanel>
             </Grid>
 
-            <!-- Lokaal model: bijtaken (samenvatten, beelden) en reserve als
-                 het hoofdmodel niet bereikbaar is. Leeg = uit. -->
-            <TextBlock Text="{DynamicResource T_HermesLokaalGroep}" Margin="0,16,0,4" FontSize="{DynamicResource FontSizeSmall}"
+            <!-- Bij LM Studio als hoofdmodel: waar het gekozen model voor bedoeld
+                 is en wat voor model het is (zie Setting08.ToonModelDoel). -->
+            <TextBlock x:Name="ModelDoel" Margin="0,8,0,0" TextWrapping="Wrap" Visibility="Collapsed"
+                       AutomationProperties.AutomationId="HermesModelDoel"
+                       FontSize="{DynamicResource FontSizeSmall}"
+                       Foreground="{DynamicResource TextPrimaryBrush}" />
+
+            <!-- Bij LM Studio als hoofdmodel: waar het naartoe gaat (de broker)
+                 en welke context. Bij een cloudprovider verborgen. -->
+            <TextBlock x:Name="LokaalHoofdUitleg" Margin="0,8,0,0" TextWrapping="Wrap" Visibility="Collapsed"
+                       FontSize="{DynamicResource FontSizeSmall}"
+                       Foreground="{DynamicResource TextMutedBrush}" />
+
+            <!-- Bij LM Studio als hoofdmodel: tot hoever de context mag
+                 meegroeien met het gesprek (zie Jabasoft.Broker/HermesProxy.cs).
+                 Tag = tokens; de broker gaat nooit boven wat het model aankan. -->
+            <StackPanel x:Name="GrensSectie" Visibility="Collapsed">
+                <TextBlock Text="{DynamicResource T_HermesGrens}" Margin="0,16,0,4" FontSize="{DynamicResource FontSizeSmall}"
+                           Foreground="{DynamicResource TextMutedBrush}" />
+                <StackPanel Orientation="Horizontal">
+                    <RadioButton x:Name="Grens96" Content="96k" Tag="98304" GroupName="HermesGrens"
+                                 AutomationProperties.AutomationId="HermesGrens96"
+                                 Checked="Grens_Checked" Style="{DynamicResource KeuzeStyle}" />
+                    <RadioButton x:Name="Grens128" Content="128k" Tag="131072" GroupName="HermesGrens" Margin="8,0,0,0"
+                                 AutomationProperties.AutomationId="HermesGrens128"
+                                 Checked="Grens_Checked" Style="{DynamicResource KeuzeStyle}" />
+                    <RadioButton x:Name="Grens192" Content="192k" Tag="196608" GroupName="HermesGrens" Margin="8,0,0,0"
+                                 AutomationProperties.AutomationId="HermesGrens192"
+                                 Checked="Grens_Checked" Style="{DynamicResource KeuzeStyle}" />
+                    <RadioButton x:Name="Grens256" Content="256k" Tag="262144" GroupName="HermesGrens" Margin="8,0,0,0"
+                                 AutomationProperties.AutomationId="HermesGrens256"
+                                 Checked="Grens_Checked" Style="{DynamicResource KeuzeStyle}" />
+                </StackPanel>
+                <TextBlock x:Name="GrensUitleg" Margin="0,6,0,0" TextWrapping="Wrap"
+                           FontSize="{DynamicResource FontSizeSmall}"
+                           Foreground="{DynamicResource TextMutedBrush}" />
+            </StackPanel>
+
+            <!-- Lokaal model. Bij een cloud-hoofdmodel: bijtaken (samenvatten,
+                 beelden) en reserve als het hoofdmodel niet bereikbaar is.
+                 Bij een lokaal hoofdmodel: alleen een model dat de beelden
+                 leest, voor een hoofdmodel dat dat zelf niet kan. Leeg = uit.
+                 De teksten zet Setting08.ToonLokaalOfCloud. -->
+            <StackPanel x:Name="LokaalSectie">
+            <TextBlock x:Name="LokaalGroepTitel" Text="{DynamicResource T_HermesLokaalGroep}" Margin="0,16,0,4" FontSize="{DynamicResource FontSizeSmall}"
                        FontWeight="SemiBold" Foreground="{DynamicResource TextMutedBrush}" />
             <Border BorderBrush="{DynamicResource BorderBrush}" BorderThickness="2" CornerRadius="{DynamicResource RadiusMedium}" Padding="12">
                 <StackPanel>
-                    <TextBlock Text="{DynamicResource T_HermesLokaalModel}" Margin="0,0,0,4" FontSize="{DynamicResource FontSizeSmall}"
+                    <TextBlock x:Name="LokaalModelLabel" Text="{DynamicResource T_HermesLokaalModel}" Margin="0,0,0,4" FontSize="{DynamicResource FontSizeSmall}"
                                Foreground="{DynamicResource TextMutedBrush}" />
                     <ComboBox x:Name="LokaalModelPicker" Height="34" ItemTemplate="{StaticResource LokaalModelTemplate}"
                               AutomationProperties.AutomationId="HermesLokaalModel"
@@ -151,6 +193,7 @@
                                Foreground="{DynamicResource TextMutedBrush}" />
                 </StackPanel>
             </Border>
+            </StackPanel>
 
             <!-- Jabasoft-tools: de MCP-server van de broker aan of uit. -->
             <TextBlock Text="{DynamicResource T_HermesMcp}" Margin="0,16,0,4" FontSize="{DynamicResource FontSizeSmall}"

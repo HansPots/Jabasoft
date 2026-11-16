@@ -11,6 +11,19 @@ public enum Modelsoort
     Embedding,
 }
 
+/// <summary>De taken waar een model voor ingezet kan worden - de kolommen van de modeltabel.</summary>
+public enum Taak
+{
+    Chat,
+    Code,
+    Controle,
+    Beeld,
+    Zoeken,
+
+    /// <summary>Als hoofdmodel van een agent (Hermes, Goose): plannen, tools gebruiken, lange context.</summary>
+    Agent,
+}
+
 /// <summary>
 /// Eén regel in een modelkeuzelijst van de AI-kaart: de naam waar het om
 /// gaat, plus wat we er uit de NAAM over kunnen zeggen - grootte, soort en
@@ -63,6 +76,34 @@ public sealed partial class Modelkeuze
     /// <summary>Geschatte inzetbaarheid per JabaSoft-taak (0-6) - zie <see cref="SchatGeschiktheid"/>.</summary>
     public Geschiktheid Taken { get; private set; } = new(0, 0, 0, 0, 0);
 
+    /// <summary>Kan het model afbeeldingen lezen? Van LM Studio als dat bekend is, anders geschat op de naam.</summary>
+    public bool KanBeelden { get; private set; }
+
+    /// <summary>Denkt het model eerst na voor het antwoordt (reasoning)? Geschat op de naam.</summary>
+    public bool Denkt { get; private set; }
+
+    /// <summary>De grootste context die het model aankan (van LM Studio), of 0 als onbekend.</summary>
+    public int MaxContext { get; private set; }
+
+    /// <summary>
+    /// Waar het model voor bedoeld is: de taken met de hoogste score (minstens
+    /// 3, en hoogstens één punt onder de beste). Zie <see cref="DoelTekst"/>.
+    /// </summary>
+    public IReadOnlyList<Taak> BedoeldVoor { get; private set; } = [];
+
+    /// <summary>"Bedoeld voor: Agent · Chat" in de taal van nu - leeg als Van geen taaknamen kreeg.</summary>
+    public string DoelTekst { get; private set; } = string.Empty;
+
+    public int Score(Taak taak) => taak switch
+    {
+        Taak.Chat => Taken.Chat,
+        Taak.Code => Taken.Code,
+        Taak.Controle => Taken.Controle,
+        Taak.Beeld => Taken.Beeld,
+        Taak.Zoeken => Taken.Zoeken,
+        _ => Taken.Agent,
+    };
+
     public override string ToString() => Naam;
 
     /// <summary>
@@ -70,8 +111,18 @@ public sealed partial class Modelkeuze
     /// een soort naar tekst in de taal van nu. <paramref name="handmatigeSterren"/>
     /// is de door de gebruiker ingestelde beoordeling (AiServerSettings.Sterren)
     /// - overschrijft de automatische schatting als hij er is.
+    /// <paramref name="taakNaam"/> vertaalt een taak naar tekst; zonder blijft
+    /// <see cref="DoelTekst"/> leeg. <paramref name="kanBeelden"/> en
+    /// <paramref name="maxContext"/> komen van LM Studio als die bekend zijn
+    /// (Hermes- en Goose-kaart, modeltabel) - beter dan raden op de naam.
     /// </summary>
-    public static Modelkeuze Van(string naam, Func<Modelsoort, string> soortNaam, int? handmatigeSterren = null)
+    public static Modelkeuze Van(
+        string naam,
+        Func<Modelsoort, string> soortNaam,
+        int? handmatigeSterren = null,
+        Func<Taak, string>? taakNaam = null,
+        bool? kanBeelden = null,
+        int maxContext = 0)
     {
         var laag = naam.ToLowerInvariant();
 
@@ -108,7 +159,22 @@ public sealed partial class Modelkeuze
         }
 
         keuze.Info = string.Join(" · ", delen);
-        keuze.Taken = SchatGeschiktheid(laag, miljarden, soort);
+        keuze.KanBeelden = soort != Modelsoort.Embedding && (kanBeelden ?? Beeldherkenning_().IsMatch(laag));
+        keuze.Denkt = soort != Modelsoort.Embedding && Redeneermodel_().IsMatch(laag);
+        keuze.MaxContext = maxContext;
+        keuze.Taken = SchatGeschiktheid(laag, miljarden, soort, keuze.KanBeelden, keuze.Denkt, maxContext);
+
+        var beste = Enum.GetValues<Taak>().Max(keuze.Score);
+        var drempel = Math.Max(3, beste - 1);
+        keuze.BedoeldVoor = beste < 3
+            ? []
+            : [.. Enum.GetValues<Taak>().Where(taak => keuze.Score(taak) >= drempel).OrderByDescending(keuze.Score)];
+
+        if (taakNaam is not null && keuze.BedoeldVoor.Count > 0)
+        {
+            keuze.DoelTekst = string.Join(" · ", keuze.BedoeldVoor.Select(taakNaam));
+        }
+
         return keuze;
     }
 
@@ -163,6 +229,36 @@ public sealed partial class Modelkeuze
     /// </summary>
     private static readonly (string Deel, string Omschrijving)[] BekendeFamilies =
     [
+        ("qwen3.6",
+            "Nieuwste Qwen, als mixture of experts: 35B in totaal, maar per woord maar zo'n 3B actief - daardoor snel " +
+            "voor zijn grootte. Sterk als agent: plant, gebruikt tools en houdt lange taken vol, en kan desgewenst " +
+            "hardop nadenken.\n" +
+            "Een goede keuze als hoofdmodel voor Hermes en Goose."),
+        ("qwen3-vl",
+            "Qwen3 met beeldherkenning: leest afbeeldingen, schermafbeeldingen en gescande documenten. Klein en snel - " +
+            "bedoeld als beeldmodel naast een hoofdmodel, niet als hoofdmodel van een agent."),
+        ("a3b-thinking",
+            "Qwen3 30B (mixture of experts, ~3B actief) in de denk-variant: denkt altijd eerst uitgebreid na voor het " +
+            "antwoordt. Sterk in redeneren, wiskunde en controleren; trager en kost meer tokens dan de gewone variant."),
+        ("a3b-2507",
+            "Qwen3 30B (mixture of experts, ~3B actief) in de instruct-variant: antwoordt meteen, zonder nadenken. " +
+            "Snel, goed in chat en in tools gebruiken - bruikbaar als agentmodel."),
+        ("gpt-oss",
+            "OpenAI's open model (mixture of experts). Sterk in redeneren en in tools gebruiken, daardoor goed als " +
+            "agent; denkt eerst na met instelbare inspanning. Leest geen afbeeldingen - geef het op de Hermes-kaart " +
+            "een apart beeldmodel."),
+        ("seed-oss",
+            "ByteDance's 36B-model met een heel lange context en een instelbaar denkbudget. Sterk in redeneren, code " +
+            "en agenttaken, maar groot: merkbaar trager op 12 GB videogeheugen."),
+        ("magistral",
+            "Mistral's redeneermodel (24B, op Mistral Small): denkt eerst na, sterk in meertalig redeneren en " +
+            "controleren. Bruikbaar met tools, maar trager door het nadenken."),
+        ("gemma-4",
+            "Google's Gemma 4: compact en snel, leest ook afbeeldingen. Breed inzetbaar voor chat en beeld; als " +
+            "agent minder sterk dan de grotere Qwen-modellen."),
+        ("gemma-3",
+            "Google's Gemma 3 - kan ook afbeeldingen lezen en beschrijven, vandaar geschikt als beeldmodel. Goed " +
+            "algemeen taalgebruik, minder gespecialiseerd in code of tools."),
         ("deepseek-r1",
             "Redeneermodel (reasoning), gebouwd om te concurreren met OpenAI's o1/o3. Denkt eerst uitgebreid in zichzelf na " +
             "(chain of thought, via reinforcement learning aangeleerd) voordat het met een antwoord komt - waar een gewoon " +
@@ -233,13 +329,17 @@ public sealed partial class Modelkeuze
     /// JabaSoft-familie (dezelfde vijf als de rolkeuzelijsten op deze kaart),
     /// op een schaal van 0 (niet geschikt) tot en met 6 (uitstekend).
     /// </summary>
-    public sealed record Geschiktheid(int Chat, int Code, int Controle, int Beeld, int Zoeken);
+    public sealed record Geschiktheid(int Chat, int Code, int Controle, int Beeld, int Zoeken, int Agent = 0);
 
-    [GeneratedRegex(@"(?<![a-z0-9])(llava|bakllava|moondream|pixtral|qwen2?\.?5?-?vl|minicpm-v|vision|cogvlm|internvl)(?![a-z0-9])")]
+    [GeneratedRegex(@"(?<![a-z0-9])(llava|bakllava|moondream|pixtral|qwen[\d.]*-?vl|minicpm-v|vision|cogvlm|internvl|gemma-?[34])(?![a-z0-9])")]
     private static partial Regex Beeldherkenning_();
 
-    [GeneratedRegex(@"(?<![a-z0-9])(deepseek-r1|qwen3|qwq|o1|o3)(?![a-z0-9])")]
+    [GeneratedRegex(@"(?<![a-z0-9])(deepseek-r1|qwen3|qwq|o1|o3|gpt-oss|magistral|thinking|seed-oss)(?![a-z0-9])")]
     private static partial Regex Redeneermodel_();
+
+    /// <summary>Families die bekendstaan als goed in tools gebruiken en lange agenttaken - een punt extra voor Agent.</summary>
+    [GeneratedRegex(@"(?<![a-z0-9])(qwen3|gpt-oss|seed-oss|magistral|devstral|mistral-small|glm|kimi)")]
+    private static partial Regex Agentfamilie_();
 
     /// <summary>
     /// Schat de geschiktheid per taak op basis van de grootte en de
@@ -247,8 +347,14 @@ public sealed partial class Modelkeuze
     /// geen benchmark. Gemma3 wordt apart herkend als beeldmodel (geen
     /// algemene "vision"-term in de naam, maar wel bekend beeldherkenning).
     /// Schaal 0-5, zoals de sterren.
+    ///
+    /// Agent (hoofdmodel van Hermes of Goose): de grootte, een punt erbij voor
+    /// een familie die goed is met tools, een punt eraf voor een klein
+    /// beeldmodel (die zijn daar niet op getraind). Kan het model bekend
+    /// minder dan 64.000 tokens context aan, dan hoogstens 1: daar beginnen
+    /// Hermes en Goose niet eens mee.
     /// </summary>
-    private static Geschiktheid SchatGeschiktheid(string laag, double? miljarden, Modelsoort soort)
+    private static Geschiktheid SchatGeschiktheid(string laag, double? miljarden, Modelsoort soort, bool kanBeelden, bool redeneert, int maxContext)
     {
         var basis = miljarden switch
         {
@@ -260,12 +366,22 @@ public sealed partial class Modelkeuze
             _ => 5,
         };
 
-        var beeld = laag.Contains("gemma3", StringComparison.Ordinal) || Beeldherkenning_().IsMatch(laag) ? 5 : 0;
-        var redeneert = Redeneermodel_().IsMatch(laag);
+        var beeld = kanBeelden ? 5 : 0;
 
         if (soort == Modelsoort.Embedding)
         {
-            return new Geschiktheid(Chat: 1, Code: 0, Controle: 0, Beeld: 0, Zoeken: 5);
+            return new Geschiktheid(Chat: 1, Code: 0, Controle: 0, Beeld: 0, Zoeken: 5, Agent: 0);
+        }
+
+        var agent = basis
+            + (Agentfamilie_().IsMatch(laag) ? 1 : 0)
+            - (kanBeelden && basis <= 3 ? 1 : 0)
+            - (soort == Modelsoort.Code ? 1 : 0);
+        agent = Math.Clamp(agent, 1, 5);
+
+        if (maxContext is > 0 and < Jabasoft.Base.AiBroker.HermesStatus.MinimaleContext)
+        {
+            agent = 1;
         }
 
         if (soort == Modelsoort.Code)
@@ -275,7 +391,8 @@ public sealed partial class Modelkeuze
                 Code: basis,
                 Controle: redeneert ? Math.Min(5, basis + 1) : basis,
                 Beeld: beeld,
-                Zoeken: 0);
+                Zoeken: 0,
+                Agent: agent);
         }
 
         return new Geschiktheid(
@@ -283,6 +400,7 @@ public sealed partial class Modelkeuze
             Code: Math.Max(1, basis - 2),
             Controle: redeneert ? Math.Min(5, basis + 1) : Math.Max(1, basis - 1),
             Beeld: beeld,
-            Zoeken: 0);
+            Zoeken: 0,
+            Agent: agent);
     }
 }

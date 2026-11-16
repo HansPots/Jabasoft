@@ -25,6 +25,15 @@ public partial class Setting08 : UserControl
 
     private HermesStatus _status = HermesStatus.Leeg;
 
+    private readonly IAiBrokerClient _broker = AiBrokerClient.CreateDefault();
+
+    /// <summary>De AI-instellingen (LM Studio) - voor de modellen die in de modeltabel op "niet tonen" staan.</summary>
+    private AiServerSettings? _lmStudio;
+
+    /// <summary>Hoort dit model in de keuzelijst? Niet als het verborgen is, tenzij het nu ingesteld staat.</summary>
+    private bool Tonen(string naam, string ingesteld) =>
+        _lmStudio?.IsVerborgen(naam) != true || string.Equals(naam, ingesteld, StringComparison.OrdinalIgnoreCase);
+
     /// <summary>Aan terwijl de kaart zichzelf invult - dan mag niets een opslag uitlokken (zie Setting06._laden).</summary>
     private bool _laden;
 
@@ -50,7 +59,10 @@ public partial class Setting08 : UserControl
     {
         Meld(Teksten.Van(this, "T_AiLaden", "Loading…"));
 
+        var instellingenTaak = _broker.GetSettingsAsync(CancellationToken.None);
         var result = await _hermes.GetAsync(CancellationToken.None);
+        var instellingen = await instellingenTaak;
+        _lmStudio = instellingen.Success ? instellingen.Settings.LmStudio : null;
         if (!result.Success)
         {
             Meld(Teksten.Vul(this, "T_AiBrokerWegFormaat", "Broker not reachable: {0}", result.ErrorMessage));
@@ -82,10 +94,15 @@ public partial class Setting08 : UserControl
             ModelPicker.Text = status.Model;
 
             ToonSleutel();
-            VulLokaleModellen();
+            ToonLokaalOfCloud(provider);
 
             McpAan.IsChecked = status.JabasoftMcp;
             McpUit.IsChecked = !status.JabasoftMcp;
+
+            foreach (var knop in GrensKnoppen())
+            {
+                knop.IsChecked = GrensVan(knop) == status.MaxContext;
+            }
         }
         finally
         {
@@ -126,26 +143,48 @@ public partial class Setting08 : UserControl
         {
             "anthropic" => ["claude-sonnet-5-5", "claude-opus-5-5", "claude-haiku-5-5", "claude-fable-5-1"],
             "openrouter" => ["anthropic/claude-sonnet-5-5", "anthropic/claude-opus-5-5", "anthropic/claude-haiku-5-5"],
-            "lmstudio" => [.. _status.LokaleModellen.Select(model => model.Naam)],
+            // Alleen wat Hermes als hoofdmodel kan gebruiken: genoeg context en geschikt als agent (zie
+            // Modelkeuze.Taken.Agent) - beste eerst. Een eigen naam typen mag nog steeds.
+            "lmstudio" => [.. _status.LokaleModellen
+                .Where(model => model.MaxContext >= HermesStatus.MinimaleContext && Keuze(model).Taken.Agent >= 3)
+                .Where(model => Tonen(model.Naam, _status.Model))
+                .OrderByDescending(model => Aanbevelingen.Voor(model.Naam).Count > 0)
+                .ThenByDescending(model => Keuze(model).Taken.Agent)
+                .ThenBy(model => model.Naam, StringComparer.OrdinalIgnoreCase)
+                .Select(model => model.Naam)],
             _ => [],
         };
 
         ModelPicker.ItemsSource = suggesties;
     }
 
-    private void VulLokaleModellen()
+    /// <summary>
+    /// Vult de keuzelijst voor het lokale model. Bij een lokaal hoofdmodel
+    /// (<paramref name="alleenBeelden"/>) gaat het alleen om afbeeldingen
+    /// lezen, dus staan alleen de modellen erin die dat kunnen.
+    /// </summary>
+    private void VulLokaleModellen(bool alleenBeelden)
     {
-        var keuzes = new List<LokaalKeuze> { new(string.Empty, Teksten.Van(this, "T_HermesLokaalGeen", "None — Hermes uses its main model for everything")) };
+        var keuzes = new List<LokaalKeuze>
+        {
+            new(string.Empty, alleenBeelden
+                ? Teksten.Van(this, "T_HermesVisionGeen", "None — the main model reads images itself (if it can)")
+                : Teksten.Van(this, "T_HermesLokaalGeen", "None — Hermes uses its main model for everything")),
+        };
 
-        keuzes.AddRange(_status.LokaleModellen.Select(model => new LokaalKeuze(
+        keuzes.AddRange(_status.LokaleModellen.Where(model => (!alleenBeelden || model.KanBeelden) && Tonen(model.Naam, _status.LokaalModel)).Select(model => new LokaalKeuze(
             model.Naam,
-            model.MaxContext >= HermesStatus.MinimaleContext
+            MetDoel(model, model.MaxContext >= HermesStatus.MinimaleContext
                 ? Teksten.Vul(this, "T_HermesContextFormaat", "{0:N0} tokens context", model.MaxContext)
-                : Teksten.Vul(this, "T_HermesContextTeKleinFormaat", "{0:N0} tokens context — too small for Hermes (min. 64,000)", model.MaxContext))));
+                : Teksten.Vul(this, "T_HermesContextTeKleinFormaat", "{0:N0} tokens context — too small for Hermes (min. 64,000)", model.MaxContext)))));
 
         // Een ingesteld model dat (nu) niet op LM Studio staat blijft
         // zichtbaar, anders zou het openen van de kaart het stilletjes wissen.
-        if (_status.LokaalModel.Length > 0 && keuzes.All(keuze => !string.Equals(keuze.Naam, _status.LokaalModel, StringComparison.OrdinalIgnoreCase)))
+        // Staat het wel op LM Studio maar kan het geen beelden lezen, dan
+        // hoort het niet in de lijst voor afbeeldingen (dan wordt het "Geen").
+        if (_status.LokaalModel.Length > 0 &&
+            keuzes.All(keuze => !string.Equals(keuze.Naam, _status.LokaalModel, StringComparison.OrdinalIgnoreCase)) &&
+            _status.LokaleModellen.All(model => !string.Equals(model.Naam, _status.LokaalModel, StringComparison.OrdinalIgnoreCase)))
         {
             keuzes.Insert(1, new LokaalKeuze(_status.LokaalModel, Teksten.Van(this, "T_HermesNietOpServer", "not on LM Studio")));
         }
@@ -153,14 +192,88 @@ public partial class Setting08 : UserControl
         LokaalModelPicker.ItemsSource = keuzes;
         LokaalModelPicker.SelectedItem = keuzes.FirstOrDefault(keuze => string.Equals(keuze.Naam, _status.LokaalModel, StringComparison.OrdinalIgnoreCase)) ?? keuzes[0];
 
-        LokaalUitleg.Text = Teksten.Vul(
-            this,
-            "T_HermesLokaalUitlegFormaat",
-            "For summarising, images (if the model can read them) and as a fallback when the main model is unavailable. Via {0} — load the model there with at least 64,000 tokens context.",
-            _status.LokaalServerUrl);
+        LokaalUitleg.Text = alleenBeelden
+            ? Teksten.Van(this, "T_HermesVisionUitleg", "For a main model that cannot read images (such as gpt-oss). The broker swaps the two models in LM Studio, so an image takes a little longer.")
+            : Teksten.Vul(
+                this,
+                "T_HermesLokaalUitlegFormaat",
+                "For summarising, images (if the model can read them) and as a fallback when the main model is unavailable. Via {0} — load the model there with at least 64,000 tokens context.",
+                _status.LokaalServerUrl);
+    }
+
+    /// <summary>De inschatting van een LM Studio-model, met wat LM Studio zelf weet (context, beelden).</summary>
+    private Modelkeuze Keuze(HermesLokaalModel model) =>
+        Modelteksten.Keuze(this, model.Naam, kanBeelden: model.KanBeelden, maxContext: model.MaxContext);
+
+    /// <summary>De info achter een model in de keuzelijst, met erachter waar het voor bedoeld is.</summary>
+    private string MetDoel(HermesLokaalModel model, string info) =>
+        Keuze(model).DoelTekst is { Length: > 0 } doel ? info + " · " + doel : info;
+
+    /// <summary>
+    /// De regel onder het hoofdmodel: waar het gekozen LM Studio-model voor
+    /// bedoeld is, en de korte omschrijving van zijn familie. Bij een
+    /// cloudprovider (of een onbekend model) verborgen.
+    /// </summary>
+    private void ToonModelDoel(bool lokaal)
+    {
+        var gekozen = lokaal
+            ? _status.LokaleModellen.FirstOrDefault(model => string.Equals(model.Naam, ModelPicker.Text.Trim(), StringComparison.OrdinalIgnoreCase))
+            : null;
+
+        if (gekozen is null)
+        {
+            ModelDoel.Visibility = Visibility.Collapsed;
+            return;
+        }
+
+        var keuze = Keuze(gekozen);
+        var omschrijving = Modelkeuze.AutomatischeOmschrijving(gekozen.Naam);
+        ModelDoel.Text = Teksten.Vul(this, "T_ModelDoelFormaat", "Intended for: {0}", keuze.DoelTekst.Length > 0 ? keuze.DoelTekst : "-")
+            + (omschrijving.Length > 0 ? "\n" + omschrijving : string.Empty);
+        ModelDoel.Visibility = Visibility.Visible;
+    }
+
+    /// <summary>
+    /// LM Studio als hoofdmodel: bijtaken en reserve hebben dan geen zin
+    /// (alles is al lokaal), alleen een apart model voor afbeeldingen nog
+    /// wel. Daaronder staat waar het naartoe gaat; een te klein model krijgt
+    /// een waarschuwing.
+    /// </summary>
+    private void ToonLokaalOfCloud(string provider)
+    {
+        var lokaal = string.Equals(provider, "lmstudio", StringComparison.OrdinalIgnoreCase);
+        LokaalHoofdUitleg.Visibility = lokaal ? Visibility.Visible : Visibility.Collapsed;
+        GrensSectie.Visibility = lokaal ? Visibility.Visible : Visibility.Collapsed;
+        LokaalGroepTitel.SetResourceReference(TextBlock.TextProperty, lokaal ? "T_HermesVisionGroep" : "T_HermesLokaalGroep");
+        LokaalModelLabel.SetResourceReference(TextBlock.TextProperty, lokaal ? "T_HermesVisionModel" : "T_HermesLokaalModel");
+        VulLokaleModellen(alleenBeelden: lokaal);
+        ToonModelDoel(lokaal);
+
+        if (!lokaal)
+        {
+            return;
+        }
+
+        var gekozen = _status.LokaleModellen.FirstOrDefault(model => string.Equals(model.Naam, ModelPicker.Text.Trim(), StringComparison.OrdinalIgnoreCase));
+        LokaalHoofdUitleg.Text = gekozen is not null && gekozen.MaxContext < HermesStatus.MinimaleContext
+            ? Teksten.Vul(this, "T_HermesContextTeKleinFormaat", "{0:N0} tokens context — too small for Hermes (min. 64,000)", gekozen.MaxContext)
+            : Teksten.Vul(this, "T_HermesViaBrokerFormaat", "Via the broker ({0}): in the same queue as the Jabasoft apps, and the broker loads the model in LM Studio itself.", _status.LokaalServerUrl);
+
+        // Een grens boven wat het model aankan heeft geen zin: dat zegt de uitleg erbij.
+        GrensUitleg.Text = gekozen is not null && gekozen.MaxContext >= HermesStatus.MinimaleContext && gekozen.MaxContext < _status.MaxContext
+            ? Teksten.Vul(this, "T_HermesGrensModelMaxFormaat", "Grows with the conversation, starting at 65,536 tokens. {0} handles at most {1:N0} tokens, so it stops there.", gekozen.Naam, gekozen.MaxContext)
+            : Teksten.Van(this, "T_HermesGrensUitleg", "Grows with the conversation, starting at 65,536 tokens. Each step means a short wait while the model reloads; higher costs more video memory, and if it does not fit the broker stays a step lower.");
     }
 
     private IEnumerable<RadioButton> ProviderKnoppen() => [ProviderAnthropic, ProviderOpenRouter, ProviderNous, ProviderLmStudio];
+
+    private IEnumerable<RadioButton> GrensKnoppen() => [Grens96, Grens128, Grens192, Grens256];
+
+    private static int GrensVan(RadioButton knop) =>
+        int.TryParse(knop.Tag as string, System.Globalization.NumberStyles.Integer, System.Globalization.CultureInfo.InvariantCulture, out var waarde) ? waarde : 0;
+
+    /// <summary>De gekozen grens, of 0 (= de broker houdt wat er staat) als er geen knop aan staat.</summary>
+    private int GekozenGrens() => GrensKnoppen().FirstOrDefault(knop => knop.IsChecked == true) is { } gekozen ? GrensVan(gekozen) : 0;
 
     private string GekozenProvider() =>
         ProviderKnoppen().FirstOrDefault(knop => knop.IsChecked == true)?.Tag as string ?? _status.Provider;
@@ -176,6 +289,11 @@ public partial class Setting08 : UserControl
         LokaalModelPicker.IsEnabled = aan;
         McpAan.IsEnabled = aan;
         McpUit.IsEnabled = aan;
+        foreach (var knop in GrensKnoppen())
+        {
+            knop.IsEnabled = aan;
+        }
+
         OpenHermesButton.IsEnabled = aan;
     }
 
@@ -186,7 +304,8 @@ public partial class Setting08 : UserControl
             GekozenProvider(),
             ModelPicker.Text.Trim(),
             (LokaalModelPicker.SelectedItem as LokaalKeuze)?.Naam ?? string.Empty,
-            McpAan.IsChecked == true);
+            McpAan.IsChecked == true,
+            GekozenGrens());
 
         if (instelling.Model.Length == 0)
         {
@@ -233,6 +352,8 @@ public partial class Setting08 : UserControl
             {
                 ModelPicker.Text = suggesties.FirstOrDefault() ?? string.Empty;
             }
+
+            ToonLokaalOfCloud(provider);
         }
         finally
         {
@@ -298,6 +419,16 @@ public partial class Setting08 : UserControl
     }
 
     private async void Mcp_Checked(object sender, RoutedEventArgs e)
+    {
+        if (_laden || !IsLoaded)
+        {
+            return;
+        }
+
+        await BewaarAsync();
+    }
+
+    private async void Grens_Checked(object sender, RoutedEventArgs e)
     {
         if (_laden || !IsLoaded)
         {

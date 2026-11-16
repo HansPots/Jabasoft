@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
@@ -19,7 +19,7 @@
          niet kan afwijken van wat er werkelijk draait. Het exe-bestand
          draagt het hierdoor ook: te zien in de eigenschappen van het
          bestand en in een foutmelding. -->
-    <Version>0.1.0.121</Version>
+    <Version>0.1.0.131</Version>
   </PropertyGroup>
 
   <ItemGroup>
@@ -38,8 +38,8 @@
 
     <!-- De onderdelen die in het venster van Jabasoft draaien: elk levert
          zijn complete scherm (header, eigen menu, inhoud, footer) als
-         UserControl, en MainWindow wisselt daartussen. Eén applicatie, één
-         proces, één venster - in plaats van losse exe's die elkaars venster
+         UserControl, en MainWindow wisselt daartussen. EÃ©n applicatie, Ã©Ã©n
+         proces, Ã©Ã©n venster - in plaats van losse exe's die elkaars venster
          overnamen. -->
     <ProjectReference Include="..\..\JabaSoft.LocalAiStudio\LocalAiStudio.App\LocalAiStudio.App.csproj" />
     <ProjectReference Include="..\..\JabaSoft.TabStudio\TabStudio.App\TabStudio.App.csproj" />

@@ -1,0 +1,78 @@
+<UserControl x:Class="Jabasoft.App.Controls.Setting10"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d" Width="1568">
+
+    <!-- Design-time-only: thema-context voor de Designer (zie Setting-06.xaml). -->
+    <d:UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/Stylebook.Components;component/Styles/Theme.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/Stylebook.Components;component/Styles/Themes/Lcars.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </d:UserControl.Resources>
+
+    <!--
+        Modeltabel: alle modellen op de AI-server in één overzicht, met wat
+        ze kunnen en waar ze nu voor gebruikt worden. Alleen lezen - kiezen
+        doe je op de AI-, Hermes- en Goose-kaart, en sterren en notities
+        stel je in het MODELLEN-blok van de AI-kaart in.
+
+        De kolommen (zie Setting-10.xaml.cs, BouwRij):
+          Go He LA IF TS  een ster per onderdeel (Goose, Hermes, LocalAiStudio,
+                       ImageFunn, TabStudio): groen = samen vastgesteld,
+                       geel = eigen favoriet (klik om te wisselen)
+          Tonen        uit = niet in de modelkeuzelijsten (behalve waar
+                       het nu ingesteld staat)
+          Model       naam, grootte · soort, en waar het voor bedoeld is;
+                       de omschrijving staat in de tooltip
+          Kwaliteit    de sterren (zelf ingesteld of geschat)
+          Context      grootste context volgens LM Studio
+          Beelden      kan afbeeldingen lezen
+          Denkt        denkt eerst na (reasoning)
+          Chat … Agent geschatte inzetbaarheid per taak, 0-5
+          In gebruik   welke rol of agent het model nu heeft
+
+        Alles behalve de sterren, context en beelden is een SCHATTING op de
+        naam (zie Modelkeuze) - geen benchmark.
+
+        Zelfde breedte (1568) en kaartopmaak als de andere kaarten.
+    -->
+    <Border MinWidth="480" CornerRadius="{DynamicResource RadiusMedium}" BorderThickness="2"
+            Background="{DynamicResource SurfaceBrush}"
+            BorderBrush="{DynamicResource BorderBrush}"
+            HorizontalAlignment="Stretch" VerticalAlignment="Top">
+        <StackPanel Margin="20,16">
+            <TextBlock Text="{DynamicResource T_ModeltabelTitel}" FontSize="{DynamicResource FontSizeTitle}" FontWeight="SemiBold"
+                       Foreground="{DynamicResource Text01Brush}" />
+            <TextBlock Text="{DynamicResource T_ModeltabelUitleg}" Margin="0,8,0,12" TextWrapping="Wrap"
+                       FontSize="{DynamicResource FontSizeSmall}"
+                       Foreground="{DynamicResource TextMutedBrush}" />
+
+            <!-- Filter: modellen die je in de kolom Tonen uitgezet hebt, staan
+                 alleen in de tabel als dit aan staat (gedimd, onderaan) - zo
+                 kun je ze weer aanzetten. Niet bewaard: bij openen uit. -->
+            <CheckBox x:Name="VerborgenTonen" Content="{DynamicResource T_ModeltabelVerborgenTonen}" Margin="0,0,0,12"
+                      AutomationProperties.AutomationId="ModeltabelVerborgenTonen"
+                      Foreground="{DynamicResource TextPrimaryBrush}"
+                      Click="VerborgenTonen_Click" />
+
+            <!-- Kopregel en rijen bouwt Setting10.BouwTabel. -->
+            <StackPanel x:Name="Tabel" AutomationProperties.AutomationId="ModeltabelRijen" />
+
+            <StackPanel Orientation="Horizontal" Margin="0,12,0,0">
+                <Button x:Name="VernieuwButton" Content="{DynamicResource T_AiVernieuwen}"
+                        AutomationProperties.AutomationId="ModeltabelVernieuwen"
+                        Click="Vernieuw_Click" Style="{DynamicResource AccentButtonStyle}" />
+                <TextBlock x:Name="MeldingTekst" Margin="14,0,0,0" VerticalAlignment="Center" TextWrapping="Wrap"
+                           AutomationProperties.AutomationId="ModeltabelMelding"
+                           FontSize="{DynamicResource FontSizeSmall}"
+                           Foreground="{DynamicResource TextMutedBrush}" />
+            </StackPanel>
+        </StackPanel>
+    </Border>
+
+</UserControl>

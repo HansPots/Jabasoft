@@ -1,0 +1,117 @@
+<UserControl x:Class="Jabasoft.App.Controls.Setting09"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d" Width="1568">
+
+    <!-- Design-time-only: thema-context voor de Designer (zie Setting-06.xaml). -->
+    <d:UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/Stylebook.Components;component/Styles/Theme.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/Stylebook.Components;component/Styles/Themes/Lcars.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </d:UserControl.Resources>
+
+    <UserControl.Resources>
+        <!-- Eén regel in de keuzelijst: naam, dan context en waar het model
+             voor bedoeld is - net als het lokale model op de Hermes-kaart. -->
+        <DataTemplate x:Key="GooseModelTemplate">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="{Binding Naam}" VerticalAlignment="Center" />
+                <TextBlock Text="{Binding Info}" Margin="12,0,0,0" VerticalAlignment="Center"
+                           FontSize="{DynamicResource FontSizeSmall}"
+                           Foreground="{DynamicResource TextMutedBrush}" />
+            </StackPanel>
+        </DataTemplate>
+    </UserControl.Resources>
+
+    <!--
+        Instellingenkaart Goose (Block): welk lokaal model Goose gebruikt.
+        Net als de Hermes-kaart staat de waarde NIET in deze applicatie: de
+        broker schrijft hem in Goose' eigen config (zie
+        Jabasoft.Broker/GooseConfigStore.cs) en zet de Jabasoft-provider
+        meteen actief. Al het andere (extensies, modus, werkmap) blijft in
+        Goose zelf.
+
+        Goose leest zijn config bij het opstarten: een wijziging geldt pas na
+        een herstart - dat staat ook onderaan de kaart.
+
+        Zelfde breedte (1568) en kaartopmaak als de Hermes-kaart.
+    -->
+    <Border MinWidth="480" CornerRadius="{DynamicResource RadiusMedium}" BorderThickness="2"
+            Background="{DynamicResource SurfaceBrush}"
+            BorderBrush="{DynamicResource BorderBrush}"
+            HorizontalAlignment="Stretch" VerticalAlignment="Top">
+        <StackPanel Margin="20,16">
+            <TextBlock Text="{DynamicResource T_GooseTitel}" FontSize="{DynamicResource FontSizeTitle}" FontWeight="SemiBold"
+                       Foreground="{DynamicResource Text01Brush}" />
+
+            <!-- Status: geïnstalleerd, draait, provider - één regel. -->
+            <TextBlock x:Name="StatusRegel" Margin="0,8,0,0" TextWrapping="Wrap"
+                       AutomationProperties.AutomationId="GooseStatusRegel"
+                       FontSize="{DynamicResource FontSizeSmall}"
+                       Foreground="{DynamicResource TextMutedBrush}" />
+
+            <TextBlock Text="{DynamicResource T_GooseModel}" Margin="0,16,0,4" FontSize="{DynamicResource FontSizeSmall}"
+                       Foreground="{DynamicResource TextMutedBrush}" />
+            <!-- PreviewMouseWheel: het muiswiel scrolt de pagina, niet door de
+                 modellen - anders wisselt Goose bij elke tik van model. -->
+            <ComboBox x:Name="ModelPicker" Height="34" ItemTemplate="{StaticResource GooseModelTemplate}"
+                      AutomationProperties.AutomationId="GooseModel"
+                      PreviewMouseWheel="ModelPicker_PreviewMouseWheel"
+                      SelectionChanged="Model_SelectionChanged" />
+
+            <!-- Waar het gekozen model voor bedoeld is en wat voor model het is. -->
+            <TextBlock x:Name="ModelDoel" Margin="0,8,0,0" TextWrapping="Wrap" Visibility="Collapsed"
+                       AutomationProperties.AutomationId="GooseModelDoel"
+                       FontSize="{DynamicResource FontSizeSmall}"
+                       Foreground="{DynamicResource TextPrimaryBrush}" />
+
+            <!-- Tot hoever de context mag meegroeien met het gesprek, net als
+                 op de Hermes-kaart maar een eigen grens (zie
+                 Jabasoft.Broker/GooseConfigStore.cs, IngesteldeMaxContext).
+                 Tag = tokens; de broker gaat nooit boven wat het model aankan. -->
+            <TextBlock Text="{DynamicResource T_HermesGrens}" Margin="0,16,0,4" FontSize="{DynamicResource FontSizeSmall}"
+                       Foreground="{DynamicResource TextMutedBrush}" />
+            <StackPanel Orientation="Horizontal">
+                <RadioButton x:Name="Grens96" Content="96k" Tag="98304" GroupName="GooseGrens"
+                             AutomationProperties.AutomationId="GooseGrens96"
+                             Checked="Grens_Checked" Style="{DynamicResource KeuzeStyle}" />
+                <RadioButton x:Name="Grens128" Content="128k" Tag="131072" GroupName="GooseGrens" Margin="8,0,0,0"
+                             AutomationProperties.AutomationId="GooseGrens128"
+                             Checked="Grens_Checked" Style="{DynamicResource KeuzeStyle}" />
+                <RadioButton x:Name="Grens192" Content="192k" Tag="196608" GroupName="GooseGrens" Margin="8,0,0,0"
+                             AutomationProperties.AutomationId="GooseGrens192"
+                             Checked="Grens_Checked" Style="{DynamicResource KeuzeStyle}" />
+                <RadioButton x:Name="Grens256" Content="256k" Tag="262144" GroupName="GooseGrens" Margin="8,0,0,0"
+                             AutomationProperties.AutomationId="GooseGrens256"
+                             Checked="Grens_Checked" Style="{DynamicResource KeuzeStyle}" />
+            </StackPanel>
+            <TextBlock x:Name="GrensUitleg" Margin="0,6,0,0" TextWrapping="Wrap"
+                       AutomationProperties.AutomationId="GooseGrensUitleg"
+                       FontSize="{DynamicResource FontSizeSmall}"
+                       Foreground="{DynamicResource TextMutedBrush}" />
+
+            <TextBlock Text="{DynamicResource T_GooseUitleg}" Margin="0,8,0,0" TextWrapping="Wrap"
+                       FontSize="{DynamicResource FontSizeSmall}"
+                       Foreground="{DynamicResource TextMutedBrush}" />
+
+            <StackPanel Orientation="Horizontal" Margin="0,16,0,0">
+                <Button x:Name="OpenGooseButton" Content="{DynamicResource T_GooseOpen}"
+                        AutomationProperties.AutomationId="GooseOpen"
+                        Click="OpenGoose_Click" Style="{DynamicResource AccentButtonStyle}" />
+                <Button x:Name="VernieuwButton" Content="{DynamicResource T_AiVernieuwen}" Margin="8,0,0,0"
+                        AutomationProperties.AutomationId="GooseVernieuwen"
+                        Click="Vernieuw_Click" Style="{DynamicResource AccentButtonStyle}" />
+                <TextBlock x:Name="MeldingTekst" Margin="14,0,0,0" VerticalAlignment="Center" TextWrapping="Wrap"
+                           AutomationProperties.AutomationId="GooseMelding"
+                           FontSize="{DynamicResource FontSizeSmall}"
+                           Foreground="{DynamicResource TextMutedBrush}" />
+            </StackPanel>
+        </StackPanel>
+    </Border>
+
+</UserControl>

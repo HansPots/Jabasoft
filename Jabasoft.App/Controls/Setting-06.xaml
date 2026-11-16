@@ -100,6 +100,11 @@
                 <TextBlock Text="{Binding SterrenTekst}" Margin="12,0,0,0" VerticalAlignment="Center"
                            Foreground="{DynamicResource AccentBrush}"
                            ToolTip="{DynamicResource T_AiSterrenTip}" />
+                <!-- Waar het model voor bedoeld is (zie Modelkeuze.BedoeldVoor). -->
+                <TextBlock Text="{Binding DoelTekst}" Margin="12,0,0,0" VerticalAlignment="Center"
+                           FontSize="{DynamicResource FontSizeSmall}"
+                           Foreground="{DynamicResource TextPrimaryBrush}"
+                           ToolTip="{DynamicResource T_AiDoelTip}" />
             </StackPanel>
         </DataTemplate>
     </UserControl.Resources>

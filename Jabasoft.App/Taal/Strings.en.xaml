@@ -158,6 +158,10 @@
     <sys:String x:Key="T_HermesSleutel">API key</sys:String>
     <sys:String x:Key="T_HermesLokaalGroep">Local</sys:String>
     <sys:String x:Key="T_HermesLokaalModel">Model for side tasks and as fallback</sys:String>
+    <sys:String x:Key="T_HermesVisionGroep">Images</sys:String>
+    <sys:String x:Key="T_HermesVisionModel">Model that reads images</sys:String>
+    <sys:String x:Key="T_HermesVisionGeen">None - the main model reads images itself (if it can)</sys:String>
+    <sys:String x:Key="T_HermesVisionUitleg">For a main model that cannot read images itself (such as gpt-oss). The broker swaps the two models in LM Studio, so an image takes a little longer.</sys:String>
     <sys:String x:Key="T_HermesMcp">Jabasoft tools (MCP)</sys:String>
     <sys:String x:Key="T_HermesAan">On</sys:String>
     <sys:String x:Key="T_HermesUit">Off</sys:String>
@@ -174,8 +178,57 @@
     <sys:String x:Key="T_HermesContextFormaat">{0:N0} tokens context</sys:String>
     <sys:String x:Key="T_HermesContextTeKleinFormaat">{0:N0} tokens context - too small for Hermes (min. 64,000)</sys:String>
     <sys:String x:Key="T_HermesNietOpServer">not on LM Studio</sys:String>
-    <sys:String x:Key="T_HermesLokaalUitlegFormaat">For summarising, images (if the model can read them) and as a fallback when the main model is unavailable. Via {0} - load the model there with at least 64,000 tokens context.</sys:String>
+    <sys:String x:Key="T_HermesLokaalUitlegFormaat">For summarising, images (if the model can read them) and as a fallback when the main model is unavailable. Via the broker ({0}): in the same queue as the Jabasoft apps, and the broker loads the model in LM Studio itself.</sys:String>
+    <sys:String x:Key="T_HermesViaBrokerFormaat">Via the broker ({0}): in the same queue as the Jabasoft apps, and the broker loads the model in LM Studio itself: with 65,536 tokens context, and larger when the conversation needs it.</sys:String>
+    <sys:String x:Key="T_HermesGrens">Context may grow up to</sys:String>
+    <sys:String x:Key="T_HermesGrensUitleg">Grows with the conversation, starting at 65,536 tokens. Each step means a short wait while the model reloads; higher costs more video memory, and if it does not fit the broker stays a step lower. Restart Hermes after a change.</sys:String>
+    <sys:String x:Key="T_HermesGrensModelMaxFormaat">Grows with the conversation, starting at 65,536 tokens. {0} handles at most {1:N0} tokens, so it stops there.</sys:String>
     <sys:String x:Key="T_HermesGeenModel">Choose or type a model first.</sys:String>
-    <sys:String x:Key="T_HermesBewaard">Saved - restart Hermes to use it.</sys:String>
+    <sys:String x:Key="T_HermesBewaard">Saved - a local model applies from the next question; another provider or the Jabasoft tools only after restarting Hermes.</sys:String>
     <sys:String x:Key="T_HermesOpenFoutFormaat">Could not open Hermes: {0}</sys:String>
+
+    <!-- What a model is intended for (Modelkeuze.BedoeldVoor) - AI, Hermes and Goose cards, model table. -->
+    <sys:String x:Key="T_ModelDoelFormaat">Intended for: {0}</sys:String>
+    <sys:String x:Key="T_AiDoelTip">What this model suits best - an estimate based on its name</sys:String>
+    <sys:String x:Key="T_AiTaakAgent">Agent</sys:String>
+    <sys:String x:Key="T_AiTaakAgentTip">Estimated fit as the main model of an agent (Hermes, Goose), 0-5</sys:String>
+    <sys:String x:Key="T_AiTaakControleLang">Check</sys:String>
+
+    <!-- Goose card (Setting-09). -->
+    <sys:String x:Key="T_SectieGoose">Goose</sys:String>
+    <sys:String x:Key="T_GooseTitel">Goose</sys:String>
+    <sys:String x:Key="T_GooseModel">Model (via the Jabasoft provider)</sys:String>
+    <sys:String x:Key="T_GooseUitleg">Only models with enough context that suit an agent are listed. Via the broker: in the same queue as the Jabasoft apps, with 65,536 tokens context growing up to 131,072. Another model applies from the next question, even while Goose is running: the broker puts the chosen model in every question from Goose. If another provider is active in Goose, choosing switches it to the Jabasoft provider - that only applies after restarting Goose.</sys:String>
+    <sys:String x:Key="T_GooseOpen">Open Goose</sys:String>
+    <sys:String x:Key="T_GooseNietGeinstalleerd">Goose is not installed on this machine.</sys:String>
+    <sys:String x:Key="T_GooseStatusFormaat">Installed · {0} · provider {1} · {2}</sys:String>
+    <sys:String x:Key="T_GooseContextTeKleinFormaat">{0:N0} tokens context - too small for an agent (min. 64,000)</sys:String>
+    <sys:String x:Key="T_GooseBewaard">Saved - applies from Goose's next question.</sys:String>
+    <sys:String x:Key="T_GooseGrensUitleg">Grows with the conversation, starting at 65,536 tokens. Each step means a short wait while the model reloads. The broker uses the new limit right away; Goose itself (which summarises at the limit) after a restart.</sys:String>
+    <sys:String x:Key="T_ModeltabelTonen">Show</sys:String>
+    <sys:String x:Key="T_ModeltabelTonenTip">Off = not offered in the model lists (AI, Hermes and Goose cards, and in Hermes and Goose themselves). A model that is in use stays where it is used.</sys:String>
+    <sys:String x:Key="T_ModeltabelVerborgenTonen">Show hidden models</sys:String>
+    <sys:String x:Key="T_ModeltabelAantalVerborgenFormaat">{0} models, {1} of them hidden</sys:String>
+    <sys:String x:Key="T_GooseGeladenFormaat">Loaded now with {0:N0} tokens context.</sys:String>
+    <sys:String x:Key="T_GooseNietGeladen">Not loaded right now.</sys:String>
+    <sys:String x:Key="T_GooseOpenFoutFormaat">Could not open Goose: {0}</sys:String>
+
+    <!-- Model table (Setting-10). -->
+    <sys:String x:Key="T_SectieModellen">Models</sys:String>
+    <sys:String x:Key="T_ModeltabelTitel">All models</sys:String>
+    <sys:String x:Key="T_ModeltabelUitleg">Green star: the best choice we determined together (tooltip: for what and why). Yellow star: your own favourite - click to set or remove, you can have several. Context and Images come from LM Studio; the scores per task (0-5) are an estimate based on the name, in bold where the model is intended for. Choose models on the cards above.</sys:String>
+    <sys:String x:Key="T_ModeltabelAantalFormaat">{0} models</sys:String>
+    <sys:String x:Key="T_ModeltabelHermesLokaal">Hermes (side tasks/images)</sys:String>
+    <sys:String x:Key="T_ModeltabelModel">Model</sys:String>
+    <sys:String x:Key="T_ModeltabelContext">Context</sys:String>
+    <sys:String x:Key="T_ModeltabelContextTip">Largest context according to LM Studio</sys:String>
+    <sys:String x:Key="T_ModeltabelBeelden">Images</sys:String>
+    <sys:String x:Key="T_ModeltabelBeeldenTip">Can read images</sys:String>
+    <sys:String x:Key="T_ModeltabelDenkt">Thinks</sys:String>
+    <sys:String x:Key="T_ModeltabelDenktTip">Thinks before answering (reasoning) - slower, stronger at checking</sys:String>
+    <sys:String x:Key="T_ModeltabelGebruik">In use for</sys:String>
+    <sys:String x:Key="T_ModeltabelSterTip">Green: the best choice we determined together. Yellow: your own favourite - click to set or remove.</sys:String>
+    <sys:String x:Key="T_ModeltabelOnzeKeuzeFormaat">Our choice for {0}: {1}</sys:String>
+    <sys:String x:Key="T_ModeltabelFavorietUit">Your favourite - click to remove</sys:String>
+    <sys:String x:Key="T_ModeltabelFavorietAan">Click to mark as favourite</sys:String>
 </ResourceDictionary>
