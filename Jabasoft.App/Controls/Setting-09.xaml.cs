@@ -112,9 +112,8 @@ public partial class Setting09 : UserControl
             .Where(model => model.MaxContext >= HermesStatus.MinimaleContext && Keuze(model).Taken.Agent >= 3)
             // Op "niet tonen" in de modeltabel: weg, behalve het model dat Goose nu gebruikt (dat komt hieronder terug).
             .Where(model => _lmStudio?.IsVerborgen(model.Naam) != true || string.Equals(model.Naam, _status.Model, StringComparison.OrdinalIgnoreCase))
-            .OrderByDescending(model => Aanbevelingen.Voor(model.Naam, Onderdelen.Goose).Count > 0)
-            .ThenByDescending(model => Keuze(model).Taken.Agent)
-            .ThenBy(model => model.Naam, StringComparer.OrdinalIgnoreCase)
+            // Op alfabet; de sterren laten zien wat de beste keuze is.
+            .OrderBy(model => model.Naam, StringComparer.OrdinalIgnoreCase)
             .Select(model => Regel(model))
             .ToList();
 

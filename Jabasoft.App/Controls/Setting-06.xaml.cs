@@ -195,7 +195,7 @@ public partial class Setting06 : UserControl
     private void Vul(ComboBox keuzelijst, List<string> namen, string ingesteld)
     {
         // Wat in de modeltabel op "niet tonen" staat valt weg; het ingestelde model komt hieronder alsnog terug.
-        var items = namen.Where(naam => !_settings.Active.IsVerborgen(naam)).ToList();
+        var items = namen.Where(naam => !_settings.Active.IsVerborgen(naam)).OrderBy(naam => naam, StringComparer.OrdinalIgnoreCase).ToList();
 
         if (!string.IsNullOrWhiteSpace(ingesteld) && !items.Contains(ingesteld, StringComparer.OrdinalIgnoreCase))
         {

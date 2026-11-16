@@ -53,7 +53,7 @@
                        Foreground="{DynamicResource TextMutedBrush}" />
 
             <!-- Filter: modellen die je in de kolom Tonen uitgezet hebt, staan
-                 alleen in de tabel als dit aan staat (gedimd, onderaan) - zo
+                 alleen in de tabel als dit aan staat (gedimd) - zo
                  kun je ze weer aanzetten. Niet bewaard: bij openen uit. -->
             <CheckBox x:Name="VerborgenTonen" Content="{DynamicResource T_ModeltabelVerborgenTonen}" Margin="0,0,0,12"
                       AutomationProperties.AutomationId="ModeltabelVerborgenTonen"

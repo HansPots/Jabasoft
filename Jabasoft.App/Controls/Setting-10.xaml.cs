@@ -79,13 +79,9 @@ public partial class Setting10 : UserControl
         var aantalVerborgen = alleNamen.Count(actief.IsVerborgen);
 
         var namen = alleNamen
-            // Verborgen modellen alleen met het filter "verborgen tonen" aan - en dan onderaan.
+            // Verborgen modellen alleen met het filter "verborgen tonen" aan (gedimd). Alles op alfabet.
             .Where(naam => VerborgenTonen.IsChecked == true || !actief.IsVerborgen(naam))
-            .OrderBy(naam => actief.IsVerborgen(naam))
-            // Eerst wat we samen vastgesteld hebben, dan de favorieten, dan de rest - elk op naam.
-            .ThenByDescending(naam => Aanbevelingen.Voor(naam).Count > 0)
-            .ThenByDescending(naam => instellingen.Settings.Active.IsFavoriet(naam))
-            .ThenBy(naam => naam, StringComparer.OrdinalIgnoreCase)
+            .OrderBy(naam => naam, StringComparer.OrdinalIgnoreCase)
             .ToList();
 
         var gebruik = Gebruik(instellingen.Settings, hermes, goose);

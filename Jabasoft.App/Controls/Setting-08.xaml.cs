@@ -141,13 +141,11 @@ public partial class Setting08 : UserControl
             "anthropic" => [.. new[] { "claude-sonnet-5-5", "claude-opus-5-5", "claude-haiku-5-5", "claude-fable-5-1" }.Select(naam => new ModelRegel(naam, string.Empty))],
             "openrouter" => [.. new[] { "anthropic/claude-sonnet-5-5", "anthropic/claude-opus-5-5", "anthropic/claude-haiku-5-5" }.Select(naam => new ModelRegel(naam, string.Empty))],
             // Alleen wat Hermes als hoofdmodel kan gebruiken: genoeg context en geschikt als agent (zie
-            // Modelkeuze.Taken.Agent) - onze keuze voor Hermes eerst, dan de beste. Een eigen naam typen mag nog steeds.
+            // Modelkeuze.Taken.Agent) - op alfabet; de sterren laten zien wat de beste keuze is. Een eigen naam typen mag nog steeds.
             "lmstudio" => [.. _status.LokaleModellen
                 .Where(model => model.MaxContext >= HermesStatus.MinimaleContext && Keuze(model).Taken.Agent >= 3)
                 .Where(model => Tonen(model.Naam, _status.Model))
-                .OrderByDescending(model => Aanbevelingen.Voor(model.Naam, Onderdelen.Hermes).Count > 0)
-                .ThenByDescending(model => Keuze(model).Taken.Agent)
-                .ThenBy(model => model.Naam, StringComparer.OrdinalIgnoreCase)
+                .OrderBy(model => model.Naam, StringComparer.OrdinalIgnoreCase)
                 .Select(model => Regel(model, Teksten.Vul(this, "T_HermesContextFormaat", "{0:N0} tokens context", model.MaxContext)))],
             _ => [],
         };
@@ -169,7 +167,7 @@ public partial class Setting08 : UserControl
                 : Teksten.Van(this, "T_HermesLokaalGeen", "None — Hermes uses its main model for everything")),
         };
 
-        keuzes.AddRange(_status.LokaleModellen.Where(model => (!alleenBeelden || model.KanBeelden) && Tonen(model.Naam, _status.LokaalModel)).Select(model => Regel(
+        keuzes.AddRange(_status.LokaleModellen.OrderBy(model => model.Naam, StringComparer.OrdinalIgnoreCase).Where(model => (!alleenBeelden || model.KanBeelden) && Tonen(model.Naam, _status.LokaalModel)).Select(model => Regel(
             model,
             MetDoel(model, model.MaxContext >= HermesStatus.MinimaleContext
                 ? Teksten.Vul(this, "T_HermesContextFormaat", "{0:N0} tokens context", model.MaxContext)
