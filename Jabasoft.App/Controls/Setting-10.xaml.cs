@@ -126,7 +126,11 @@ public partial class Setting10 : UserControl
         Voeg(actief.CodeModel, Modelteksten.TaakNaam(this, Taak.Code));
         Voeg(actief.ControleModel, Modelteksten.TaakNaam(this, Taak.Controle));
         Voeg(actief.BeeldModel, Modelteksten.TaakNaam(this, Taak.Beeld));
-        Voeg(actief.EmbedModel, Modelteksten.TaakNaam(this, Taak.Zoeken));
+        // Het zoeken kan op de andere server lopen (AiSettings.ZoekProvider); dan staat het model niet in deze lijst.
+        if (instellingen.ZoekSoort == instellingen.Provider)
+        {
+            Voeg(actief.EmbedModel, Modelteksten.TaakNaam(this, Taak.Zoeken));
+        }
 
         if (hermes.Geinstalleerd)
         {

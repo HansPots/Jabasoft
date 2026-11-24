@@ -82,6 +82,8 @@ public partial class Setting06 : UserControl
         {
             ProviderLmStudio.IsChecked = _settings.Provider == AiProvider.LmStudio;
             ProviderOllama.IsChecked = _settings.Provider == AiProvider.Ollama;
+            ZoekLmStudio.IsChecked = _settings.ZoekSoort == AiProvider.LmStudio;
+            ZoekOllama.IsChecked = _settings.ZoekSoort == AiProvider.Ollama;
             ServerUrlBox.Text = _settings.ActiveServerUrl;
             ContextRondesSlider.Value = _settings.MaxContextRondes;
             ChatTimeoutSlider.Value = _settings.ChatTimeoutSeconden / 60.0;
@@ -149,6 +151,14 @@ public partial class Setting06 : UserControl
         var lijst = await _broker.ListConfiguredModelsAsync(CancellationToken.None);
         var namen = lijst.Models.ToList();
 
+        // Het zoeken kan op de andere server lopen dan de chat: dan komen de embeddingmodellen van daar.
+        var zoekNamen = namen;
+        if (_settings.ZoekSoort != _settings.Provider)
+        {
+            var zoekLijst = await _broker.ListModelsAsync(_settings.ZoekSoort, _settings.ZoekServerUrl, CancellationToken.None);
+            zoekNamen = zoekLijst.Models.ToList();
+        }
+
         _laden = true;
         try
         {
@@ -159,7 +169,9 @@ public partial class Setting06 : UserControl
             List<string> Met(Func<Modelkeuze, bool> zinvol) => [.. keuzes.Where(zinvol).Select(keuze => keuze.Naam)];
 
             Vul(ChatModelPicker, Met(keuze => keuze.Soort != Modelsoort.Embedding), _settings.Active.ChatModel);
-            Vul(EmbedModelPicker, Met(keuze => keuze.Soort == Modelsoort.Embedding), _settings.Active.EmbedModel);
+            Vul(EmbedModelPicker,
+                [.. zoekNamen.Where(naam => Modelteksten.Keuze(this, naam).Soort == Modelsoort.Embedding)],
+                _settings.ZoekModel);
             Vul(CodeModelPicker, Met(keuze => keuze.Soort != Modelsoort.Embedding), _settings.Active.CodeModel);
             Vul(ControleModelPicker, Met(keuze => keuze.Soort != Modelsoort.Embedding), _settings.Active.ControleModel);
             Vul(BeeldModelPicker, Met(keuze => keuze.KanBeelden), _settings.Active.BeeldModel);
@@ -504,7 +516,7 @@ public partial class Setting06 : UserControl
         try
         {
             HerbouwKeuzelijst(ChatModelPicker, _settings.Active.ChatModel);
-            HerbouwKeuzelijst(EmbedModelPicker, _settings.Active.EmbedModel);
+            HerbouwKeuzelijst(EmbedModelPicker, _settings.ZoekModel);
             HerbouwKeuzelijst(CodeModelPicker, _settings.Active.CodeModel);
             HerbouwKeuzelijst(ControleModelPicker, _settings.Active.ControleModel);
             HerbouwKeuzelijst(BeeldModelPicker, _settings.Active.BeeldModel);
@@ -530,13 +542,44 @@ public partial class Setting06 : UserControl
         {
             Url = ServerUrlBox.Text,
             ChatModel = Gekozen(ChatModelPicker),
-            EmbedModel = Gekozen(EmbedModelPicker),
             CodeModel = Gekozen(CodeModelPicker),
             ControleModel = Gekozen(ControleModelPicker),
             BeeldModel = Gekozen(BeeldModelPicker),
         };
 
-        await ToepassenAsync((_settings with { Provider = provider }).With(provider, server));
+        // Het embeddingmodel hoort bij de ZOEKserver, die een andere soort kan zijn dan de chatserver.
+        var nieuw = (_settings with { Provider = provider }).With(provider, server);
+        nieuw = nieuw.With(nieuw.ZoekSoort, nieuw.ZoekServer with { EmbedModel = Gekozen(EmbedModelPicker) });
+
+        await ToepassenAsync(nieuw);
+    }
+
+    /// <summary>
+    /// Andere serversoort voor het zoeken gekozen. Alleen de soort gaat om; het embeddingmodel dat voor die soort
+    /// bewaard staat komt terug. De broker bouwt de zoekindex daarna opnieuw op - dat is hier terecht, want de
+    /// vectoren van het vorige model passen niet bij het nieuwe.
+    /// </summary>
+    private async void Zoek_Checked(object sender, RoutedEventArgs e)
+    {
+        if (_laden || !IsLoaded)
+        {
+            return;
+        }
+
+        var soort = ReferenceEquals(sender, ZoekOllama) ? AiProvider.Ollama : AiProvider.LmStudio;
+        if (soort == _settings.ZoekSoort)
+        {
+            return;
+        }
+
+        await ToepassenAsync(_settings with { ZoekProvider = soort });
+        await VulModellenAsync();
+
+        if (!string.IsNullOrWhiteSpace(_settings.ZoekModel))
+        {
+            Meld(Teksten.Vul(this, "T_AiZoekIndexOpnieuw", "Search now runs via {0} - the search index is being rebuilt in the background.",
+                soort == AiProvider.Ollama ? "Ollama" : "LM Studio"));
+        }
     }
 
     /// <summary>
@@ -556,7 +599,7 @@ public partial class Setting06 : UserControl
         _settings = result.Settings;
         ActivityLog.Shared.Add(
             "app",
-            $"AI ingesteld: {_settings.Provider}, chat '{_settings.Active.ChatModel}', embedding '{_settings.Active.EmbedModel}', " +
+            $"AI ingesteld: {_settings.Provider}, chat '{_settings.Active.ChatModel}', zoeken via {_settings.ZoekSoort} met '{_settings.ZoekModel}', " +
             $"code '{_settings.Active.CodeModel}', controle '{_settings.Active.ControleModel}'");
 
         SettingsSaved?.Invoke(this, EventArgs.Empty);

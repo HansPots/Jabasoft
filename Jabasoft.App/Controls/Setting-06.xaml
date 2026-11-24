@@ -192,9 +192,26 @@
                 <StackPanel Grid.Column="2">
                     <TextBlock Text="{DynamicResource T_AiEmbeddingmodel}" Margin="0,0,0,4" FontSize="{DynamicResource FontSizeSmall}"
                                Foreground="{DynamicResource TextMutedBrush}" />
-                    <ComboBox x:Name="EmbedModelPicker" Height="34" ItemTemplate="{StaticResource ModelkeuzeTemplate}"
-                              AutomationProperties.AutomationId="AiEmbedModel"
-                              SelectionChanged="Model_SelectionChanged" />
+                    <!-- Het zoeken heeft een EIGEN serversoort (AiSettings.ZoekProvider), los van de chatserver
+                         bovenaan: zo laat wisselen van chatserver de zoekindex heel. De keuzelijst toont de
+                         embeddingmodellen van DIE server. -->
+                    <Grid ToolTip="{DynamicResource T_AiZoekServerTip}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <ComboBox x:Name="EmbedModelPicker" Height="34" ItemTemplate="{StaticResource ModelkeuzeTemplate}"
+                                  AutomationProperties.AutomationId="AiEmbedModel"
+                                  SelectionChanged="Model_SelectionChanged" />
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="8,0,0,0">
+                            <RadioButton x:Name="ZoekLmStudio" Content="LM Studio" GroupName="ZoekServer"
+                                         AutomationProperties.AutomationId="AiZoekLmStudio"
+                                         Checked="Zoek_Checked" Style="{DynamicResource ServerChoiceStyle}" />
+                            <RadioButton x:Name="ZoekOllama" Content="Ollama" GroupName="ZoekServer" Margin="8,0,0,0"
+                                         AutomationProperties.AutomationId="AiZoekOllama"
+                                         Checked="Zoek_Checked" Style="{DynamicResource ServerChoiceStyle}" />
+                        </StackPanel>
+                    </Grid>
                 </StackPanel>
             </Grid>
 

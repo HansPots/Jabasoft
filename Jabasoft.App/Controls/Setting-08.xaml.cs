@@ -59,7 +59,7 @@ public partial class Setting08 : UserControl
         var instellingenTaak = _broker.GetSettingsAsync(CancellationToken.None);
         var result = await _hermes.GetAsync(CancellationToken.None);
         var instellingen = await instellingenTaak;
-        _lmStudio = instellingen.Success ? instellingen.Settings.LmStudio : null;
+        _lmStudio = instellingen.Success ? instellingen.Settings.Active : null; // de gekozen chatserver: daar komen de modellen van deze kaart vandaan
         if (!result.Success)
         {
             Meld(Teksten.Vul(this, "T_AiBrokerWegFormaat", "Broker not reachable: {0}", result.ErrorMessage));
